@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustAuto Kenya | Quality Used Cars - Buy, Sell, Trade-In</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #0ea5e9;
+            --accent: #06b6d4;
+            --dark: #1e293b;
+            --light: #f1f5f9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(30, 64, 175, 0.1);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            box-shadow: 0 4px 30px rgba(30, 64, 175, 0.15);
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            font-weight: 600;
+            color: var(--dark) !important;
+            margin: 0 0.5rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary) !important;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 80%;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, 
+                rgba(30, 64, 175, 0.95) 0%, 
+                rgba(30, 58, 138, 0.92) 50%,
+                rgba(14, 165, 233, 0.9) 100%), 
+                url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            padding: 120px 0 100px;
+            margin-top: 76px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 4px 8px rgba(0,0,0,0.3);
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        
+        .trust-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .trust-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.9rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .trust-badge:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+        
+        /* Search Box */
+        .search-box {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 30px 80px rgba(30, 64, 175, 0.25);
+            border: 1px solid rgba(30, 64, 175, 0.1);
+        }
+        
+        .search-box h3 {
+            color: var(--dark);
+            margin-bottom: 2rem;
+            font-weight: 800;
+            font-size: 1.75rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-select, .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:focus, .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, var(--light) 0%, #ffffff 100%);
+            padding: 5rem 0;
+            position: relative;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 2.5rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(30, 64, 175, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(30, 64, 175, 0.15);
+            border-color: var(--primary-light);
+        }
+        
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        /* Vehicle Cards */
+        .vehicles-section {
+            padding: 6rem 0;
+            background: #ffffff;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 80px;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+        
+        .car-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(30, 64, 175, 0.08);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid transparent;
+        }
+        
+        .car-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 60px rgba(30, 64, 175, 0.2);
+            border-color: var(--primary-light);
+        }
+        
+        .car-image-wrapper {
+            position: relative;
+            overflow: hidden;
+            height: 180px;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        }
+        
+        .car-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .car-card:hover .car-image {
+            transform: scale(1.15);
+        }
+        
+        .badge-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 2;
+        }
+        
+        .badge-bottom {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.6rem;
+            font-weight: 700;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .car-body {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .car-year-badge {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 6px rgba(30, 64, 175, 0.25);
+        }
+        
+        .car-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .car-description {
+            display: none;
+        }
+        
+        /* Car Meta Information */
+        .car-meta {
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.65rem 0;
+            margin: 0.65rem 0;
+        }
+        
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem 0.3rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+        
+        .meta-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.25rem;
+            color: var(--primary);
+            font-size: 0.75rem;
+            background: rgba(30, 64, 175, 0.08);
+            border-radius: 6px;
+        }
+        
+        .meta-label {
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 0.1rem;
+            font-size: 0.65rem;
+        }
+        
+        .meta-value {
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+        
+        /* Price and Info */
+        .car-price-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .car-price {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .car-views {
+            display: none;
+        }
+        
+        /* Contact Methods - Compact Like Khushi Motors */
+        .contact-methods {
+            margin-top: auto;
+        }
+        
+        .contact-methods-title {
+            display: none;
+        }
+        
+        .contact-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.55rem 0.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .contact-btn i {
+            font-size: 0.85rem;
+        }
+        
+        .btn-details {
+            grid-column: 1 / -1;
+        }
+        
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+        
+        .btn-whatsapp:hover {
+            background: #20BA5A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            color: white;
+        }
+        
+        .btn-phone {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-phone:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+            color: white;
+        }
+        
+        .btn-email {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+        
+        .btn-email:hover {
+            background: #d19803;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 169, 4, 0.3);
+            color: var(--dark);
+        }
+        
+        .btn-details {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-details:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+        }
+        
+        /* Services Section */
+        .services-section {
+            background: linear-gradient(135deg, var(--light) 0%, #ffffff 100%);
+            padding: 6rem 0;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            height: 100%;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 10px 30px rgba(30, 64, 175, 0.08);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 25px 60px rgba(30, 64, 175, 0.15);
+            border-color: var(--primary-light);
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(14, 165, 233, 0.1));
+            color: var(--primary);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover .service-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .service-card h4 {
+            margin-bottom: 1rem;
+            font-weight: 800;
+            color: var(--dark);
+            font-size: 1.4rem;
+        }
+        
+        .service-card p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            padding: 1rem 2.5rem;
+            font-weight: 700;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0.75rem 2rem;
+            font-weight: 700;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);
+        }
+        
+        /* WhatsApp Float */
+        .whatsapp-float {
+            position: fixed;
+            width: 70px;
+            height: 70px;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #25D366, #20BA5A);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        .whatsapp-float:hover {
+            transform: scale(1.15);
+            box-shadow: 0 12px 35px rgba(37, 211, 102, 0.6);
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
+            }
+            50% {
+                box-shadow: 0 8px 35px rgba(37, 211, 102, 0.7);
+            }
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--dark) 0%, #0f172a 100%);
+            color: white;
+            padding: 5rem 0 2rem;
+        }
+        
+        .footer h4, .footer h5 {
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .footer a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-light);
+            padding-left: 5px;
+        }
+        
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            margin-right: 0.75rem;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .footer-social a:hover {
+            background: var(--primary-light);
+            transform: translateY(-5px);
+            border-color: var(--primary-light);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .hero-section {
+                padding: 80px 0 60px;
+            }
+            
+            .meta-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .trust-badges {
+                justify-content: center;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .contact-methods {
+                padding: 1.25rem;
+            }
+            
+            .contact-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Loading Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .car-card {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        /* Filter and Sort Controls */
+        .filter-sort-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .results-count {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sort-label {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        .sort-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-weight: 600;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+        
+        .clear-filters-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .clear-filters-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/254722000000?text=Hello,%20I'm%20interested%20in%20your%20vehicles" 
+       class="whatsapp-float" 
+       target="_blank"
+       aria-label="Contact us on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-car me-2"></i>TrustAuto Kenya
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#inventory">Browse Cars</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-primary" href="tel:+254722000000">
+                            <i class="fas fa-phone me-2"></i>0722 000 000
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <h1 class="hero-title">Quality Used Cars You Can Trust</h1>
+                    <p class="hero-subtitle">12+ Years Experience • 1000+ Happy Customers • NTSA Assistance</p>
+                    <div class="trust-badges">
+                        <span class="trust-badge">
+                            <i class="fas fa-check-circle"></i>
+                            500+ Vehicles Sold
+                        </span>
+                        <span class="trust-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            All Paperwork Handled
+                        </span>
+                        <span class="trust-badge">
+                            <i class="fas fa-handshake"></i>
+                            Fair Pricing
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="search-box">
+                        <h3><i class="fas fa-search me-2"></i>Find Your Perfect Car</h3>
+                        <form id="searchForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Make</label>
+                                    <select class="form-select" id="makeFilter">
+                                        <option selected value="all">Any Make</option>
+                                        <option value="toyota">Toyota</option>
+                                        <option value="ford">Ford</option>
+                                        <option value="honda">Honda</option>
+                                        <option value="bmw">BMW</option>
+                                        <option value="tesla">Tesla</option>
+                                        <option value="chevrolet">Chevrolet</option>
+                                        <option value="jeep">Jeep</option>
+                                        <option value="mazda">Mazda</option>
+                                        <option value="hyundai">Hyundai</option>
+                                        <option value="subaru">Subaru</option>
+                                        <option value="mercedes">Mercedes-Benz</option>
+                                        <option value="ram">Ram</option>
+                                        <option value="nissan">Nissan</option>
+                                        <option value="audi">Audi</option>
+                                        <option value="kia">Kia</option>
+                                        <option value="lexus">Lexus</option>
+                                        <option value="gmc">GMC</option>
+                                        <option value="volkswagen">Volkswagen</option>
+                                        <option value="porsche">Porsche</option>
+                                        <option value="genesis">Genesis</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Price Range (KSh)</label>
+                                    <select class="form-select" id="priceFilter">
+                                        <option selected value="all">Any Price</option>
+                                        <option value="0-3000000">Up to 3M</option>
+                                        <option value="3000000-6000000">3M - 6M</option>
+                                        <option value="6000000-9000000">6M - 9M</option>
+                                        <option value="9000000-12000000">9M - 12M</option>
+                                        <option value="12000000+">Over 12M</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Body Type</label>
+                                    <select class="form-select" id="bodyTypeFilter">
+                                        <option selected value="all">Any Type</option>
+                                        <option value="sedan">Sedan</option>
+                                        <option value="suv">SUV</option>
+                                        <option value="truck">Truck</option>
+                                        <option value="coupe">Coupe</option>
+                                        <option value="hatchback">Hatchback</option>
+                                        <option value="wagon">Wagon</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Fuel Type</label>
+                                    <select class="form-select" id="fuelTypeFilter">
+                                        <option selected value="all">Any Fuel</option>
+                                        <option value="gasoline">Petrol</option>
+                                        <option value="diesel">Diesel</option>
+                                        <option value="hybrid">Hybrid</option>
+                                        <option value="electric">Electric</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100 py-3">
+                                        <i class="fas fa-search me-2"></i>Search 24+ Vehicles
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <div class="stat-card">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Vehicles Sold</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <div class="stat-card">
+                        <div class="stat-number">24+</div>
+                        <div class="stat-label">Cars in Stock</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <div class="stat-card">
+                        <div class="stat-number">12+</div>
+                        <div class="stat-label">Years Experience</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Happy Customers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Vehicles -->
+    <section id="inventory" class="vehicles-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Featured Vehicles</h2>
+                <p class="text-muted mt-4 fs-5">Browse our hand-picked selection of quality used cars</p>
+            </div>
+            
+            <!-- Filter and Sort Bar -->
+            <div class="filter-sort-bar">
+                <div class="results-info">
+                    <div class="results-count">
+                        <i class="fas fa-car me-2"></i>
+                        <span id="resultsCount">Showing all vehicles</span>
+                    </div>
+                    <div class="sort-controls">
+                        <label class="sort-label">Sort by:</label>
+                        <select id="sortSelect" class="sort-select">
+                            <option value="default">Default</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="year-new">Year: Newest First</option>
+                            <option value="year-old">Year: Oldest First</option>
+                            <option value="brand">Brand: A to Z</option>
+                        </select>
+                        <button id="clearFilters" class="clear-filters-btn" style="display: none;">
+                            <i class="fas fa-times me-1"></i> Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-4" id="vehicleGrid">
+                <!-- Vehicle cards will be inserted here by JavaScript -->
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="#" class="btn btn-primary btn-lg px-5 py-3">
+                    View All 24+ Vehicles <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Our Services</h2>
+                <p class="text-muted mt-4 fs-5">Everything you need for a hassle-free car buying experience</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <h4>Buy a Car</h4>
+                        <p>Browse verified inventory with transparent pricing and detailed information</p>
+                        <a href="#inventory" class="btn btn-outline-primary">Browse Now</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h4>Sell Your Car</h4>
+                        <p>Get fair market value and sell your car quickly with our expert assistance</p>
+                        <a href="#contact" class="btn btn-outline-primary">Get Valuation</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h4>Trade-In</h4>
+                        <p>Upgrade your vehicle with our convenient trade-in program</p>
+                        <a href="#contact" class="btn btn-outline-primary">Trade Today</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h4>NTSA Transfer</h4>
+                        <p>Complete paperwork and NTSA transfer assistance included</p>
+                        <a href="#contact" class="btn btn-outline-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h4><i class="fas fa-car me-2"></i>TrustAuto Kenya</h4>
+                    <p class="mt-3">Your trusted partner for quality used cars in Kenya. Over 12 years of serving customers with transparent pricing and excellent service.</p>
+                    <div class="footer-social mt-4">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://wa.me/254722000000" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><a href="#home">Home</a></li>
+                        <li class="mb-2"><a href="#inventory">Browse Cars</a></li>
+                        <li class="mb-2"><a href="#services">Services</a></li>
+                        <li class="mb-2"><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Mombasa Road, Nairobi
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            <a href="tel:+254722000000">0722 000 000</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <a href="mailto:info@trustauto.co.ke">info@trustauto.co.ke</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fab fa-whatsapp me-2"></i>
+                            <a href="https://wa.me/254722000000">WhatsApp Us</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div id="contact" class="col-lg-3 mb-4">
+                    <h5>Business Hours</h5>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="far fa-clock me-2"></i>Mon - Fri: 8:00 AM - 6:00 PM</li>
+                        <li class="mb-2"><i class="far fa-clock me-2"></i>Saturday: 9:00 AM - 4:00 PM</li>
+                        <li class="mb-2"><i class="far fa-clock me-2"></i>Sunday: 10:00 AM - 2:00 PM</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2024 TrustAuto Kenya. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="me-3">Privacy Policy</a>
+                    <a href="#" class="me-3">Terms of Service</a>
+                    <a href="#">FAQ</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Vehicle Data
+        let allVehicles = [
+            {
+                id: 1,
+                make: "Toyota",
+                model: "Camry",
+                year: 2023,
+                price: 4275000,
+                mileage: 5200,
+                bodyType: "Sedan",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "FWD",
+                exteriorColor: "Midnight Black Metallic",
+                interiorColor: "Black",
+                engine: "2.5L I4",
+                vin: "4T1B11HK6PU123456",
+                status: "Used",
+                featured: true,
+                description: "Experience reliability and comfort with this 2023 Toyota Camry. With low mileage and a pristine condition, it offers a smooth and efficient ride. Features include a touchscreen infotainment system, Apple CarPlay, and Toyota Safety Sense 2.5+. Perfect for daily commutes and long road trips alike.",
+                imageUrls: ["https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 2,
+                make: "Ford",
+                model: "F-150",
+                year: 2024,
+                price: 6750000,
+                mileage: 15,
+                bodyType: "Truck",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "4WD",
+                exteriorColor: "Iconic Silver",
+                interiorColor: "Medium Stone",
+                engine: "3.5L V6 EcoBoost",
+                vin: "1FTFW1E58RKF12345",
+                status: "New",
+                featured: true,
+                description: "The 2024 Ford F-150 is built for work and play. This brand-new model features the powerful 3.5L EcoBoost V6 engine, a spacious interior with the latest SYNC 4 technology, and Pro Power Onboard to turn your truck into a mobile generator. Ready for any challenge.",
+                imageUrls: ["https://images.unsplash.com/photo-1563411065591-3e7d8c2c5e46?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 3,
+                make: "Honda",
+                model: "CR-V",
+                year: 2022,
+                price: 4650000,
+                mileage: 18500,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Platinum White Pearl",
+                interiorColor: "Gray",
+                engine: "1.5L Turbo I4",
+                vin: "2HKRW2H52NH678901",
+                status: "Certified Pre-Owned",
+                featured: false,
+                description: "A versatile and reliable SUV, this 2022 Honda CR-V is perfect for families. It comes with a certified pre-owned warranty, all-wheel drive for all-weather confidence, and a fuel-efficient turbocharged engine. Spacious cargo area and top safety ratings.",
+                imageUrls: ["https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 4,
+                make: "BMW",
+                model: "330i",
+                year: 2023,
+                price: 6300000,
+                mileage: 9800,
+                bodyType: "Sedan",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "RWD",
+                exteriorColor: "Alpine White",
+                interiorColor: "Black",
+                engine: "2.0L Turbo I4",
+                vin: "WBA33AK09PD234567",
+                status: "Used",
+                featured: true,
+                description: "Enjoy the ultimate driving machine in this 2023 BMW 330i. It blends sporty performance with everyday luxury. Features include the iDrive infotainment system, premium sound, and advanced driver-assistance features. A thrilling yet sophisticated ride.",
+                imageUrls: ["https://images.unsplash.com/photo-1617654112361-92000d48d477?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 5,
+                make: "Tesla",
+                model: "Model Y",
+                year: 2023,
+                price: 7800000,
+                mileage: 12000,
+                bodyType: "SUV",
+                fuelType: "Electric",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Deep Blue Metallic",
+                interiorColor: "Black",
+                engine: "Dual Motor AWD",
+                vin: "5YJ3E1EA5PF123456",
+                status: "Used",
+                featured: false,
+                description: "Step into the future with this 2023 Tesla Model Y. This all-electric SUV offers incredible acceleration, a minimalist high-tech interior, and access to the Supercharger network. Autopilot capabilities and over-the-air updates keep it at the cutting edge.",
+                imageUrls: ["https://images.unsplash.com/photo-1617704548629-94655d379f5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 6,
+                make: "Chevrolet",
+                model: "Equinox",
+                year: 2021,
+                price: 3525000,
+                mileage: 31000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "FWD",
+                exteriorColor: "Summit White",
+                interiorColor: "Jet Black",
+                engine: "1.5L Turbo I4",
+                vin: "2GNAXHEV4M6123456",
+                status: "On Sale",
+                featured: false,
+                description: "Great value in a compact SUV! This 2021 Chevrolet Equinox is clean, reliable, and fuel-efficient. It comes with a user-friendly infotainment system and plenty of cargo space. Priced to sell, it's the perfect practical choice.",
+                imageUrls: ["https://images.unsplash.com/photo-1593941707882-a5bac6861d75?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 7,
+                make: "Jeep",
+                model: "Wrangler",
+                year: 2022,
+                price: 5700000,
+                mileage: 15000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Manual",
+                drivetrain: "4WD",
+                exteriorColor: "Firecracker Red",
+                interiorColor: "Black",
+                engine: "3.6L V6",
+                vin: "1C4HJXFG6NW789012",
+                status: "Used",
+                featured: false,
+                description: "Unleash your adventurous side with this 2022 Jeep Wrangler. Equipped with a manual transmission and legendary 4x4 capability, it's ready for trails or city streets. The removable top and doors offer an open-air experience like no other.",
+                imageUrls: ["https://images.unsplash.com/photo-1604108415419-6d4bd73a1c2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 8,
+                make: "Mazda",
+                model: "CX-5",
+                year: 2023,
+                price: 4800000,
+                mileage: 7000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Soul Red Crystal",
+                interiorColor: "Parchment",
+                engine: "2.5L I4",
+                vin: "JM3KFBDM9P0123456",
+                status: "Certified Pre-Owned",
+                featured: false,
+                description: "Style and substance define the 2023 Mazda CX-5. With its upscale interior and responsive handling, it feels more like a luxury vehicle. The i-Activsense safety package and Apple CarPlay integration make every drive safer and more enjoyable.",
+                imageUrls: ["https://images.unsplash.com/photo-1583121274602-3e2820c6f88f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 9,
+                make: "Hyundai",
+                model: "Elantra",
+                year: 2024,
+                price: 3300000,
+                mileage: 50,
+                bodyType: "Sedan",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "FWD",
+                exteriorColor: "Phantom Black",
+                interiorColor: "Gray",
+                engine: "2.0L I4",
+                vin: "KMHLJ4AE2RA123456",
+                status: "New",
+                featured: false,
+                description: "A brand-new 2024 Hyundai Elantra, offering modern tech and an impressive warranty. Its bold design stands out, while the fuel-efficient engine and comfortable ride make it an excellent daily driver. Comes with a suite of standard safety features.",
+                imageUrls: ["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 10,
+                make: "Subaru",
+                model: "Outback",
+                year: 2022,
+                price: 4500000,
+                mileage: 21000,
+                bodyType: "Wagon",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Crystal White Pearl",
+                interiorColor: "Ivory",
+                engine: "2.5L Boxer 4",
+                vin: "4S4BTACC6N3123456",
+                status: "Used",
+                featured: false,
+                description: "The go-anywhere 2022 Subaru Outback. Standard Symmetrical All-Wheel Drive gives you confidence in any weather. With its rugged design and wagon-like utility, it's perfect for outdoor enthusiasts and families alike.",
+                imageUrls: ["https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 11,
+                make: "Mercedes-Benz",
+                model: "C-Class",
+                year: 2023,
+                price: 7200000,
+                mileage: 11000,
+                bodyType: "Sedan",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "RWD",
+                exteriorColor: "Iridium Silver Metallic",
+                interiorColor: "Black",
+                engine: "2.0L Turbo I4",
+                vin: "W1KRF8DB7PR123456",
+                status: "Used",
+                featured: false,
+                description: "Elegance and innovation in the 2023 Mercedes-Benz C-Class. The interior is a marvel of modern design with a large vertical touchscreen. It delivers a refined, comfortable ride with responsive performance when you need it.",
+                imageUrls: ["https://images.unsplash.com/photo-1617814076367-b759c7d7e738?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 12,
+                make: "Ram",
+                model: "1500",
+                year: 2021,
+                price: 5250000,
+                mileage: 40000,
+                bodyType: "Truck",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "4WD",
+                exteriorColor: "Bright White",
+                interiorColor: "Black",
+                engine: "5.7L HEMI V8",
+                vin: "1C6RR7GT5MN123456",
+                status: "On Sale",
+                featured: false,
+                description: "Get the power of a HEMI V8 with this 2021 Ram 1500. Known for its smooth ride and luxurious interior, this truck is as comfortable as it is capable. A great deal on a feature-packed truck.",
+                imageUrls: ["https://images.unsplash.com/photo-1554224154-260325c0594e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 13,
+                make: "Nissan",
+                model: "Rogue",
+                year: 2023,
+                price: 4350000,
+                mileage: 8000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Gun Metallic",
+                interiorColor: "Charcoal",
+                engine: "1.5L Turbo I4",
+                vin: "5N1AT3BV4PC123456",
+                status: "Used",
+                featured: false,
+                description: "A practical and tech-savvy choice, the 2023 Nissan Rogue features a spacious interior and a large digital display. ProPILOT Assist makes highway driving less stressful. It's a well-rounded compact SUV for the modern family.",
+                imageUrls: ["https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 14,
+                make: "Audi",
+                model: "Q5",
+                year: 2022,
+                price: 6150000,
+                mileage: 18000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Navarra Blue Metallic",
+                interiorColor: "Gray",
+                engine: "2.0L Turbo I4",
+                vin: "WA1CFAF29ND123456",
+                status: "Certified Pre-Owned",
+                featured: false,
+                description: "Experience premium German engineering with this 2022 Audi Q5. Its Quattro all-wheel-drive system provides sure-footed handling, while the cabin is a haven of luxury and technology. A perfect blend of performance and sophistication.",
+                imageUrls: ["https://images.unsplash.com/photo-1617654112361-92000d48d477?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 15,
+                make: "Ford",
+                model: "Mustang",
+                year: 2023,
+                price: 5850000,
+                mileage: 5000,
+                bodyType: "Coupe",
+                fuelType: "Gasoline",
+                transmission: "Manual",
+                drivetrain: "RWD",
+                exteriorColor: "Race Red",
+                interiorColor: "Black",
+                engine: "2.3L EcoBoost I4",
+                vin: "1FA6P8CF0P5123456",
+                status: "Used",
+                featured: false,
+                description: "Pure American muscle. This 2023 Ford Mustang with a manual transmission offers an engaging and thrilling driving experience. The turbocharged EcoBoost engine provides plenty of power, and its iconic styling turns heads everywhere.",
+                imageUrls: ["https://images.unsplash.com/photo-1583121274602-3e2820c6f88f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 16,
+                make: "Kia",
+                model: "Telluride",
+                year: 2023,
+                price: 5550000,
+                mileage: 12000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Evergreen Silver",
+                interiorColor: "Black",
+                engine: "3.8L V6",
+                vin: "5XYP5DHC1PG123456",
+                status: "Used",
+                featured: false,
+                description: "The award-winning Kia Telluride offers a luxurious and spacious three-row cabin without the luxury price tag. This 2023 model is packed with features and provides a comfortable, quiet ride for the whole family.",
+                imageUrls: ["https://images.unsplash.com/photo-1593941707882-a5bac6861d75?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 17,
+                make: "Lexus",
+                model: "RX 350",
+                year: 2021,
+                price: 6600000,
+                mileage: 28000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Nebula Gray Pearl",
+                interiorColor: "NuLuxe",
+                engine: "3.5L V6",
+                vin: "2T2BZMCA1MC123456",
+                status: "Certified Pre-Owned",
+                featured: false,
+                description: "Refined luxury and legendary reliability. This 2021 Lexus RX 350 delivers an exceptionally smooth and quiet ride. The cabin is impeccably crafted with high-quality materials, and it comes with the peace of mind of a Lexus CPO warranty.",
+                imageUrls: ["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 18,
+                make: "Toyota",
+                model: "Prius",
+                year: 2023,
+                price: 4050000,
+                mileage: 15000,
+                bodyType: "Hatchback",
+                fuelType: "Hybrid",
+                transmission: "Automatic",
+                drivetrain: "FWD",
+                exteriorColor: "Cutting Edge",
+                interiorColor: "Black",
+                engine: "2.0L Hybrid I4",
+                vin: "JTDKAMFV1P3123456",
+                status: "Used",
+                featured: false,
+                description: "Save money on gas with this stylish and efficient 2023 Toyota Prius. The latest generation features a futuristic design and a more powerful hybrid system. It's the perfect choice for the eco-conscious driver who doesn't want to sacrifice style.",
+                imageUrls: ["https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 19,
+                make: "GMC",
+                model: "Sierra 1500",
+                year: 2024,
+                price: 8250000,
+                mileage: 10,
+                bodyType: "Truck",
+                fuelType: "Diesel",
+                transmission: "Automatic",
+                drivetrain: "4WD",
+                exteriorColor: "Dark Sky Metallic",
+                interiorColor: "Jet Black",
+                engine: "3.0L Duramax Turbo-Diesel I6",
+                vin: "1GTU9DEL4RZ123456",
+                status: "New",
+                featured: true,
+                description: "This brand-new 2024 GMC Sierra 1500 is the pinnacle of truck luxury and capability. The Duramax diesel engine provides massive torque for towing, while the premium Denali trim offers a multi-pro tailgate, a massive infotainment screen, and unparalleled comfort.",
+                imageUrls: ["https://images.unsplash.com/photo-1554224154-260325c0594e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 20,
+                make: "Volkswagen",
+                model: "Atlas",
+                year: 2022,
+                price: 4950000,
+                mileage: 25000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Pyramid Silver Metallic",
+                interiorColor: "Vienna Leather",
+                engine: "3.6L VR6",
+                vin: "1V2WR2CA7NC123456",
+                status: "Used",
+                featured: false,
+                description: "The family hauler redefined. This 2022 VW Atlas offers a massive and flexible interior with three rows of seating. The powerful V6 engine and smooth ride make it a great long-distance cruiser for the entire family.",
+                imageUrls: ["https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 21,
+                make: "Porsche",
+                model: "Macan",
+                year: 2023,
+                price: 9300000,
+                mileage: 7000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "AWD",
+                exteriorColor: "Carmine Red",
+                interiorColor: "Black",
+                engine: "2.0L Turbo I4",
+                vin: "WP1AB2A58PDA12345",
+                status: "Certified Pre-Owned",
+                featured: false,
+                description: "The sports car of compact SUVs. This 2023 Porsche Macan combines thrilling performance with everyday practicality. Its precise handling and powerful engine make every drive an event, wrapped in a luxurious and well-built package.",
+                imageUrls: ["https://images.unsplash.com/photo-1617654112361-92000d48d477?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 22,
+                make: "Honda",
+                model: "Accord",
+                year: 2024,
+                price: 3900000,
+                mileage: 5,
+                bodyType: "Sedan",
+                fuelType: "Hybrid",
+                transmission: "Automatic",
+                drivetrain: "FWD",
+                exteriorColor: "Meteorite Gray Metallic",
+                interiorColor: "Black",
+                engine: "2.0L Hybrid I4",
+                vin: "1HGCV1F34RA123456",
+                status: "New",
+                featured: false,
+                description: "All-new for 2024, the Honda Accord Hybrid sets the standard for sedans. It offers exceptional fuel economy, a sophisticated and spacious interior, and a smooth, quiet ride. A smart and stylish choice for a new car.",
+                imageUrls: ["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 23,
+                make: "Ford",
+                model: "Explorer",
+                year: 2021,
+                price: 4425000,
+                mileage: 35000,
+                bodyType: "SUV",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "RWD",
+                exteriorColor: "Agate Black Metallic",
+                interiorColor: "Sandstone",
+                engine: "2.3L EcoBoost I4",
+                vin: "1FM5K8GC1MGA12345",
+                status: "On Sale",
+                featured: false,
+                description: "A versatile three-row SUV at a great price. This 2021 Ford Explorer has room for the whole family and their gear. The powerful EcoBoost engine provides plenty of get-up-and-go, and the rear-wheel-drive platform offers a balanced ride.",
+                imageUrls: ["https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 24,
+                make: "Genesis",
+                model: "G70",
+                year: 2023,
+                price: 6000000,
+                mileage: 9000,
+                bodyType: "Sedan",
+                fuelType: "Gasoline",
+                transmission: "Automatic",
+                drivetrain: "RWD",
+                exteriorColor: "Savannah Metallic",
+                interiorColor: "Dapper Red",
+                engine: "2.0L Turbo I4",
+                vin: "KMHTC6AE2PU123456",
+                status: "Used",
+                featured: false,
+                description: "A true sports sedan with luxury appointments. The 2023 Genesis G70 offers rear-wheel-drive dynamics, a powerful engine, and a stunning interior design. With features like a limited-slip differential and Brembo brakes, it's built for driving enthusiasts.",
+                imageUrls: ["https://images.unsplash.com/photo-1617654112361-92000d48d477?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            }
+        ];
+
+        // Convert USD prices to KES (assuming 1 USD = 150 KES)
+        allVehicles.forEach(vehicle => {
+            vehicle.priceKES = Math.round(vehicle.price * 150);
+        });
+
+        // Format currency
+        function formatPrice(price) {
+            return 'KSh ' + price.toLocaleString();
+        }
+
+        // Create vehicle card HTML
+        function createVehicleCard(vehicle) {
+            const statusClass = vehicle.status === 'Featured' ? 'bg-danger' : 
+                               vehicle.status === 'On Sale' ? 'bg-warning text-dark' :
+                               vehicle.status === 'Certified Pre-Owned' ? 'bg-success' :
+                               vehicle.status === 'New' ? 'bg-primary' :
+                               'bg-secondary';
+            
+            const whatsappMsg = encodeURIComponent(`Hi, I'm interested in the ${vehicle.make} ${vehicle.model} ${vehicle.year} listed for ${formatPrice(vehicle.priceKES)}. Is it still available?`);
+            const emailSubject = encodeURIComponent(`Inquiry: ${vehicle.make} ${vehicle.model} ${vehicle.year}`);
+            const emailBody = encodeURIComponent(`Hello,\n\nI'm interested in the following vehicle:\n\n${vehicle.make} ${vehicle.model} ${vehicle.year}\nPrice: ${formatPrice(vehicle.priceKES)}\n\nPlease provide more details.\n\nThank you.`);
+            
+            // Determine seats based on body type
+            let seats = 5;
+            if (vehicle.bodyType === "SUV" && (vehicle.model === "Telluride" || vehicle.model === "Atlas" || vehicle.model === "Explorer")) {
+                seats = 7;
+            } else if (vehicle.bodyType === "Truck") {
+                seats = 5;
+            }
+            
+            return `
+                <div class="col-lg-4 col-md-6">
+                    <div class="car-card">
+                        <div class="car-image-wrapper">
+                            <img src="${vehicle.imageUrls[0]}" alt="${vehicle.make} ${vehicle.model}" class="car-image">
+                            ${vehicle.featured ? '<span class="badge-overlay badge bg-danger">Featured</span>' : ''}
+                            <span class="badge-bottom badge ${statusClass}">${vehicle.status}</span>
+                        </div>
+                        <div class="car-body">
+                            <div class="car-year-badge">${vehicle.year} ${vehicle.bodyType}</div>
+                            <h5 class="car-title">${vehicle.make.toUpperCase()} ${vehicle.model.toUpperCase()}</h5>
+                            
+                            <div class="car-meta">
+                                <div class="meta-grid">
+                                    <div class="meta-item">
+                                        <div class="meta-icon"><i class="fas fa-wrench"></i></div>
+                                        <div><span class="meta-value">${vehicle.make}</span></div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-icon"><i class="fas fa-palette"></i></div>
+                                        <div><span class="meta-value">${vehicle.exteriorColor}</span></div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-icon"><i class="fas fa-calendar-day"></i></div>
+                                        <div><span class="meta-value">${vehicle.year}</span></div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-icon"><i class="fas fa-gas-pump"></i></div>
+                                        <div><span class="meta-value">${vehicle.fuelType}</span></div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                        <div><span class="meta-value">${vehicle.engine}</span></div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-icon"><i class="fas fa-cogs"></i></div>
+                                        <div><span class="meta-value">${vehicle.transmission}</span></div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-icon"><i class="fas fa-chair"></i></div>
+                                        <div><span class="meta-value">${vehicle.interiorColor}</span></div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-icon"><i class="fas fa-users"></i></div>
+                                        <div><span class="meta-value">${seats} Seats</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="car-price-section">
+                                <div class="car-price">${formatPrice(vehicle.priceKES)}</div>
+                            </div>
+                            
+                            <div class="contact-methods">
+                                <div class="contact-buttons">
+                                    <a href="https://wa.me/254722000000?text=${whatsappMsg}" class="contact-btn btn-whatsapp" target="_blank">
+                                        <i class="fab fa-whatsapp"></i>
+                                        <span>WhatsApp</span>
+                                    </a>
+                                    <a href="tel:+254722000000" class="contact-btn btn-phone">
+                                        <i class="fas fa-phone"></i>
+                                        <span>Call</span>
+                                    </a>
+                                    <a href="mailto:info@trustauto.co.ke?subject=${emailSubject}&body=${emailBody}" class="contact-btn btn-email">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Email</span>
+                                    </a>
+                                    <button class="contact-btn btn-details" data-bs-toggle="modal" data-bs-target="#carModal" data-car-id="${vehicle.id}">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>View Details</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load vehicles
+        let vehicles = [...allVehicles];
+        
+        function loadVehicles() {
+            const grid = document.getElementById('vehicleGrid');
+            grid.innerHTML = vehicles.map(vehicle => createVehicleCard(vehicle)).join('');
+            updateResultsCount();
+        }
+
+        // Update results count
+        function updateResultsCount() {
+            const countElement = document.getElementById('resultsCount');
+            countElement.textContent = `Showing ${vehicles.length} of ${allVehicles.length} vehicles`;
+        }
+
+        // Filter vehicles
+        function filterVehicles() {
+            const makeFilter = document.getElementById('makeFilter').value;
+            const priceFilter = document.getElementById('priceFilter').value;
+            const bodyTypeFilter = document.getElementById('bodyTypeFilter').value;
+            const fuelTypeFilter = document.getElementById('fuelTypeFilter').value;
+            
+            vehicles = allVehicles.filter(vehicle => {
+                let matchMake = makeFilter === 'all' || vehicle.make.toLowerCase() === makeFilter;
+                let matchPrice = true;
+                let matchBodyType = bodyTypeFilter === 'all' || vehicle.bodyType.toLowerCase() === bodyTypeFilter;
+                let matchFuelType = fuelTypeFilter === 'all' || vehicle.fuelType.toLowerCase() === fuelTypeFilter;
+                
+                // Price filter
+                if (priceFilter !== 'all') {
+                    if (priceFilter === '0-3000000') {
+                        matchPrice = vehicle.priceKES <= 3000000;
+                    } else if (priceFilter === '3000000-6000000') {
+                        matchPrice = vehicle.priceKES > 3000000 && vehicle.priceKES <= 6000000;
+                    } else if (priceFilter === '6000000-9000000') {
+                        matchPrice = vehicle.priceKES > 6000000 && vehicle.priceKES <= 9000000;
+                    } else if (priceFilter === '9000000-12000000') {
+                        matchPrice = vehicle.priceKES > 9000000 && vehicle.priceKES <= 12000000;
+                    } else if (priceFilter === '12000000+') {
+                        matchPrice = vehicle.priceKES > 12000000;
+                    }
+                }
+                
+                return matchMake && matchPrice && matchBodyType && matchFuelType;
+            });
+            
+            loadVehicles();
+            
+            // Show clear filters button if any filter is applied
+            const clearBtn = document.getElementById('clearFilters');
+            if (makeFilter !== 'all' || priceFilter !== 'all' || bodyTypeFilter !== 'all' || fuelTypeFilter !== 'all') {
+                clearBtn.style.display = 'block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+        }
+
+        // Sort vehicles
+        function sortVehicles() {
+            const sortValue = document.getElementById('sortSelect').value;
+            
+            switch(sortValue) {
+                case 'price-low':
+                    vehicles.sort((a, b) => a.priceKES - b.priceKES);
+                    break;
+                case 'price-high':
+                    vehicles.sort((a, b) => b.priceKES - a.priceKES);
+                    break;
+                case 'year-new':
+                    vehicles.sort((a, b) => b.year - a.year);
+                    break;
+                case 'year-old':
+                    vehicles.sort((a, b) => a.year - b.year);
+                    break;
+                case 'brand':
+                    vehicles.sort((a, b) => a.make.localeCompare(b.make));
+                    break;
+                default:
+                    // Reset to original order
+                    vehicles = [...allVehicles];
+            }
+            
+            loadVehicles();
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('makeFilter').value = 'all';
+            document.getElementById('priceFilter').value = 'all';
+            document.getElementById('bodyTypeFilter').value = 'all';
+            document.getElementById('fuelTypeFilter').value = 'all';
+            document.getElementById('sortSelect').value = 'default';
+            
+            vehicles = [...allVehicles];
+            loadVehicles();
+            
+            document.getElementById('clearFilters').style.display = 'none';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadVehicles();
+            
+            // Add event listeners for filters
+            document.getElementById('makeFilter').addEventListener('change', filterVehicles);
+            document.getElementById('priceFilter').addEventListener('change', filterVehicles);
+            document.getElementById('bodyTypeFilter').addEventListener('change', filterVehicles);
+            document.getElementById('fuelTypeFilter').addEventListener('change', filterVehicles);
+            document.getElementById('sortSelect').addEventListener('change', sortVehicles);
+            document.getElementById('clearFilters').addEventListener('click', clearFilters);
+            
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Search form
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                filterVehicles();
+                // Scroll to vehicles section
+                document.getElementById('inventory').scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#' && !href.includes('modal')) {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) {
+                            const offset = 80;
+                            const targetPosition = target.offsetTop - offset;
+                            window.scrollTo({
+                                top: targetPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // Car modal
+            document.querySelectorAll('.btn-details').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const carId = parseInt(this.getAttribute('data-car-id'));
+                    const car = allVehicles.find(v => v.id === carId);
+                    
+                    if (car) {
+                        // Update modal content with car details
+                        document.getElementById('modalCarTitle').textContent = `${car.make} ${car.model} ${car.year}`;
+                        document.getElementById('modalCarPrice').textContent = formatPrice(car.priceKES);
+                        document.getElementById('modalCarDescription').textContent = car.description;
+                        document.getElementById('modalCarImage').src = car.imageUrls[0];
+                        document.getElementById('modalCarImage').alt = `${car.make} ${car.model}`;
+                        
+                        // Update specs
+                        document.getElementById('modalSpecs').innerHTML = `
+                            <tr><td>Year</td><td>${car.year}</td></tr>
+                            <tr><td>Make</td><td>${car.make}</td></tr>
+                            <tr><td>Model</td><td>${car.model}</td></tr>
+                            <tr><td>Body Type</td><td>${car.bodyType}</td></tr>
+                            <tr><td>Engine</td><td>${car.engine}</td></tr>
+                            <tr><td>Transmission</td><td>${car.transmission}</td></tr>
+                            <tr><td>Drivetrain</td><td>${car.drivetrain}</td></tr>
+                            <tr><td>Fuel Type</td><td>${car.fuelType}</td></tr>
+                            <tr><td>Exterior Color</td><td>${car.exteriorColor}</td></tr>
+                            <tr><td>Interior Color</td><td>${car.interiorColor}</td></tr>
+                            <tr><td>Mileage</td><td>${car.mileage.toLocaleString()} km</td></tr>
+                            <tr><td>VIN</td><td>${car.vin}</td></tr>
+                            <tr><td>Status</td><td>${car.status}</td></tr>
+                        `;
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <!-- Car Details Modal -->
+    <div class="modal fade" id="carModal" tabindex="-1" aria-labelledby="carModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCarTitle">Car Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img id="modalCarImage" src="" alt="" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-6">
+                            <h3 id="modalCarPrice" class="text-primary mb-3"></h3>
+                            <p id="modalCarDescription"></p>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody id="modalSpecs">
+                                        <!-- Specs will be inserted here by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="tel:+254722000000" class="btn btn-primary">
+                        <i class="fas fa-phone me-2"></i>Call Now
+                    </a>
+                    <a href="https://wa.me/254722000000" class="btn btn-success" target="_blank">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
