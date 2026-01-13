@@ -1,13 +1,31 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useState, useEffect } from 'react';
+import { Mail, Search, CheckCircle, Clock, User, Phone, ChevronDown, Trash2, Filter } from 'lucide-react';
 import { api } from '@/lib/api';
-import { Inquiry } from '@/lib/types';
 
-function InquiriesContent() {
+interface Inquiry {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  vehicleId?: string;
+  status: 'PENDING' | 'RESOLVED';
+  createdAt: string;
+  vehicle?: {
+    make: string;
+    model: string;
+    year: number;
+    priceKES: number;
+  };
+}
+
+export default function InquiriesPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'RESOLVED'>('ALL');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'RESOLVED'>('ALL');
 
   useEffect(() => {
     fetchInquiries();
@@ -27,7 +45,9 @@ function InquiriesContent() {
   const updateStatus = async (id: string, status: string) => {
     try {
       await api.patch(`/inquiries/${id}/status`, { status });
-      fetchInquiries();
+      setInquiries(inquiries.map(i => 
+        i.id === id ? { ...i, status } as any : i
+      ));
     } catch (error) {
       alert('Failed to update status');
     }
@@ -40,154 +60,203 @@ function InquiriesContent() {
 
     try {
       await api.delete(`/inquiries/${id}`);
-      fetchInquiries();
+      setInquiries(inquiries.filter(i => i.id !== id));
     } catch (error) {
       alert('Failed to delete inquiry');
     }
   };
 
-  const filteredInquiries =
-    filter === 'ALL'
-      ? inquiries
-      : inquiries.filter((i) => i.status === filter);
+  const filteredInquiries = inquiries.filter(i => {
+    const matchesSearch = 
+      `${i.name} ${i.email} ${i.phone}`.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'ALL' || i.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'RESOLVED':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return <Clock size={16} />;
+      case 'RESOLVED':
+        return <CheckCircle size={16} />;
+      default:
+        return <Mail size={16} />;
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
 
   if (loading) {
-    return <div className="text-center py-5">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading inquiries...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container py-5">
-      <h1 className="mb-4">Manage Inquiries</h1>
-
-      <div className="card shadow border-0 mb-4" style={{ borderRadius: '15px' }}>
-        <div className="card-body p-3">
-          <div className="btn-group">
-            <button
-              className={`btn ${
-                filter === 'ALL' ? 'btn-primary' : 'btn-outline-primary'
-              }`}
-              onClick={() => setFilter('ALL')}
-            >
-              All ({inquiries.length})
-            </button>
-            <button
-              className={`btn ${
-                filter === 'PENDING' ? 'btn-primary' : 'btn-outline-primary'
-              }`}
-              onClick={() => setFilter('PENDING')}
-            >
-              Pending ({inquiries.filter((i) => i.status === 'PENDING').length})
-            </button>
-            <button
-              className={`btn ${
-                filter === 'RESOLVED' ? 'btn-primary' : 'btn-outline-primary'
-              }`}
-              onClick={() => setFilter('RESOLVED')}
-            >
-              Resolved ({inquiries.filter((i) => i.status === 'RESOLVED').length})
-            </button>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Manage Inquiries</h1>
+          <p className="text-sm text-gray-600">
+            {inquiries.length} total inquiry{inquiries.length !== 1 ? 'ies' : ''}
+          </p>
         </div>
       </div>
 
-      <div className="card shadow border-0" style={{ borderRadius: '15px' }}>
-        <div className="card-body p-0">
-          <div className="table-responsive">
-            <table className="table table-hover mb-0">
-              <thead className="table-light">
-                <tr>
-                  <th>Date</th>
-                  <th>Name</th>
-                  <th>Contact</th>
-                  <th>Vehicle</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredInquiries.map((inquiry) => (
-                  <tr key={inquiry.id}>
-                    <td>
-                      {new Date(inquiry.createdAt).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </td>
-                    <td>
-                      <strong>{inquiry.name}</strong>
-                      <br />
-                      <small className="text-muted">{inquiry.email}</small>
-                    </td>
-                    <td>
-                      <i className="fas fa-phone me-1 text-primary"></i>
-                      {inquiry.phone}
-                    </td>
-                    <td>
-                      {inquiry.vehicle ? (
-                        <div>
-                          <strong>{inquiry.vehicle.make} {inquiry.vehicle.model}</strong>
-                          <br />
-                          <small className="text-muted">
-                            {inquiry.vehicle.year} • KSh {inquiry.vehicle.priceKES.toLocaleString()}
-                          </small>
-                        </div>
-                      ) : (
-                        <span className="text-muted">General Inquiry</span>
-                      )}
-                    </td>
-                    <td>
-                      <span
-                        className={`badge ${
-                          inquiry.status === 'PENDING'
-                            ? 'bg-warning'
-                            : 'bg-success'
-                        }`}
-                      >
-                        {inquiry.status}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="btn-group btn-group-sm">
-                        <select
-                          className="form-select form-select-sm"
-                          style={{ width: '120px' }}
-                          value={inquiry.status}
-                          onChange={(e) => updateStatus(inquiry.id, e.target.value)}
-                        >
-                          <option value="PENDING">Pending</option>
-                          <option value="RESOLVED">Resolved</option>
-                        </select>
-                        <button
-                          onClick={() => handleDelete(inquiry.id)}
-                          className="btn btn-danger"
-                        >
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search by name, email, or phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
 
-          {filteredInquiries.length === 0 && (
-            <div className="text-center py-5">
-              <i className="fas fa-envelope-open fa-3x text-muted mb-3"></i>
-              <p className="text-muted">No inquiries found</p>
-            </div>
-          )}
+          {/* Status Filter */}
+          <div className="relative min-w-48">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as any)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer"
+            >
+              <option value="ALL">All Status</option>
+              <option value="PENDING">Pending</option>
+              <option value="RESOLVED">Resolved</option>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+          </div>
         </div>
+
+        {/* Results Count */}
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          Showing <span className="font-semibold text-gray-900">{filteredInquiries.length}</span> inquiry{filteredInquiries.length !== 1 ? 'ies' : ''}
+          {searchTerm && <span className="ml-1">matching "{searchTerm}"</span>}
+        </div>
+      </div>
+
+      {/* Inquiries List */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {filteredInquiries.length > 0 ? (
+          <div className="divide-y divide-gray-200">
+            {filteredInquiries.map((inquiry, index) => (
+              <div key={inquiry.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start gap-4">
+                  {/* Status Icon */}
+                  <div className={`p-3 rounded-lg ${getStatusColor(inquiry.status)} flex-shrink-0`}>
+                    {getStatusIcon(inquiry.status)}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-4 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-semibold text-gray-900 mb-1">
+                          {inquiry.name}
+                        </h3>
+                        <p className="text-sm text-gray-500">{inquiry.email}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(inquiry.status)}`}>
+                          {inquiry.status}
+                        </span>
+                        <span className="text-xs text-gray-500">{formatDate(inquiry.createdAt)}</span>
+                      </div>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="flex items-center gap-6 mb-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone size={16} className="text-gray-500" />
+                        <span className="text-gray-700">{inquiry.phone}</span>
+                      </div>
+                      <User size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">Customer</span>
+                    </div>
+
+                    {/* Message */}
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                      {inquiry.message}
+                    </p>
+
+                    {/* Vehicle Info */}
+                    {inquiry.vehicle && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                        <p className="text-sm font-semibold text-gray-900">
+                          {inquiry.vehicle.make} {inquiry.vehicle.model} ({inquiry.vehicle.year})
+                        </p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          KSh {inquiry.vehicle.priceKES.toLocaleString()}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3">
+                      <select
+                        value={inquiry.status}
+                        onChange={(e) => updateStatus(inquiry.id, e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                      >
+                        <option value="PENDING">Mark as Pending</option>
+                        <option value="RESOLVED">Mark as Resolved</option>
+                      </select>
+                      <button
+                        onClick={() => handleDelete(inquiry.id)}
+                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete inquiry"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <Mail className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No inquiries found</h3>
+            <p className="text-sm text-gray-600">
+              {searchTerm
+                ? 'Try adjusting your search or filters'
+                : 'No inquiries have been received yet'
+              }
+            </p>
+          </div>
+        )}
       </div>
     </div>
-  );
-}
-
-export default function AdminInquiriesPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <InquiriesContent />
-    </Suspense>
   );
 }

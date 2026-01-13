@@ -1,23 +1,37 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosError } from 'axios';
 
 class ApiClient {
   private client: AxiosInstance;
 
   constructor() {
+    const apiURL = typeof window !== 'undefined' 
+      ? `${window.location.protocol}//${window.location.hostname}:5000/api`
+      : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api');
+
     this.client = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+      baseURL: apiURL,
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
     this.client.interceptors.request.use((config) => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
       return config;
     });
+
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error: AxiosError) => {
+        console.error('API Error:', error.response?.data || error.message);
+        return Promise.reject(error);
+      }
+    );
   }
 
   async get(url: string, params?: any) {

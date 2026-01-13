@@ -20,7 +20,7 @@ export const removeToken = () => {
 export const isAuthenticated = () => {
   const token = getToken();
   if (!token) return false;
-
+ 
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     const now = Date.now() / 1000;
@@ -28,4 +28,8 @@ export const isAuthenticated = () => {
   } catch (e) {
     return false;
   }
+};
+
+export const logout = () => {
+  removeToken();
 };

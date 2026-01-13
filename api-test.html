@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - TrustAuto Kenya</title>
+</head>
+<body>
+    <h1>API Connection Test</h1>
+    <div id="results"></div>
+    
+    <h2>1. Test Backend Health</h2>
+    <button onclick="testHealth()">Test Health</button>
+    
+    <h2>2. Test Login</h2>
+    <button onclick="testLogin()">Test Login</button>
+    
+    <h2>3. Test Get Vehicles</h2>
+    <button onclick="testVehicles()">Test Vehicles</button>
+    
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        const results = document.getElementById('results');
+        
+        function log(message) {
+            const p = document.createElement('p');
+            p.textContent = message;
+            results.appendChild(p);
+        }
+        
+        async function testHealth() {
+            log('Testing health endpoint...');
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                log(`✅ Health: ${JSON.stringify(data)}`);
+            } catch (error) {
+                log(`❌ Health Error: ${error.message}`);
+            }
+        }
+        
+        async function testLogin() {
+            log('Testing login endpoint...');
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@trustauto.co.ke',
+                        password: 'Admin123!'
+                    })
+                });
+                const data = await response.json();
+                log(`✅ Login Success! Token: ${data.token.substring(0, 20)}...`);
+                localStorage.setItem('test_token', data.token);
+            } catch (error) {
+                log(`❌ Login Error: ${error.message}`);
+            }
+        }
+        
+        async function testVehicles() {
+            log('Testing vehicles endpoint...');
+            try {
+                const token = localStorage.getItem('test_token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(`${API_URL}/vehicles`, { headers });
+                const data = await response.json();
+                log(`✅ Vehicles: Found ${data.length} vehicles`);
+            } catch (error) {
+                log(`❌ Vehicles Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

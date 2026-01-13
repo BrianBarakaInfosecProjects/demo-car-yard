@@ -21,11 +21,23 @@ export default function LoginPage() {
     setError('');
 
     try {
+      console.log('Attempting login with:', formData.email);
       const response = await api.post('/auth/login', formData);
+      console.log('Login response:', response);
+      
+      if (!response.token) {
+        throw new Error('No token received from server');
+      }
+      
       setToken(response.token);
+      console.log('Token set, redirecting to dashboard...');
       router.push('/admin/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.error || 
+                       err.message || 
+                       'Login failed. Please check your credentials.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

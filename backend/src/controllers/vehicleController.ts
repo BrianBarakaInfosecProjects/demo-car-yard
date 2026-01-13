@@ -21,7 +21,17 @@ export const getVehicleById = async (req: Request, res: Response) => {
 
 export const createVehicle = async (req: Request, res: Response) => {
   try {
-    const vehicle = await vehicleService.createVehicle(req.body);
+    const vehicleData = { ...req.body };
+
+    const files = (req as any).files as Express.Multer.File[];
+    if (files && files.length > 0) {
+      vehicleData.images = files.map((file) => `/uploads/${file.filename}`);
+      vehicleData.imageUrl = vehicleData.images[0];
+    } else if (vehicleData.imageUrl) {
+      vehicleData.images = [vehicleData.imageUrl];
+    }
+
+    const vehicle = await vehicleService.createVehicle(vehicleData);
     res.status(201).json(vehicle);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
@@ -30,7 +40,19 @@ export const createVehicle = async (req: Request, res: Response) => {
 
 export const updateVehicle = async (req: Request, res: Response) => {
   try {
-    const vehicle = await vehicleService.updateVehicle(req.params.id, req.body);
+    const vehicleData = { ...req.body };
+
+    const files = (req as any).files as Express.Multer.File[];
+    if (files && files.length > 0) {
+      vehicleData.images = files.map((file) => `/uploads/${file.filename}`);
+      vehicleData.imageUrl = vehicleData.images[0];
+    } else if (!vehicleData.imageUrl && !vehicleData.images) {
+      const existingVehicle = await vehicleService.getVehicleById(req.params.id);
+      vehicleData.imageUrl = existingVehicle.imageUrl;
+      vehicleData.images = existingVehicle.images || [existingVehicle.imageUrl];
+    }
+
+    const vehicle = await vehicleService.updateVehicle(req.params.id, vehicleData);
     res.json(vehicle);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
