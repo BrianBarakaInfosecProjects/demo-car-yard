@@ -6,6 +6,11 @@ import { Vehicle } from '@/lib/types';
 import { api } from '@/lib/api';
 import VehicleCard from '@/components/vehicles/VehicleCard';
 import VehicleModal from '@/components/vehicles/VehicleModal';
+import Link from 'next/link';
+import { useURLFilters } from '@/lib/useURLFilters';
+import ScrollPositionManager from '@/components/ScrollPositionManager';
+import NavigationButtons from '@/components/NavigationButtons';
+import FindYourPerfectCar from '@/components/sections/FindYourPerfectCar';
 
 function InventoryContent() {
   const searchParams = useSearchParams();
@@ -15,13 +20,8 @@ function InventoryContent() {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [vehiclesPerPage] = useState(9);
-  const [filters, setFilters] = useState({
-    make: 'all',
-    priceRange: 'all',
-    bodyType: 'all',
-    fuelType: 'all',
-    sortBy: 'default',
-  });
+  const [sortBy, setSortBy] = useState('default');
+  const { filters, updateFilter, clearFilters } = useURLFilters();
 
   useEffect(() => {
     fetchVehicles();
@@ -29,10 +29,6 @@ function InventoryContent() {
 
   useEffect(() => {
     applyFilters();
-  }, [searchParams]);
-
-  useEffect(() => {
-    setCurrentPage(1);
   }, [filters]);
 
   const fetchVehicles = async () => {
@@ -48,16 +44,26 @@ function InventoryContent() {
   };
 
   const applyFilters = () => {
-    const make = searchParams.get('make');
-    const priceRange = searchParams.get('priceRange');
-    const bodyType = searchParams.get('bodyType');
-    const fuelType = searchParams.get('fuelType');
+    const make = filters.make;
+    const model = filters.model;
+    const priceRange = filters.priceRange;
+    const bodyType = filters.bodyType;
+    const fuelType = filters.fuelType;
+    const yearFrom = filters.yearFrom;
+    const yearTo = filters.yearTo;
+    const location = filters.location;
 
     let filtered = [...allVehicles];
 
     if (make && make !== 'all') {
       filtered = filtered.filter((v) =>
         v.make.toLowerCase() === make.toLowerCase()
+      );
+    }
+
+    if (model && model !== 'all') {
+      filtered = filtered.filter((v) =>
+        v.model.toLowerCase() === model.toLowerCase()
       );
     }
 
@@ -84,14 +90,20 @@ function InventoryContent() {
       }
     }
 
+    if (yearFrom) {
+      filtered = filtered.filter((v) => v.year >= parseInt(yearFrom));
+    }
+
+    if (yearTo) {
+      filtered = filtered.filter((v) => v.year <= parseInt(yearTo));
+    }
+
+    if (location && location !== 'all') {
+      filtered = filtered.filter((v) => v.location === location);
+    }
+
     setVehicles(filtered);
-    setFilters({
-      make: make || 'all',
-      priceRange: priceRange || 'all',
-      bodyType: bodyType || 'all',
-      fuelType: fuelType || 'all',
-      sortBy: filters.sortBy,
-    });
+    setCurrentPage(1);
   };
 
   const handleSort = (sortBy: string) => {
@@ -119,11 +131,11 @@ function InventoryContent() {
     }
 
     setVehicles(sorted);
-    setFilters({ ...filters, sortBy });
+    setSortBy(sortBy);
   };
 
   const handleClearFilters = () => {
-    window.location.href = '/inventory';
+    clearFilters();
   };
 
   const totalPages = Math.ceil(vehicles.length / vehiclesPerPage);
@@ -221,104 +233,110 @@ function InventoryContent() {
   }
 
   return (
-    <section id="inventory" className="vehicles-section">
-      <div className="container">
-        <div className="text-center mb-5">
-          <h2 className="section-title">Featured Vehicles</h2>
-          <p className="text-muted mt-4 fs-5">
-            Browse our hand-picked selection of quality used cars
-          </p>
-        </div>
+    <>
+      <ScrollPositionManager />
+      <NavigationButtons />
+      <FindYourPerfectCar />
+      <section id="inventory" className="vehicles-section">
+        <div className="container">
+          <div className="text-center mb-5">
+            <h2 className="section-title">Featured Vehicles</h2>
+            <p className="text-muted mt-4 fs-5">
+              Browse our hand-picked selection of quality used cars
+            </p>
+          </div>
 
-        {/* Filter and Sort Bar */}
-        <div className="filter-sort-bar">
-          <div className="results-info">
-            <div className="results-count">
-              <i className="fas fa-car me-2"></i>
-              <span>
-                Showing {currentVehicles.length} of {vehicles.length} vehicles (Page {currentPage} of {totalPages})
-              </span>
-            </div>
-            <div className="sort-controls">
-              <label className="sort-label">Sort by:</label>
-              <select
-                id="sortSelect"
-                className="sort-select"
-                value={filters.sortBy}
-                onChange={(e) => handleSort(e.target.value)}
-              >
-                <option value="default">Default</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="year-new">Year: Newest First</option>
-                <option value="year-old">Year: Oldest First</option>
-                <option value="brand">Brand: A to Z</option>
-              </select>
-              {(filters.make !== 'all' ||
-                filters.priceRange !== 'all' ||
-                filters.bodyType !== 'all' ||
-                filters.fuelType !== 'all') && (
-                <button
-                  id="clearFilters"
-                  className="clear-filters-btn"
-                  onClick={handleClearFilters}
+          {/* Filter and Sort Bar */}
+          <div className="filter-sort-bar">
+            <div className="results-info">
+              <div className="results-count">
+                <i className="fas fa-car me-2"></i>
+                <span>
+                  Showing {currentVehicles.length} of {vehicles.length} vehicles (Page {currentPage} of {totalPages})
+                </span>
+              </div>
+              <div className="sort-controls">
+                <label className="sort-label">Sort by:</label>
+                <select
+                  id="sortSelect"
+                  className="sort-select"
+                  value={sortBy}
+                  onChange={(e) => handleSort(e.target.value)}
                 >
-                  <i className="fas fa-times me-1"></i> Clear Filters
-                </button>
-              )}
+                  <option value="default">Default</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="year-new">Year: Newest First</option>
+                  <option value="year-old">Year: Oldest First</option>
+                  <option value="brand">Brand: A to Z</option>
+                </select>
+                {(filters.make !== 'all' ||
+                  filters.model !== 'all' ||
+                  filters.priceRange !== 'all' ||
+                  filters.bodyType !== 'all' ||
+                  filters.fuelType !== 'all') && (
+                  <button
+                    id="clearFilters"
+                    className="clear-filters-btn"
+                    onClick={handleClearFilters}
+                  >
+                    <i className="fas fa-times me-1"></i> Clear Filters
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="row g-4" id="vehicleGrid">
-          {currentVehicles.map((vehicle) => (
-            <VehicleCard
-              key={vehicle.id}
-              vehicle={vehicle}
-              onDetailsClick={setSelectedVehicle}
-            />
-          ))}
-        </div>
-
-        {currentVehicles.length === 0 && vehicles.length > 0 && currentPage > 1 && (
-          <div className="text-center py-5">
-            <h3>No vehicles on this page</h3>
-            <button
-              className="btn btn-primary mt-3"
-              onClick={() => paginate(1)}
-            >
-              Go to First Page
-            </button>
+          <div className="row g-4" id="vehicleGrid">
+            {currentVehicles.map((vehicle) => (
+              <VehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                onDetailsClick={setSelectedVehicle}
+              />
+            ))}
           </div>
-        )}
 
-        {vehicles.length === 0 && (
-          <div className="text-center py-5">
-            <h3>No vehicles found matching your criteria</h3>
-            <button
-              className="btn btn-primary mt-3"
-              onClick={handleClearFilters}
-            >
-              Clear Filters
-            </button>
+          {currentVehicles.length === 0 && vehicles.length > 0 && currentPage > 1 && (
+            <div className="text-center py-5">
+              <h3>No vehicles on this page</h3>
+              <button
+                className="btn btn-primary mt-3"
+                onClick={() => paginate(1)}
+              >
+                Go to First Page
+              </button>
+            </div>
+          )}
+
+          {vehicles.length === 0 && (
+            <div className="text-center py-5">
+              <h3>No vehicles found matching your criteria</h3>
+              <button
+                className="btn btn-primary mt-3"
+                onClick={handleClearFilters}
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
+
+          {vehicles.length > 0 && renderPageNumbers()}
+
+          <div className="text-center mt-5">
+            <Link href="/inventory" className="btn btn-primary btn-lg px-5 py-3">
+              View All Vehicles <i className="fas fa-arrow-right ms-2"></i>
+            </Link>
           </div>
-        )}
-
-        {vehicles.length > 0 && renderPageNumbers()}
-
-        <div className="text-center mt-5">
-          <a href="#inventory" className="btn btn-primary btn-lg px-5 py-3">
-            View All 24+ Vehicles <i className="fas fa-arrow-right ms-2"></i>
-          </a>
         </div>
-      </div>
+      </section>
 
       <VehicleModal
         isOpen={!!selectedVehicle}
         onClose={() => setSelectedVehicle(null)}
         vehicle={selectedVehicle}
       />
-    </section>
+    </>
   );
 }
 

@@ -20,6 +20,7 @@ interface VehicleFormData {
   interiorColor: string;
   engine: string;
   vin: string;
+  location: string;
   status: 'NEW' | 'USED' | 'CERTIFIED_PRE_OWNED' | 'ON_SALE';
   featured: boolean;
   description: string;
@@ -47,6 +48,7 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
     interiorColor: '',
     engine: '',
     vin: '',
+    location: '',
     status: 'USED',
     featured: false,
     description: '',
@@ -324,6 +326,22 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
                   <option value="DIESEL">Diesel</option>
                   <option value="HYBRID">Hybrid</option>
                   <option value="ELECTRIC">Electric</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={formData.location || ''}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                >
+                  <option value="">Select Location</option>
+                  <option value="Nairobi Showroom">Nairobi Showroom</option>
+                  <option value="Mombasa Road">Mombasa Road</option>
+                  <option value="Westlands">Westlands</option>
+                  <option value="Industrial Area">Industrial Area</option>
+                  <option value="Karen">Karen</option>
                 </select>
               </div>
 

@@ -4,6 +4,8 @@ import { Vehicle } from '@/lib/types';
 import { formatPrice, formatStatus, getSeatsCount, getStatusClass } from '@/lib/utils';
 import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
+import NegotiateModal from '@/components/vehicles/NegotiateModal';
+import { MapPin, GitCompare, MessageCircle } from 'lucide-react';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -11,15 +13,17 @@ interface VehicleCardProps {
 }
 
 export default function VehicleCard({ vehicle, onDetailsClick }: VehicleCardProps) {
+  const [showNegotiateModal, setShowNegotiateModal] = useState(false);
+
   const whatsappMsg = encodeURIComponent(
-    `Hi, I'm interested in the ${vehicle.make} ${vehicle.model} ${vehicle.year} listed for ${formatPrice(vehicle.priceKES)}. Is it still available?`
+    `Hi, I'm interested in ${vehicle.make} ${vehicle.model} ${vehicle.year} listed for ${formatPrice(vehicle.priceKES)}. Is it still available?`
   );
 
   const emailSubject = encodeURIComponent(
     `Inquiry: ${vehicle.make} ${vehicle.model} ${vehicle.year}`
   );
   const emailBody = encodeURIComponent(
-    `Hello,\n\nI'm interested in the following vehicle:\n\n${vehicle.make} ${vehicle.model} ${vehicle.year}\nPrice: ${formatPrice(vehicle.priceKES)}\n\nPlease provide more details.\n\nThank you.`
+    `Hello,\n\nI'm interested in following vehicle:\n\n${vehicle.make} ${vehicle.model} ${vehicle.year}\nPrice: ${formatPrice(vehicle.priceKES)}\n\nPlease provide more details.\n\nThank you.`
   );
 
   const statusClass = getStatusClass(vehicle.status);
@@ -116,7 +120,45 @@ export default function VehicleCard({ vehicle, onDetailsClick }: VehicleCardProp
                   <span className="meta-value">{seats} Seats</span>
                 </div>
               </div>
+              {vehicle.location && (
+                <div className="meta-item">
+                  <div className="meta-icon">
+                    <MapPin size={18} className="text-gray-600" />
+                  </div>
+                  <div>
+                    <span className="meta-value">{vehicle.location}</span>
+                  </div>
+                </div>
+              )}
             </div>
+          </div>
+
+          <div className="action-buttons mb-3">
+            <button
+              className="action-btn btn-compare"
+              onClick={() => {
+                const compareList = JSON.parse(localStorage.getItem('compareList') || '[]');
+                if (!compareList.some((v: Vehicle) => v.id === vehicle.id)) {
+                  if (compareList.length >= 3) {
+                    alert('You can only compare up to 3 vehicles');
+                    return;
+                  }
+                  compareList.push(vehicle);
+                  localStorage.setItem('compareList', JSON.stringify(compareList));
+                  alert(`Added ${vehicle.make} ${vehicle.model} to compare list`);
+                }
+              }}
+            >
+              <GitCompare size={18} />
+              <span>Compare</span>
+            </button>
+            <button
+              className="action-btn btn-negotiate"
+              onClick={() => setShowNegotiateModal(true)}
+            >
+              <MessageCircle size={18} />
+              <span>Negotiate</span>
+            </button>
           </div>
 
           <div className="car-price-section">
@@ -156,6 +198,12 @@ export default function VehicleCard({ vehicle, onDetailsClick }: VehicleCardProp
           </div>
         </div>
       </div>
+
+      <NegotiateModal
+        isOpen={showNegotiateModal}
+        onClose={() => setShowNegotiateModal(false)}
+        vehicle={vehicle}
+      />
     </div>
   );
 }

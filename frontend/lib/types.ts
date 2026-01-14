@@ -13,6 +13,7 @@ export interface Vehicle {
   interiorColor: string;
   engine: string;
   vin: string;
+  location?: string;
   status: 'NEW' | 'USED' | 'CERTIFIED_PRE_OWNED' | 'ON_SALE';
   featured: boolean;
   description: string;

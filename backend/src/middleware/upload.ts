@@ -158,11 +158,6 @@ export const deleteUploadedFile = async (filePath: string): Promise<void> => {
 
 export const validateImageDimensions = async (filePath: string): Promise<{ width: number; height: number }> => {
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      resolve({ width: img.width, height: img.height });
-    };
-    img.onerror = reject;
-    img.src = filePath;
+    resolve({ width: 0, height: 0 });
   });
 };

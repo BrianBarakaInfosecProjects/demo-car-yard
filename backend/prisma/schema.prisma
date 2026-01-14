@@ -33,6 +33,7 @@ model Vehicle {
   interiorColor   String
   engine          String
   vin             String    @unique
+  location        String?
   status          Status    @default(USED)
   featured        Boolean   @default(false)
   description     String

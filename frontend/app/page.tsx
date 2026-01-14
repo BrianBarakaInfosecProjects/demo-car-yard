@@ -1,6 +1,7 @@
 import Hero from '@/components/sections/Hero';
 import Stats from '@/components/sections/Stats';
 import Services from '@/components/sections/Services';
+import BuyingFactors from '@/components/sections/BuyingFactors';
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
       <Hero />
       <Stats />
       <Services />
+      <BuyingFactors />
     </main>
   );
 }
