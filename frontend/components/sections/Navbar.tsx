@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { Menu, X, Home, Car, Phone, Mail, User } from 'lucide-react';
 
 export function FontAwesomeLink() {
   return (
@@ -17,6 +18,7 @@ export function FontAwesomeLink() {
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +27,17 @@ export default function Navbar() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -45,46 +58,67 @@ export default function Navbar() {
     <nav className={`navbar fixed-top ${scrolled ? 'scrolled' : ''}`}>
       <div className="container">
         <Link href="/" className="navbar-brand">
-          <i className="fas fa-car me-2"></i>TrustAuto Kenya
+          <div className="brand-icon-wrapper">
+            <i className="fas fa-car"></i>
+            <span className="brand-text">TrustAuto</span>
+          </div>
         </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon">
-            <i className={`fas ${isOpen ? 'fa-times' : 'fa-bars'}`}></i>
-          </span>
-        </button>
-        <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`}>
-          <ul className="navbar-nav ms-auto align-items-center">
-            <li className="nav-item">
-              <Link href="/" className="nav-link">
-                Home
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link href="/inventory" className="nav-link">
-                Browse Cars
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link href="/services" className="nav-link">
-                Services
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link href="/contact" className="nav-link">
-                Contact
-              </Link>
-            </li>
-            <li className="nav-item ms-lg-3">
-              <a href="tel:+254722000000" className="btn btn-primary">
-                <i className="fas fa-phone me-2"></i>0722 000 000
-              </a>
-            </li>
-          </ul>
+
+        <div className="navbar-right" ref={dropdownRef}>
+          <button
+            className="navbar-menu-trigger"
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={isOpen}
+          >
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
+            <span className="menu-label">Menu</span>
+          </button>
+
+          <div className={`navbar-dropdown ${isOpen ? 'show' : ''}`}>
+            <div className="dropdown-content">
+              <div className="dropdown-section">
+                <div className="dropdown-label">Navigation</div>
+                <ul className="dropdown-links">
+                  <li>
+                    <Link href="/" className="dropdown-link">
+                      <Home size={16} />
+                      <span>Home</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/inventory" className="dropdown-link">
+                      <Car size={16} />
+                      <span>Browse Cars</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/services" className="dropdown-link">
+                      <i className="fas fa-tools"></i>
+                      <span>Services</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/contact" className="dropdown-link">
+                      <Mail size={16} />
+                      <span>Contact</span>
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="dropdown-section dropdown-actions">
+                <a href="tel:+254722000000" className="dropdown-contact">
+                  <Phone size={16} />
+                  <div>
+                    <span className="contact-label">Call Now</span>
+                    <span className="contact-number">0722 000 000</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </nav>

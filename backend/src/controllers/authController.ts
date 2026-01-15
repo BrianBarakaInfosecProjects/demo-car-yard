@@ -34,3 +34,15 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
     res.status(404).json({ error: error.message });
   }
 };
+
+export const updateProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const user = await authService.updateProfile(req.user.userId, req.body);
+    res.json(user);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};

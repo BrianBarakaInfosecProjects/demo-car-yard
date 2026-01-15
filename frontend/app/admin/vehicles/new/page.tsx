@@ -24,6 +24,8 @@ interface VehicleFormData {
   status: 'NEW' | 'USED' | 'CERTIFIED_PRE_OWNED' | 'ON_SALE';
   featured: boolean;
   description: string;
+  isDraft: boolean;
+  scheduledAt: string;
 }
 
 export default function VehicleFormPage({ params }: { params: { id?: string } }) {
@@ -52,6 +54,8 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
     status: 'USED',
     featured: false,
     description: '',
+    isDraft: false,
+    scheduledAt: '',
   });
 
   useEffect(() => {
@@ -448,6 +452,38 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
             </div>
           </div>
 
+          {/* Publishing Options */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+              Publishing Options
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    checked={formData.isDraft}
+                    onChange={(e) => handleInputChange('isDraft', e.target.checked)}
+                  />
+                  <span className="text-sm font-medium text-gray-700">Save as Draft</span>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Schedule Publish</label>
+                <input
+                  type="datetime-local"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={formData.scheduledAt}
+                  onChange={(e) => handleInputChange('scheduledAt', e.target.value)}
+                  disabled={formData.isDraft}
+                />
+                <p className="text-xs text-gray-500 mt-1">Leave empty to publish immediately</p>
+              </div>
+            </div>
+          </div>
+
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -476,9 +512,53 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
             >
               {imagePreviews.length > 0 ? (
                 <div className="w-full">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative">
+                      <div key={index} className="relative group">
+                        <div className="absolute top-2 left-2 z-10 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {index > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newPreviews = [...imagePreviews];
+                                const newFiles = [...imageFiles];
+                                const prevPreview = newPreviews[index];
+                                const prevFile = newFiles[index];
+                                newPreviews[index] = newPreviews[index - 1];
+                                newFiles[index] = newFiles[index - 1];
+                                newPreviews[index - 1] = prevPreview;
+                                newFiles[index - 1] = prevFile;
+                                setImagePreviews(newPreviews);
+                                setImageFiles(newFiles);
+                              }}
+                              className="p-1.5 bg-gray-700 text-white rounded hover:bg-gray-800 transition-colors"
+                              title="Move left"
+                            >
+                              ←
+                            </button>
+                          )}
+                          {index < imagePreviews.length - 1 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newPreviews = [...imagePreviews];
+                                const newFiles = [...imageFiles];
+                                const nextPreview = newPreviews[index + 1];
+                                const nextFile = newFiles[index + 1];
+                                newPreviews[index] = nextPreview;
+                                newFiles[index] = nextFile;
+                                newPreviews[index + 1] = preview;
+                                newFiles[index + 1] = imageFiles[index];
+                                setImagePreviews(newPreviews);
+                                setImageFiles(newFiles);
+                              }}
+                              className="p-1.5 bg-gray-700 text-white rounded hover:bg-gray-800 transition-colors"
+                              title="Move right"
+                            >
+                              →
+                            </button>
+                          )}
+                        </div>
                         <img
                           src={preview}
                           alt={`Preview ${index + 1}`}

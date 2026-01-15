@@ -93,3 +93,40 @@ export const getProfile = async (userId: string) => {
 
   return user;
 };
+
+export const updateProfile = async (userId: string, data: { name?: string; email?: string; password?: string }) => {
+  const updateData: any = {};
+  
+  if (data.name) {
+    updateData.name = data.name;
+  }
+  
+  if (data.email) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email },
+    });
+    
+    if (existingUser && existingUser.id !== userId) {
+      throw new Error('Email already in use');
+    }
+    updateData.email = data.email;
+  }
+  
+  if (data.password) {
+    updateData.password = await hashPassword(data.password);
+  }
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: updateData,
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      updatedAt: true,
+    },
+  });
+
+  return user;
+};

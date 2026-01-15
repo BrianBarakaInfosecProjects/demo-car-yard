@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { isAuthenticated as checkAuth, logout } from '@/lib/auth';
 import {
   LayoutDashboard, Car, Mail, Star, Settings, Users, LogOut,
-  ChevronRight, Home, Menu, X, Bell, Search
+  ChevronRight, Home, Menu, X, Bell, Search, BarChart3, History
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -15,9 +15,10 @@ interface AdminLayoutProps {
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/vehicles', label: 'Vehicles', icon: Car },
   { href: '/admin/inquiries', label: 'Inquiries', icon: Mail },
-  { href: '/admin/featured', label: 'Featured', icon: Star },
+  { href: '/admin/activity-logs', label: 'Activity Logs', icon: History },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -26,10 +27,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
 
   useEffect(() => {
     const auth = checkAuth();
     setIsAuthenticated(auth);
+    
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        setUser(JSON.parse(userStr));
+      }
+    }
+
     if (!auth && !pathname.includes('/auth/login')) {
       router.push('/auth/login');
     }
@@ -43,10 +54,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const breadcrumbs = pathname.split('/').filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex items-stretch">
       {/* Sidebar */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:relative lg:transform-none lg:z-auto lg:flex lg:flex-shrink-0 lg:shadow-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="h-full flex flex-col">
           {/* Logo */}
@@ -90,11 +101,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="p-4 border-t border-gray-200">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                A
+                {user?.name?.charAt(0).toUpperCase() || 'A'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">Admin</p>
-                <p className="text-xs text-gray-500 truncate">admin@trustauto.co.ke</p>
+                <p className="text-sm font-semibold text-gray-900 truncate">{user?.name || 'Admin'}</p>
+                <p className="text-xs text-gray-500 truncate">{user?.email || 'admin@trustauto.co.ke'}</p>
               </div>
               <button
                 onClick={handleLogout}
@@ -117,7 +128,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:pl-0 min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-auto">
         {/* Top Navigation Bar */}
         <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-30">
           <div className="px-4 sm:px-6 lg:px-8">
@@ -179,21 +190,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   </span>
                 </button>
 
-                {/* Profile */}
-                <div className="hidden md:flex items-center space-x-2 pl-3 border-l border-gray-200">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                    A
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Admin</span>
-                </div>
+                 {/* Profile */}
+                 <div className="hidden md:flex items-center space-x-2 pl-3 border-l border-gray-200">
+                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                     {user?.name?.charAt(0).toUpperCase() || 'A'}
+                   </div>
+                   <span className="text-sm font-medium text-gray-700">{user?.name || 'Admin'}</span>
+                 </div>
               </div>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full min-w-0">
+          <div className="w-full h-full">
             {children}
           </div>
         </main>

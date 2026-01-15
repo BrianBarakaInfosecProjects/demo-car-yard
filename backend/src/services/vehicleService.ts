@@ -2,7 +2,9 @@ import prisma from '../config/database';
 import { VehicleInput, VehicleFilter } from '../utils/validators';
 
 export const getVehicles = async (filters: VehicleFilter) => {
-  const where: any = {};
+  const where: any = {
+    isDraft: false,
+  };
 
   if (filters.make) {
     where.make = { equals: filters.make, mode: 'insensitive' };
@@ -66,6 +68,15 @@ export const getVehicleById = async (id: string) => {
   if (!vehicle) {
     throw new Error('Vehicle not found');
   }
+
+  await prisma.vehicle.update({
+    where: { id },
+    data: {
+      viewCount: {
+        increment: 1,
+      },
+    },
+  });
 
   return vehicle;
 };
@@ -131,7 +142,7 @@ export const deleteVehicle = async (id: string) => {
 
 export const getFeaturedVehicles = async () => {
   const vehicles = await prisma.vehicle.findMany({
-    where: { featured: true },
+    where: { featured: true, isDraft: false },
     orderBy: { createdAt: 'desc' },
     take: 6,
   });

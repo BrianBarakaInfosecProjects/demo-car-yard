@@ -16,6 +16,23 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   inquiries Inquiry[]
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  entityType  String
+  entityId    String?
+  changes     String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  vehicleId   String?
+  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
+  inquiryId   String?
+  inquiry     Inquiry? @relation(fields: [inquiryId], references: [id])
+  ipAddress   String?
+  createdAt   DateTime @default(now())
 }
 
 model Vehicle {
@@ -39,9 +56,15 @@ model Vehicle {
   description     String
   imageUrl        String
   images          String[]
+  imagePublicIds  String[]
+  viewCount       Int       @default(0)
+  isDraft         Boolean   @default(false)
+  scheduledAt     DateTime?
+  publishedAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   inquiries       Inquiry[]
+  auditLogs       AuditLog[]
 }
 
 model Inquiry {
@@ -56,6 +79,7 @@ model Inquiry {
   user        User?    @relation(fields: [userId], references: [id])
   status      String   @default("PENDING")
   createdAt   DateTime @default(now())
+  auditLogs   AuditLog[]
 }
 
 enum Role {

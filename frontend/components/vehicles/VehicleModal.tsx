@@ -3,7 +3,7 @@
 import { Vehicle } from '@/lib/types';
 import { formatPrice, formatStatus, getSeatsCount } from '@/lib/utils';
 import { Modal } from '@/components/ui/Modal';
-import { Phone, X, MessageCircle } from 'lucide-react';
+import { Phone, X, MessageCircle, Mail } from 'lucide-react';
 
 interface VehicleModalProps {
   isOpen: boolean;
@@ -37,6 +37,13 @@ export default function VehicleModal({
     { label: 'Status', value: formatStatus(vehicle.status) },
     ...(vehicle.location ? [{ label: 'Location', value: vehicle.location }] : []),
   ];
+
+  const emailSubject = encodeURIComponent(
+    `Inquiry: ${vehicle.make} ${vehicle.model} ${vehicle.year}`
+  );
+  const emailBody = encodeURIComponent(
+    `Hello,\n\nI'm interested in following vehicle:\n\n${vehicle.make} ${vehicle.model} ${vehicle.year}\nPrice: ${formatPrice(vehicle.priceKES)}\n\nPlease provide more details.\n\nThank you.`
+  );
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`${vehicle.make} ${vehicle.model} ${vehicle.year}`} size="xl">
@@ -83,6 +90,13 @@ export default function VehicleModal({
             >
               <MessageCircle size={20} />
               <span>WhatsApp</span>
+            </a>
+            <a
+              href={`mailto:info@trustauto.co.ke?subject=${emailSubject}&body=${emailBody}`}
+              className="d-flex align-items-center justify-content-center gap-2 btn btn-outline-primary py-3"
+            >
+              <Mail size={20} />
+              <span>Email</span>
             </a>
           </div>
         </div>

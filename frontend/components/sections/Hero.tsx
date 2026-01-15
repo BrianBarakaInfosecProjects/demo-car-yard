@@ -72,20 +72,6 @@ export default function Hero() {
             <p className="hero-subtitle">
               Quality Vehicles • Transparent Pricing • NTSA Support Included
             </p>
-            <div className="trust-badges">
-              <span className="trust-badge">
-                <i className="fas fa-check-circle"></i>
-                500+ Vehicles Sold
-              </span>
-              <span className="trust-badge">
-                <i className="fas fa-shield-alt"></i>
-                All Paperwork Handled
-              </span>
-              <span className="trust-badge">
-                <i className="fas fa-handshake"></i>
-                Fair Pricing
-              </span>
-            </div>
             <div className="hero-cta mt-4">
               <Link
                 href="/inventory#inventory"
@@ -98,12 +84,12 @@ export default function Hero() {
             </div>
           </div>
           <div className="col-lg-6">
-            <div className="search-box">
+            <div className="search-box-compact">
               <h3>
                 <i className="fas fa-search me-2"></i>Quick Search
               </h3>
               <form id="searchForm" onSubmit={handleSubmit}>
-                <div className="row g-3">
+                <div className="row g-2">
                   <div className="col-md-6">
                     <label className="form-label">Make</label>
                     <select

@@ -1,19 +1,16 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Vehicle } from '@/lib/types';
 import { api } from '@/lib/api';
 import VehicleCard from '@/components/vehicles/VehicleCard';
 import VehicleModal from '@/components/vehicles/VehicleModal';
-import Link from 'next/link';
-import { useURLFilters } from '@/lib/useURLFilters';
+import BrandFilter from '@/components/BrandFilter';
+import SearchInput from '@/components/SearchInput';
 import ScrollPositionManager from '@/components/ScrollPositionManager';
 import NavigationButtons from '@/components/NavigationButtons';
-import FindYourPerfectCar from '@/components/sections/FindYourPerfectCar';
 
 function InventoryContent() {
-  const searchParams = useSearchParams();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [allVehicles, setAllVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,15 +18,12 @@ function InventoryContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [vehiclesPerPage] = useState(9);
   const [sortBy, setSortBy] = useState('default');
-  const { filters, updateFilter, clearFilters } = useURLFilters();
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchVehicles();
   }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [filters]);
 
   const fetchVehicles = async () => {
     try {
@@ -44,99 +38,41 @@ function InventoryContent() {
   };
 
   const applyFilters = () => {
-    const make = filters.make;
-    const model = filters.model;
-    const priceRange = filters.priceRange;
-    const bodyType = filters.bodyType;
-    const fuelType = filters.fuelType;
-    const yearFrom = filters.yearFrom;
-    const yearTo = filters.yearTo;
-    const location = filters.location;
-
     let filtered = [...allVehicles];
 
-    if (make && make !== 'all') {
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((v) => {
+        const searchTerms = `${v.make} ${v.model} ${v.year} ${v.description}`.toLowerCase();
+        return searchTerms.includes(query);
+      });
+    }
+
+    if (selectedBrand) {
       filtered = filtered.filter((v) =>
-        v.make.toLowerCase() === make.toLowerCase()
+        v.make.toLowerCase() === selectedBrand.toLowerCase()
       );
     }
 
-    if (model && model !== 'all') {
-      filtered = filtered.filter((v) =>
-        v.model.toLowerCase() === model.toLowerCase()
-      );
-    }
-
-    if (bodyType && bodyType !== 'all') {
-      filtered = filtered.filter(
-        (v) => v.bodyType.toLowerCase() === bodyType.toLowerCase()
-      );
-    }
-
-    if (fuelType && fuelType !== 'all') {
-      filtered = filtered.filter(
-        (v) => v.fuelType.toLowerCase() === fuelType.toLowerCase()
-      );
-    }
-
-    if (priceRange && priceRange !== 'all') {
-      const [min, max] = priceRange.split('-');
-      if (max) {
-        filtered = filtered.filter(
-          (v) => v.priceKES >= parseInt(min) && v.priceKES <= parseInt(max)
-        );
-      } else if (priceRange === '12000000+') {
-        filtered = filtered.filter((v) => v.priceKES > 12000000);
-      }
-    }
-
-    if (yearFrom) {
-      filtered = filtered.filter((v) => v.year >= parseInt(yearFrom));
-    }
-
-    if (yearTo) {
-      filtered = filtered.filter((v) => v.year <= parseInt(yearTo));
-    }
-
-    if (location && location !== 'all') {
-      filtered = filtered.filter((v) => v.location === location);
+    if (sortBy === 'price-low') {
+      filtered.sort((a, b) => a.priceKES - b.priceKES);
+    } else if (sortBy === 'price-high') {
+      filtered.sort((a, b) => b.priceKES - a.priceKES);
+    } else if (sortBy === 'year-new') {
+      filtered.sort((a, b) => b.year - a.year);
+    } else if (sortBy === 'year-old') {
+      filtered.sort((a, b) => a.year - b.year);
+    } else if (sortBy === 'brand') {
+      filtered.sort((a, b) => a.make.localeCompare(b.make));
     }
 
     setVehicles(filtered);
     setCurrentPage(1);
   };
 
-  const handleSort = (sortBy: string) => {
-    let sorted = [...vehicles];
-
-    switch (sortBy) {
-      case 'price-low':
-        sorted.sort((a, b) => a.priceKES - b.priceKES);
-        break;
-      case 'price-high':
-        sorted.sort((a, b) => b.priceKES - a.priceKES);
-        break;
-      case 'year-new':
-        sorted.sort((a, b) => b.year - a.year);
-        break;
-      case 'year-old':
-        sorted.sort((a, b) => a.year - b.year);
-        break;
-      case 'brand':
-        sorted.sort((a, b) => a.make.localeCompare(b.make));
-        break;
-      default:
-        sorted = [...allVehicles];
-        applyFilters();
-    }
-
-    setVehicles(sorted);
-    setSortBy(sortBy);
-  };
-
-  const handleClearFilters = () => {
-    clearFilters();
-  };
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery, selectedBrand, sortBy]);
 
   const totalPages = Math.ceil(vehicles.length / vehiclesPerPage);
   const indexOfLastVehicle = currentPage * vehiclesPerPage;
@@ -236,7 +172,7 @@ function InventoryContent() {
     <>
       <ScrollPositionManager />
       <NavigationButtons />
-      <FindYourPerfectCar />
+
       <section id="inventory" className="vehicles-section">
         <div className="container">
           <div className="text-center mb-5">
@@ -246,44 +182,45 @@ function InventoryContent() {
             </p>
           </div>
 
-          {/* Filter and Sort Bar */}
-          <div className="filter-sort-bar">
-            <div className="results-info">
-              <div className="results-count">
-                <i className="fas fa-car me-2"></i>
-                <span>
-                  Showing {currentVehicles.length} of {vehicles.length} vehicles (Page {currentPage} of {totalPages})
-                </span>
-              </div>
-              <div className="sort-controls">
-                <label className="sort-label">Sort by:</label>
-                <select
-                  id="sortSelect"
-                  className="sort-select"
-                  value={sortBy}
-                  onChange={(e) => handleSort(e.target.value)}
+          <div className="search-and-filters">
+            <SearchInput value={searchQuery} onChange={setSearchQuery} />
+            <BrandFilter selectedBrand={selectedBrand} onBrandSelect={setSelectedBrand} />
+          </div>
+
+          <div className="results-bar">
+            <div className="results-count">
+              <span>
+                Showing {currentVehicles.length} of {vehicles.length} vehicles
+                {searchQuery && <span> matching "{searchQuery}"</span>}
+                {selectedBrand && <span> - {brands.find(b => b.id === selectedBrand)?.name}</span>}
+              </span>
+            </div>
+            <div className="sort-controls">
+              <label className="sort-label">Sort by:</label>
+              <select
+                id="sortSelect"
+                className="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="default">Default</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="year-new">Year: Newest First</option>
+                <option value="year-old">Year: Oldest First</option>
+                <option value="brand">Brand: A to Z</option>
+              </select>
+              {(searchQuery || selectedBrand) && (
+                <button
+                  className="clear-filters-btn"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedBrand(null);
+                  }}
                 >
-                  <option value="default">Default</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="year-new">Year: Newest First</option>
-                  <option value="year-old">Year: Oldest First</option>
-                  <option value="brand">Brand: A to Z</option>
-                </select>
-                {(filters.make !== 'all' ||
-                  filters.model !== 'all' ||
-                  filters.priceRange !== 'all' ||
-                  filters.bodyType !== 'all' ||
-                  filters.fuelType !== 'all') && (
-                  <button
-                    id="clearFilters"
-                    className="clear-filters-btn"
-                    onClick={handleClearFilters}
-                  >
-                    <i className="fas fa-times me-1"></i> Clear Filters
-                  </button>
-                )}
-              </div>
+                  <i className="fas fa-times me-1"></i> Clear All
+                </button>
+              )}
             </div>
           </div>
 
@@ -311,22 +248,28 @@ function InventoryContent() {
 
           {vehicles.length === 0 && (
             <div className="text-center py-5">
-              <h3>No vehicles found matching your criteria</h3>
-              <button
-                className="btn btn-primary mt-3"
-                onClick={handleClearFilters}
-              >
-                Clear Filters
-              </button>
+              <h3>No vehicles found</h3>
+              <p className="text-muted">Try adjusting your search or clearing filters</p>
+              {(searchQuery || selectedBrand) && (
+                <button
+                  className="btn btn-primary mt-3"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedBrand(null);
+                  }}
+                >
+                  Clear All
+                </button>
+              )}
             </div>
           )}
 
           {vehicles.length > 0 && renderPageNumbers()}
 
           <div className="text-center mt-5">
-            <Link href="/inventory" className="btn btn-primary btn-lg px-5 py-3">
+            <a href="/inventory" className="btn btn-primary btn-lg px-5 py-3">
               View All Vehicles <i className="fas fa-arrow-right ms-2"></i>
-            </Link>
+            </a>
           </div>
         </div>
       </section>

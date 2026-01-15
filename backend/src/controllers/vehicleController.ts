@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as vehicleService from '../services/vehicleService';
+import { uploadMultipleToCloudinary, deleteMultipleFromCloudinary } from '../config/cloudinary';
 
 export const getVehicles = async (req: Request, res: Response) => {
   try {
@@ -25,8 +26,10 @@ export const createVehicle = async (req: Request, res: Response) => {
 
     const files = (req as any).files as Express.Multer.File[];
     if (files && files.length > 0) {
-      vehicleData.images = files.map((file) => `/uploads/${file.filename}`);
-      vehicleData.imageUrl = vehicleData.images[0];
+      const uploadedImages = await uploadMultipleToCloudinary(files);
+      vehicleData.images = uploadedImages.map(img => img.url);
+      vehicleData.imageUrl = uploadedImages[0].url;
+      vehicleData.imagePublicIds = uploadedImages.map(img => img.publicId);
     } else if (vehicleData.imageUrl) {
       vehicleData.images = [vehicleData.imageUrl];
     }
@@ -44,8 +47,15 @@ export const updateVehicle = async (req: Request, res: Response) => {
 
     const files = (req as any).files as Express.Multer.File[];
     if (files && files.length > 0) {
-      vehicleData.images = files.map((file) => `/uploads/${file.filename}`);
-      vehicleData.imageUrl = vehicleData.images[0];
+      const existingVehicle = await vehicleService.getVehicleById(req.params.id);
+      if (existingVehicle.imagePublicIds && existingVehicle.imagePublicIds.length > 0) {
+        await deleteMultipleFromCloudinary(existingVehicle.imagePublicIds);
+      }
+
+      const uploadedImages = await uploadMultipleToCloudinary(files);
+      vehicleData.images = uploadedImages.map(img => img.url);
+      vehicleData.imageUrl = uploadedImages[0].url;
+      vehicleData.imagePublicIds = uploadedImages.map(img => img.publicId);
     } else if (!vehicleData.imageUrl && !vehicleData.images) {
       const existingVehicle = await vehicleService.getVehicleById(req.params.id);
       vehicleData.imageUrl = existingVehicle.imageUrl;
@@ -61,6 +71,10 @@ export const updateVehicle = async (req: Request, res: Response) => {
 
 export const deleteVehicle = async (req: Request, res: Response) => {
   try {
+    const vehicle = await vehicleService.getVehicleById(req.params.id);
+    if (vehicle.imagePublicIds && vehicle.imagePublicIds.length > 0) {
+      await deleteMultipleFromCloudinary(vehicle.imagePublicIds);
+    }
     const result = await vehicleService.deleteVehicle(req.params.id);
     res.json(result);
   } catch (error: any) {
