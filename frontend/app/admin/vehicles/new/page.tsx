@@ -36,6 +36,7 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState<VehicleFormData>({
     make: '',
     model: '',
@@ -54,7 +55,7 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
     status: 'USED',
     featured: false,
     description: '',
-    isDraft: true,
+    isDraft: false,
     scheduledAt: '',
   });
 
@@ -64,6 +65,26 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
       fetchVehicle(vehicleId);
     }
   }, [vehicleId]);
+
+  // Prevent accidental navigation with unsaved changes
+  useEffect(() => {
+    const hasUnsavedChanges = !isEditing && (
+      formData.make !== '' ||
+      formData.model !== '' ||
+      formData.vin !== '' ||
+      imageFiles.length > 0
+    );
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formData, imageFiles, isEditing]);
 
   const fetchVehicle = async (id: string) => {
     try {
@@ -80,8 +101,9 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitStatus('submitting');
     setLoading(true);
 
     try {
@@ -90,7 +112,13 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
       Object.keys(formData).forEach((key) => {
         const value = formData[key as keyof VehicleFormData];
         if (value !== undefined && value !== null) {
-          formDataToSend.append(key, String(value));
+          if (typeof value === 'boolean') {
+            formDataToSend.append(key, value ? 'true' : 'false');
+          } else if (typeof value === 'number') {
+            formDataToSend.append(key, String(value));
+          } else {
+            formDataToSend.append(key, String(value));
+          }
         }
       });
 
@@ -110,13 +138,22 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
         body: formDataToSend,
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        throw new Error(isEditing ? 'Failed to update vehicle' : 'Failed to create vehicle');
+        throw new Error(responseData.error?.message || responseData.message || isEditing ? 'Failed to update vehicle' : 'Failed to create vehicle');
       }
 
-      router.push('/admin/vehicles');
+      setSubmitStatus('success');
+      alert(isEditing ? 'Vehicle updated successfully!' : 'Vehicle created successfully!');
+
+      setTimeout(() => {
+        router.push('/admin/vehicles');
+      }, 500);
     } catch (error: any) {
-      alert(error.response?.data?.error || error.message || 'Failed to save vehicle');
+      console.error('Error saving vehicle:', error);
+      setSubmitStatus('error');
+      alert(error.response?.data?.error?.message || error.message || 'Failed to save vehicle');
       setLoading(false);
     }
   };
@@ -187,7 +224,11 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
   };
 
   const handleInputChange = (field: keyof VehicleFormData, value: any) => {
-    setFormData({ ...formData, [field]: value });
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Reset submit status when user edits after error
+    if (submitStatus === 'error') {
+      setSubmitStatus('idle');
+    }
   };
 
   return (
@@ -519,7 +560,8 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
                           {index > 0 && (
                             <button
                               type="button"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.preventDefault();
                                 const newPreviews = [...imagePreviews];
                                 const newFiles = [...imageFiles];
                                 const prevPreview = newPreviews[index];
@@ -540,7 +582,8 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
                           {index < imagePreviews.length - 1 && (
                             <button
                               type="button"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.preventDefault();
                                 const newPreviews = [...imagePreviews];
                                 const newFiles = [...imageFiles];
                                 const nextPreview = newPreviews[index + 1];
@@ -566,7 +609,10 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
                         />
                         <button
                           type="button"
-                          onClick={() => removeImage(index)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            removeImage(index);
+                          }}
                           className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                         >
                           <X size={16} />
@@ -593,7 +639,10 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
                     </label>
                     <button
                       type="button"
-                      onClick={clearAllImages}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        clearAllImages();
+                      }}
                       className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-300 cursor-pointer"
                     >
                       <X size={18} />
@@ -646,13 +695,18 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
             </Link>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || submitStatus === 'submitting'}
               className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {submitStatus === 'submitting' ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Saving...</span>
+                </>
+              ) : submitStatus === 'success' ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-green-400 border-t-transparent rounded-full"></div>
+                  <span>Saved!</span>
                 </>
               ) : (
                 <>
