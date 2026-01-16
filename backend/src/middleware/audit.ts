@@ -1,6 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../config/database';
 import { AuthRequest } from './auth';
+import {
+  shouldLogAuditEvent,
+  getBeforeStateForLog,
+  getAfterStateForLog,
+  getChangesForLog,
+  getIpAddressForLog,
+} from '../config/features';
 
 const ACTION_MAP: Record<string, string> = {
   'CREATE': 'VEHICLE_CREATED',
@@ -18,6 +25,14 @@ export const auditLogger = (action: string, entityType: string) => {
       const authReq = req as AuthRequest;
 
       if (authReq.user && res.statusCode < 400) {
+        const mappedAction = ACTION_MAP[action] || action;
+
+        if (!shouldLogAuditEvent(mappedAction)) {
+          const result = oldJson.call(this, data);
+          res.json = oldJson;
+          return result;
+        }
+
         const entityId = req.params.id || (data.id && typeof data.id === 'string' ? data.id : undefined);
 
         let beforeState: string | null = null;
@@ -30,7 +45,7 @@ export const auditLogger = (action: string, entityType: string) => {
                 where: { id: entityId },
               });
               if (existingVehicle) {
-                beforeState = JSON.stringify(existingVehicle);
+                beforeState = getBeforeStateForLog(JSON.stringify(existingVehicle));
               }
             } catch (err) {
               console.error('Failed to fetch before state:', err);
@@ -39,26 +54,22 @@ export const auditLogger = (action: string, entityType: string) => {
         }
 
         if (data.vehicle) {
-          afterState = JSON.stringify(data.vehicle);
+          afterState = getAfterStateForLog(JSON.stringify(data.vehicle));
         } else if (entityType === 'VEHICLE' && entityId) {
           try {
             const updatedVehicle = await prisma.vehicle.findUnique({
               where: { id: entityId },
             });
             if (updatedVehicle) {
-              afterState = JSON.stringify(updatedVehicle);
+              afterState = getAfterStateForLog(JSON.stringify(updatedVehicle));
             }
           } catch (err) {
             console.error('Failed to fetch after state:', err);
           }
         }
 
-        let changes = null;
-        if (req.body) {
-          changes = JSON.stringify(req.body);
-        }
-
-        const mappedAction = ACTION_MAP[action] || action;
+        const changes = getChangesForLog(req.body ? JSON.stringify(req.body) : undefined);
+        const ipAddress = getIpAddressForLog(req.ip || req.socket.remoteAddress || 'unknown');
 
         prisma.auditLog.create({
           data: {
@@ -71,7 +82,7 @@ export const auditLogger = (action: string, entityType: string) => {
             userId: authReq.user.userId,
             vehicleId: entityType === 'VEHICLE' ? entityId : undefined,
             inquiryId: entityType === 'INQUIRY' ? entityId : undefined,
-            ipAddress: req.ip || req.socket.remoteAddress || 'unknown',
+            ipAddress,
           },
         }).catch((err) => console.error('Audit logging failed:', err));
       }

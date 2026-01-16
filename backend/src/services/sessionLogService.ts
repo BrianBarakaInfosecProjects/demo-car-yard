@@ -1,5 +1,11 @@
 import prisma from '../config/database';
 import { AuthRequest } from '../middleware/auth';
+import {
+  shouldLogSessionEvent,
+  getUserAgentForLog,
+  getIpAddressForLog,
+  config,
+} from '../config/features';
 
 export interface SessionLogInput {
   eventType: 'LOGIN_SUCCESS' | 'LOGIN_FAILED' | 'LOGOUT' | 'SESSION_EXPIRED';
@@ -19,6 +25,10 @@ export const logLoginSuccess = async (
   ipAddress: string,
   userAgent: string
 ) => {
+  if (!shouldLogSessionEvent('LOGIN_SUCCESS')) {
+    return;
+  }
+
   try {
     await prisma.sessionLog.create({
       data: {
@@ -26,8 +36,8 @@ export const logLoginSuccess = async (
         userId,
         username,
         role,
-        ipAddress,
-        userAgent,
+        ipAddress: getIpAddressForLog(ipAddress),
+        userAgent: getUserAgentForLog(userAgent),
         sessionStart: new Date(),
       },
     });
@@ -41,13 +51,17 @@ export const logLoginFailed = async (
   ipAddress: string,
   userAgent: string
 ) => {
+  if (!shouldLogSessionEvent('LOGIN_FAILED')) {
+    return;
+  }
+
   try {
     await prisma.sessionLog.create({
       data: {
         eventType: 'LOGIN_FAILED',
         username,
-        ipAddress,
-        userAgent,
+        ipAddress: getIpAddressForLog(ipAddress),
+        userAgent: getUserAgentForLog(userAgent),
       },
     });
   } catch (error) {
@@ -62,6 +76,10 @@ export const logLogout = async (
   ipAddress: string,
   userAgent: string
 ) => {
+  if (!shouldLogSessionEvent('LOGOUT')) {
+    return;
+  }
+
   try {
     const latestLogin = await prisma.sessionLog.findFirst({
       where: {
@@ -75,7 +93,7 @@ export const logLogout = async (
 
     const sessionStart = latestLogin?.sessionStart || latestLogin?.createdAt;
     const sessionEnd = new Date();
-    const sessionDuration = sessionStart
+    const sessionDuration = config.logSessionDuration && sessionStart
       ? Math.floor((sessionEnd.getTime() - sessionStart.getTime()) / 1000)
       : null;
 
@@ -85,8 +103,8 @@ export const logLogout = async (
         userId,
         username,
         role,
-        ipAddress,
-        userAgent,
+        ipAddress: getIpAddressForLog(ipAddress),
+        userAgent: getUserAgentForLog(userAgent),
         sessionStart,
         sessionEnd,
         sessionDuration,
@@ -104,6 +122,10 @@ export const logSessionExpired = async (
   ipAddress: string,
   userAgent: string
 ) => {
+  if (!shouldLogSessionEvent('SESSION_EXPIRED')) {
+    return;
+  }
+
   try {
     const latestLogin = await prisma.sessionLog.findFirst({
       where: {
@@ -117,7 +139,7 @@ export const logSessionExpired = async (
 
     const sessionStart = latestLogin?.sessionStart || latestLogin?.createdAt;
     const sessionEnd = new Date();
-    const sessionDuration = sessionStart
+    const sessionDuration = config.logSessionDuration && sessionStart
       ? Math.floor((sessionEnd.getTime() - sessionStart.getTime()) / 1000)
       : null;
 
@@ -127,8 +149,8 @@ export const logSessionExpired = async (
         userId,
         username,
         role,
-        ipAddress,
-        userAgent,
+        ipAddress: getIpAddressForLog(ipAddress),
+        userAgent: getUserAgentForLog(userAgent),
         sessionStart,
         sessionEnd,
         sessionDuration,
