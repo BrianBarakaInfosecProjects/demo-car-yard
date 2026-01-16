@@ -25,11 +25,11 @@ export const vehicleSchema = z.object({
   exteriorColor: z.string().min(1, 'Exterior color is required'),
   interiorColor: z.string().min(1, 'Interior color is required'),
   engine: z.string().min(1, 'Engine is required'),
-  vin: z.string().min(1, 'VIN is required'),
+  vin: z.string().optional(),
   status: z.enum(['NEW', 'USED', 'CERTIFIED_PRE_OWNED', 'ON_SALE']).default('USED'),
   featured: z.boolean().default(false),
   description: z.string().min(10, 'Description must be at least 10 characters'),
-  imageUrl: z.string().url('Invalid image URL'),
+  imageUrl: z.string().url('Invalid image URL').optional().default('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'),
   isDraft: z.boolean().default(true),
 });
 

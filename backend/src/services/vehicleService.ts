@@ -3,7 +3,7 @@ import { VehicleInput, VehicleFilter } from '../utils/validators';
 
 function generateSlug(make: string, model: string, year: number): string {
   const baseSlug = `${year}-${make.toLowerCase()}-${model.toLowerCase()}`
-    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/[^a-z0-9]/g, '-')
     .replace(/-+/g, '-')
     .trim();
   return baseSlug;
@@ -29,6 +29,234 @@ async function ensureUniqueSlug(make: string, model: string, year: number, maxAt
 
   throw new Error(`Failed to generate unique slug after ${maxAttempts} attempts for ${make} ${model} ${year}`);
 }
+
+// ==================== LIFECYCLE HELPERS ====================
+
+export const lifecycle = {
+  /**
+   * Mark vehicle as sold
+   * - Sets status to SOLD
+   * - Removes from featured (if featured)
+   * - Records soldAt timestamp
+   * - Creates notification
+   */
+  markAsSold: async (id: string, userId: string) => {
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+    if (!vehicle) throw new Error('Vehicle not found');
+
+    const updated = await prisma.vehicle.update({
+      where: { id },
+      data: {
+        status: 'SOLD',
+        featured: false,
+        soldAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+
+    // Create notification
+    await prisma.notification.create({
+      type: 'SUCCESS',
+      message: `Vehicle marked as sold: ${vehicle.make} ${vehicle.model} (${vehicle.year})`,
+      action: 'VEHICLE_SOLD',
+      entityType: 'VEHICLE',
+      entityId: id,
+      userId,
+      vehicleId: id,
+    });
+
+    return updated;
+  },
+
+  /**
+   * Archive vehicle (soft delete)
+   * - Sets deletedAt timestamp
+   * - Does not remove from database
+   * - Vehicle remains hidden but recoverable
+   */
+  archiveVehicle: async (id: string, userId: string) => {
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+    if (!vehicle) throw new Error('Vehicle not found');
+
+    const updated = await prisma.vehicle.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        featured: false, // Remove from featured if archived
+        updatedAt: new Date(),
+      },
+    });
+
+    // Create notification
+    await prisma.notification.create({
+      type: 'INFO',
+      message: `Vehicle archived: ${vehicle.make} ${vehicle.model} (${vehicle.year})`,
+      action: 'VEHICLE_ARCHIVED',
+      entityType: 'VEHICLE',
+      entityId: id,
+      userId,
+      vehicleId: id,
+    });
+
+    return updated;
+  },
+
+  /**
+   * Restore archived vehicle
+   * - Clears deletedAt timestamp
+   * - Vehicle becomes visible again
+   */
+  restoreVehicle: async (id: string, userId: string) => {
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+    if (!vehicle) throw new Error('Vehicle not found');
+
+    const updated = await prisma.vehicle.update({
+      where: { id },
+      data: {
+        deletedAt: null,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Create notification
+    await prisma.notification.create({
+      type: 'SUCCESS',
+      message: `Vehicle restored: ${vehicle.make} ${vehicle.model} (${vehicle.year})`,
+      action: 'VEHICLE_RESTORED',
+      entityType: 'VEHICLE',
+      entityId: id,
+      userId,
+      vehicleId: id,
+    });
+
+    return updated;
+  },
+
+  /**
+   * Permanently delete vehicle
+   * - Removes from database
+   * - Cleans up related records if needed
+   */
+  permanentDelete: async (id: string, userId: string) => {
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+    if (!vehicle) throw new Error('Vehicle not found');
+
+    // Delete images from Cloudinary if needed
+    if (vehicle.imagePublicIds && vehicle.imagePublicIds.length > 0) {
+      // Import deleteMultipleFromCloudinary if available
+      // For now, just log it
+      console.log('Would delete images from Cloudinary:', vehicle.imagePublicIds);
+    }
+
+    // Delete the vehicle
+    await prisma.vehicle.delete({
+      where: { id },
+    });
+
+    // Create notification
+    await prisma.notification.create({
+      type: 'ERROR',
+      message: `Vehicle permanently deleted: ${vehicle.make} ${vehicle.model} (${vehicle.year})`,
+      action: 'VEHICLE_DELETED',
+      entityType: 'VEHICLE',
+      entityId: id,
+      userId,
+      vehicleId: id,
+    });
+
+    return vehicle;
+  },
+
+  /**
+   * Toggle featured status
+   * - If featured: unfeature
+   * - If not featured: feature
+   * - Checks max featured count (optional)
+   */
+  toggleFeatured: async (id: string, userId: string) => {
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+    if (!vehicle) throw new Error('Vehicle not found');
+
+    const newFeaturedStatus = !vehicle.featured;
+
+    // Optional: Enforce max featured limit
+    // Uncomment to enable max featured limit of 10
+    /*
+    if (newFeaturedStatus) {
+      const featuredCount = await prisma.vehicle.count({
+        where: {
+          featured: true,
+          status: { in: ['NEW', 'USED', 'CERTIFIED_PRE_OWNED'] },
+          deletedAt: null,
+        },
+      });
+
+      if (featuredCount >= 10) {
+        throw new Error('Maximum of 10 featured vehicles reached. Unfeature another vehicle first.');
+      }
+    }
+    */
+
+    const updated = await prisma.vehicle.update({
+      where: { id },
+      data: {
+        featured: newFeaturedStatus,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Create notification
+    await prisma.notification.create({
+      type: newFeaturedStatus ? 'SUCCESS' : 'INFO',
+      message: `Vehicle ${newFeaturedStatus ? 'featured' : 'unfeatured'}: ${vehicle.make} ${vehicle.model}`,
+      action: 'FEATURED_TOGGLED',
+      entityType: 'VEHICLE',
+      entityId: id,
+      userId,
+      vehicleId: id,
+    });
+
+    return updated;
+  },
+
+  /**
+   * Update vehicle status
+   * - Handles all lifecycle status changes
+   * - Automatically unfeatures sold vehicles
+   */
+  updateStatus: async (id: string, status: string, userId: string) => {
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+    if (!vehicle) throw new Error('Vehicle not found');
+
+    // If marking as sold, automatically unfeature
+    const updateData: any = {
+      status,
+      updatedAt: new Date(),
+    };
+
+    if (status === 'SOLD') {
+      updateData.featured = false;
+    }
+
+    const updated = await prisma.vehicle.update({
+      where: { id },
+      data: updateData,
+    });
+
+    // Create notification
+    await prisma.notification.create({
+      type: status === 'SOLD' ? 'SUCCESS' : 'INFO',
+      message: `Vehicle status updated to ${status}: ${vehicle.make} ${vehicle.model}`,
+      action: 'STATUS_UPDATED',
+      entityType: 'VEHICLE',
+      entityId: id,
+      userId,
+      vehicleId: id,
+    });
+
+    return updated;
+  },
+};
 
 export const getVehicles = async (filters: VehicleFilter & { page?: number; limit?: number; includeDrafts?: boolean }) => {
   const conditions: any = [];
@@ -197,14 +425,6 @@ export const getSimilarVehicles = async (vehicleId: string, limit: number = 4) =
 };
 
 export const createVehicle = async (input: VehicleInput) => {
-  const existingVehicle = await prisma.vehicle.findUnique({
-    where: { vin: input.vin },
-  });
-
-  if (existingVehicle) {
-    throw new Error('Vehicle with this VIN already exists');
-  }
-
   const slug = await ensureUniqueSlug(input.make, input.model, input.year);
 
   const vehicle = await prisma.vehicle.create({
@@ -225,16 +445,6 @@ export const updateVehicle = async (id: string, input: Partial<VehicleInput>) =>
 
   if (!existingVehicle) {
     throw new Error('Vehicle not found');
-  }
-
-  if (input.vin && input.vin !== existingVehicle.vin) {
-    const duplicateVin = await prisma.vehicle.findUnique({
-      where: { vin: input.vin },
-    });
-
-    if (duplicateVin) {
-      throw new Error('Vehicle with this VIN already exists');
-    }
   }
 
   const vehicle = await prisma.vehicle.update({

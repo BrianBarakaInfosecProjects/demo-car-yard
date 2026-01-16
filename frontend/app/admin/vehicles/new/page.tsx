@@ -71,7 +71,6 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
     const hasUnsavedChanges = !isEditing && (
       formData.make !== '' ||
       formData.model !== '' ||
-      formData.vin !== '' ||
       imageFiles.length > 0
     );
 
@@ -454,13 +453,13 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">VIN</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">VIN (Optional)</label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={formData.vin}
                   onChange={(e) => handleInputChange('vin', e.target.value)}
-                  required
+                  placeholder="e.g., JH4KA3150K000000"
                 />
               </div>
 
