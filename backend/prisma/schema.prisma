@@ -8,31 +8,38 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String      @id @default(uuid())
+  email     String      @unique
   password  String
   name      String?
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role        @default(ADMIN)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   inquiries Inquiry[]
   auditLogs AuditLog[]
+  sessionLogs SessionLog[]
 }
 
 model AuditLog {
-  id          String   @id @default(uuid())
-  action      String
-  entityType  String
-  entityId    String?
-  changes     String?
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  vehicleId   String?
-  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
-  inquiryId   String?
-  inquiry     Inquiry? @relation(fields: [inquiryId], references: [id])
-  ipAddress   String?
-  createdAt   DateTime @default(now())
+  id           String   @id @default(uuid())
+  action       String
+  entityType   String
+  entityId     String?
+  changes      String?
+  beforeState  String?  @db.Text
+  afterState   String?  @db.Text
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  vehicleId    String?
+  vehicle      Vehicle? @relation(fields: [vehicleId], references: [id])
+  inquiryId    String?
+  inquiry      Inquiry? @relation(fields: [inquiryId], references: [id])
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType])
+  @@index([createdAt])
 }
 
 model Vehicle {
@@ -89,6 +96,25 @@ model Inquiry {
   status      String   @default("PENDING")
   createdAt   DateTime @default(now())
   auditLogs   AuditLog[]
+}
+
+model SessionLog {
+  id              String    @id @default(uuid())
+  eventType       String
+  userId          String?
+  username        String?
+  role            String?
+  ipAddress       String?
+  userAgent       String?    @db.Text
+  sessionStart    DateTime?
+  sessionEnd      DateTime?
+  sessionDuration Int?
+  createdAt       DateTime  @default(now())
+  user            User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([createdAt])
 }
 
 enum Role {

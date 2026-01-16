@@ -2,6 +2,7 @@ import prisma from '../config/database';
 import { hashPassword, comparePassword } from '../utils/passwordHash';
 import { generateToken, TokenPayload } from '../utils/token';
 import { RegisterInput, LoginInput } from '../utils/validators';
+import { logLoginSuccess, logLoginFailed, logLogout } from './sessionLogService';
 
 export const register = async (input: RegisterInput) => {
   const existingUser = await prisma.user.findUnique({
@@ -40,18 +41,20 @@ export const register = async (input: RegisterInput) => {
   return { user, token };
 };
 
-export const login = async (input: LoginInput) => {
+export const login = async (input: LoginInput, ipAddress?: string, userAgent?: string) => {
   const user = await prisma.user.findUnique({
     where: { email: input.email },
   });
 
   if (!user) {
+    await logLoginFailed(input.email, ipAddress || 'unknown', userAgent || 'unknown');
     throw new Error('Invalid credentials');
   }
 
   const isValid = await comparePassword(input.password, user.password);
 
   if (!isValid) {
+    await logLoginFailed(user.email, ipAddress || 'unknown', userAgent || 'unknown');
     throw new Error('Invalid credentials');
   }
 
@@ -62,6 +65,14 @@ export const login = async (input: LoginInput) => {
   };
 
   const token = generateToken(payload);
+
+  await logLoginSuccess(
+    user.id,
+    user.email,
+    user.role,
+    ipAddress || 'unknown',
+    userAgent || 'unknown'
+  );
 
   return {
     user: {
@@ -96,22 +107,22 @@ export const getProfile = async (userId: string) => {
 
 export const updateProfile = async (userId: string, data: { name?: string; email?: string; password?: string }) => {
   const updateData: any = {};
-  
+
   if (data.name) {
     updateData.name = data.name;
   }
-  
+
   if (data.email) {
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
     });
-    
+
     if (existingUser && existingUser.id !== userId) {
       throw new Error('Email already in use');
     }
     updateData.email = data.email;
   }
-  
+
   if (data.password) {
     updateData.password = await hashPassword(data.password);
   }
@@ -129,4 +140,9 @@ export const updateProfile = async (userId: string, data: { name?: string; email
   });
 
   return user;
+};
+
+export const logout = async (userId: string, username: string, role: string, ipAddress: string, userAgent: string) => {
+  await logLogout(userId, username, role, ipAddress, userAgent);
+  return { message: 'Logged out successfully' };
 };

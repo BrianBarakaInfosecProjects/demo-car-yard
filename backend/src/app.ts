@@ -7,6 +7,7 @@ import vehicleRoutes from './routes/vehicles';
 import inquiryRoutes from './routes/inquiries';
 import analyticsRoutes from './routes/analytics';
 import bulkRoutes from './routes/bulk';
+import logsRoutes from './routes/logs';
 import { errorHandler } from './middleware/errorHandler';
 import { limiter, authLimiter } from './middleware/rateLimiter';
 
@@ -64,6 +65,7 @@ app.get('/', (req, res) => {
       inquiries: '/api/inquiries',
       analytics: '/api/analytics',
       bulk: '/api/bulk',
+      logs: '/api/logs',
     },
     documentation: 'See README.md for API documentation',
   });
@@ -75,6 +77,7 @@ app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/bulk', bulkRoutes);
+app.use('/api/logs', logsRoutes);
 
 app.use(errorHandler);
 
