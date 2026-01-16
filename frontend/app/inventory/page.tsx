@@ -1,35 +1,49 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Vehicle } from '@/lib/types';
 import { api } from '@/lib/api';
 import VehicleCard from '@/components/vehicles/VehicleCard';
-import VehicleModal from '@/components/vehicles/VehicleModal';
-import BrandFilter from '@/components/BrandFilter';
-import SearchInput from '@/components/SearchInput';
+import InventoryFilters from '@/components/inventory/InventoryFilters';
 import ScrollPositionManager from '@/components/ScrollPositionManager';
 import NavigationButtons from '@/components/NavigationButtons';
 
 function InventoryContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [allVehicles, setAllVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [vehiclesPerPage] = useState(9);
-  const [sortBy, setSortBy] = useState('default');
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
+  const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'default');
+  const [make, setMake] = useState(searchParams.get('make') || '');
 
   useEffect(() => {
     fetchVehicles();
   }, []);
 
   const fetchVehicles = async () => {
+    setLoading(true);
     try {
-      const data = await api.get('/vehicles');
-      setVehicles(data);
-      setAllVehicles(data);
+      const params: any = {
+        page: currentPage,
+        limit: vehiclesPerPage,
+      };
+      if (search) params.search = search;
+      if (make) params.make = make;
+      if (minPrice) params.priceMin = parseInt(minPrice);
+      if (maxPrice) params.priceMax = parseInt(maxPrice);
+      if (sortBy && sortBy !== 'default') params.sortBy = sortBy;
+
+      const response = await api.get('/vehicles', params);
+      setVehicles(response.vehicles || []);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
@@ -37,44 +51,25 @@ function InventoryContent() {
     }
   };
 
-  const applyFilters = () => {
-    let filtered = [...allVehicles];
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((v) => {
-        const searchTerms = `${v.make} ${v.model} ${v.year} ${v.description}`.toLowerCase();
-        return searchTerms.includes(query);
-      });
-    }
-
-    if (selectedBrand) {
-      filtered = filtered.filter((v) =>
-        v.make.toLowerCase() === selectedBrand.toLowerCase()
-      );
-    }
-
-    if (sortBy === 'price-low') {
-      filtered.sort((a, b) => a.priceKES - b.priceKES);
-    } else if (sortBy === 'price-high') {
-      filtered.sort((a, b) => b.priceKES - a.priceKES);
-    } else if (sortBy === 'year-new') {
-      filtered.sort((a, b) => b.year - a.year);
-    } else if (sortBy === 'year-old') {
-      filtered.sort((a, b) => a.year - b.year);
-    } else if (sortBy === 'brand') {
-      filtered.sort((a, b) => a.make.localeCompare(b.make));
-    }
-
-    setVehicles(filtered);
-    setCurrentPage(1);
-  };
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (make) params.set('make', make);
+    if (minPrice) params.set('minPrice', minPrice);
+    if (maxPrice) params.set('maxPrice', maxPrice);
+    if (sortBy && sortBy !== 'default') params.set('sortBy', sortBy);
+    
+    const queryString = params.toString();
+    const path = queryString ? `/inventory?${queryString}` : '/inventory';
+    
+    router.push(path);
+  }, [search, make, minPrice, maxPrice, sortBy, router]);
 
   useEffect(() => {
-    applyFilters();
-  }, [searchQuery, selectedBrand, sortBy]);
+    fetchVehicles();
+  }, [search, make, minPrice, maxPrice, sortBy]);
 
-  const totalPages = Math.ceil(vehicles.length / vehiclesPerPage);
+  const totalPages = vehicles.length > 0 ? Math.ceil(vehicles.length / vehiclesPerPage) : 1;
   const indexOfLastVehicle = currentPage * vehiclesPerPage;
   const indexOfFirstVehicle = indexOfLastVehicle - vehiclesPerPage;
   const currentVehicles = vehicles.slice(indexOfFirstVehicle, indexOfLastVehicle);
@@ -89,6 +84,40 @@ function InventoryContent() {
       setCurrentPage(pageNumber);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setCurrentPage(1);
+  };
+
+  const handleMinPriceChange = (value: string) => {
+    setMinPrice(value);
+    setCurrentPage(1);
+  };
+
+  const handleMaxPriceChange = (value: string) => {
+    setMaxPrice(value);
+    setCurrentPage(1);
+  };
+
+  const handleSortByChange = (value: string) => {
+    setSortBy(value);
+    setCurrentPage(1);
+  };
+
+  const handleMakeClear = () => {
+    setMake('');
+    setCurrentPage(1);
+  };
+
+  const handleClearAll = () => {
+    setSearch('');
+    setMake('');
+    setMinPrice('');
+    setMaxPrice('');
+    setCurrentPage(1);
+    setSortBy('default');
   };
 
   const renderPageNumbers = () => {
@@ -182,17 +211,23 @@ function InventoryContent() {
             </p>
           </div>
 
-          <div className="search-and-filters">
-            <SearchInput value={searchQuery} onChange={setSearchQuery} />
-            <BrandFilter selectedBrand={selectedBrand} onBrandSelect={setSelectedBrand} />
-          </div>
+          <InventoryFilters
+            search={search}
+            make={make}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onSearchChange={handleSearchChange}
+            onMakeClear={handleMakeClear}
+            onMinPriceChange={handleMinPriceChange}
+            onMaxPriceChange={handleMaxPriceChange}
+            onClearAll={handleClearAll}
+          />
 
           <div className="results-bar">
             <div className="results-count">
               <span>
                 Showing {currentVehicles.length} of {vehicles.length} vehicles
-                {searchQuery && <span> matching "{searchQuery}"</span>}
-                {selectedBrand && <span> - {brands.find(b => b.id === selectedBrand)?.name}</span>}
+                {search && <span> matching "{search}"</span>}
               </span>
             </div>
             <div className="sort-controls">
@@ -201,7 +236,10 @@ function InventoryContent() {
                 id="sortSelect"
                 className="sort-select"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setCurrentPage(1);
+                }}
               >
                 <option value="default">Default</option>
                 <option value="price-low">Price: Low to High</option>
@@ -210,27 +248,18 @@ function InventoryContent() {
                 <option value="year-old">Year: Oldest First</option>
                 <option value="brand">Brand: A to Z</option>
               </select>
-              {(searchQuery || selectedBrand) && (
-                <button
-                  className="clear-filters-btn"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedBrand(null);
-                  }}
-                >
-                  <i className="fas fa-times me-1"></i> Clear All
-                </button>
-              )}
             </div>
           </div>
 
           <div className="row g-4" id="vehicleGrid">
             {currentVehicles.map((vehicle) => (
-              <VehicleCard
+              <Link
                 key={vehicle.id}
-                vehicle={vehicle}
-                onDetailsClick={setSelectedVehicle}
-              />
+                href={vehicle.slug ? `/vehicles/${vehicle.slug}` : `/inventory`}
+                className="col-lg-4 col-md-6"
+              >
+                <VehicleCard vehicle={vehicle} />
+              </Link>
             ))}
           </div>
 
@@ -250,13 +279,10 @@ function InventoryContent() {
             <div className="text-center py-5">
               <h3>No vehicles found</h3>
               <p className="text-muted">Try adjusting your search or clearing filters</p>
-              {(searchQuery || selectedBrand) && (
+              {(search || minPrice || maxPrice) && (
                 <button
                   className="btn btn-primary mt-3"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedBrand(null);
-                  }}
+                  onClick={handleClearAll}
                 >
                   Clear All
                 </button>
@@ -273,12 +299,6 @@ function InventoryContent() {
           </div>
         </div>
       </section>
-
-      <VehicleModal
-        isOpen={!!selectedVehicle}
-        onClose={() => setSelectedVehicle(null)}
-        vehicle={selectedVehicle}
-      />
     </>
   );
 }

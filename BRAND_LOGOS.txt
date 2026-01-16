@@ -1,0 +1,82 @@
+================================================================================
+                     BRAND LOGOS - COMPLETE LIST (IN ORDER)
+================================================================================
+
+LOCATION: /workspaces/demo-car-yard/frontend/public/brands/
+TOTAL:   19 brand logos
+DATE:     January 15, 2026
+
+--------------------------------------------------------------------------------
+
+  1. TOYOTA        → /brands/toyota.svg       (Red #EB0A1E)
+  2. NISSAN        → /brands/nissan.svg       (Red #C3002F)
+  3. SUBARU        → /brands/subaru.svg       (Blue #005CA9)
+  4. MAZDA         → /brands/mazda.svg        (Purple #9D1BBB)
+  5. HONDA         → /brands/honda.svg        (Red #CC0000)
+  6. MITSUBISHI    → /brands/mitsubishi.svg   (Red #ED1B2E)
+  7. MERCEDES      → /brands/mercedes.svg     (Black #000000)
+  8. BMW           → /brands/bmw.svg          (Blue #0066B1)
+  9. AUDI          → /brands/audi.svg         (Black #000000)
+ 10. HYUNDAI       → /brands/hyundai.svg      (Navy #002C5F)
+ 11. KIA           → /brands/kia.svg          (Dark #05141F)
+ 12. ISUZU         → /brands/isuzu.svg        (Red #CC0000)
+ 13. VOLKSWAGEN    → /brands/volkswagen.svg   (Blue #001E50)
+ 14. CHEVROLET     → /brands/chevrolet.svg    (Green #D4AF37)
+ 15. FORD          → /brands/ford.svg         (Blue #003478)
+ 16. JEEP          → /brands/jeep.svg         (Green #003300)
+ 17. LEXUS         → /brands/lexus.svg        (Black #1A1A1A)
+ 18. LAND ROVER    → /brands/landrover.svg    (Green #004E33)
+ 19. TESLA         → /brands/tesla.svg        (Red #E82127)
+
+--------------------------------------------------------------------------------
+
+QUICK LIST (for copy-paste):
+toyota.svg
+nissan.svg
+subaru.svg
+mazda.svg
+honda.svg
+mitsubishi.svg
+mercedes.svg
+bmw.svg
+audi.svg
+hyundai.svg
+kia.svg
+isuzu.svg
+volkswagen.svg
+chevrolet.svg
+ford.svg
+jeep.svg
+lexus.svg
+landrover.svg
+tesla.svg
+
+--------------------------------------------------------------------------------
+
+USAGE IN COMPONENT:
+------------------
+const BRAND_LOGOS = {
+  toyota: '/brands/toyota.svg',
+  nissan: '/brands/nissan.svg',
+  subaru: '/brands/subaru.svg',
+  mazda: '/brands/mazda.svg',
+  honda: '/brands/honda.svg',
+  mitsubishi: '/brands/mitsubishi.svg',
+  mercedes: '/brands/mercedes.svg',
+  bmw: '/brands/bmw.svg',
+  audi: '/brands/audi.svg',
+  hyundai: '/brands/hyundai.svg',
+  kia: '/brands/kia.svg',
+  isuzu: '/brands/isuzu.svg',
+  volkswagen: '/brands/volkswagen.svg',
+  chevrolet: '/brands/chevrolet.svg',
+  ford: '/brands/ford.svg',
+  jeep: '/brands/jeep.svg',
+  lexus: '/brands/lexus.svg',
+  landrover: '/brands/landrover.svg',
+  tesla: '/brands/tesla.svg',
+};
+
+================================================================================
+                              END OF LIST
+================================================================================

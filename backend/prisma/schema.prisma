@@ -37,6 +37,7 @@ model AuditLog {
 
 model Vehicle {
   id              String    @id @default(uuid())
+  slug            String?   @unique @db.VarChar(255)
   make            String
   model           String
   year            Int
@@ -65,6 +66,14 @@ model Vehicle {
   updatedAt       DateTime  @updatedAt
   inquiries       Inquiry[]
   auditLogs       AuditLog[]
+
+  @@index([slug])
+  @@index([vin])
+  @@index([status])
+  @@index([featured])
+  @@index([isDraft])
+  @@index([make, model])
+  @@index([status, featured])
 }
 
 model Inquiry {

@@ -4,9 +4,18 @@ import * as inquiryService from '../services/inquiryService';
 export const createInquiry = async (req: Request, res: Response) => {
   try {
     const inquiry = await inquiryService.createInquiry(req.body);
-    res.status(201).json(inquiry);
+    res.status(201).json({
+      success: true,
+      inquiry,
+    });
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: {
+        message: error.message,
+        code: 'CREATE_INQUIRY_ERROR',
+      },
+    });
   }
 };
 

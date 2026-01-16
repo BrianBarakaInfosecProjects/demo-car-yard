@@ -8,10 +8,14 @@ import inquiryRoutes from './routes/inquiries';
 import analyticsRoutes from './routes/analytics';
 import bulkRoutes from './routes/bulk';
 import { errorHandler } from './middleware/errorHandler';
+import { limiter, authLimiter } from './middleware/rateLimiter';
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+}));
+
 app.use(cors({
   origin: function (origin, callback) {
     const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000,http://127.0.0.1:3000').split(',');
@@ -23,6 +27,8 @@ app.use(cors({
   },
   credentials: true,
 }));
+
+app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -35,12 +41,19 @@ app.use('/uploads', express.static(uploadsPath));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    success: true,
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: 'connected',
+    environment: process.env.NODE_ENV || 'development',
+    uptime: process.uptime(),
+  });
 });
 
-// Root route
 app.get('/', (req, res) => {
   res.json({
+    success: true,
     message: 'TrustAuto Kenya API',
     version: '1.0.0',
     status: 'running',
@@ -56,6 +69,7 @@ app.get('/', (req, res) => {
   });
 });
 
+app.use('/api/auth/login', authLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/inquiries', inquiryRoutes);

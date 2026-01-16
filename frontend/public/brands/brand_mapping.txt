@@ -1,0 +1,26 @@
+Brand Logo Mapping
+==================
+
+This file shows the mapping between brand names and their SVG filenames.
+
+Toyota        -> toyota.svg
+Nissan         -> nissan.svg
+Subaru         -> subaru.svg
+Mazda          -> mazda.svg
+Honda          -> honda.svg
+Mitsubishi     -> mitsubishi.svg
+Mercedes-Benz  -> mercedes.svg
+BMW            -> bmw.svg
+Audi           -> audi.svg
+Hyundai        -> hyundai.svg
+Kia            -> kia.svg
+Isuzu          -> isuzu.svg
+Volkswagen      -> volkswagen.svg
+Chevrolet      -> chevrolet.svg
+Ford           -> ford.svg
+Jeep           -> jeep.svg
+Lexus          -> lexus.svg
+Land Rover     -> landrover.svg
+Tesla          -> tesla.svg
+
+All SVGs are stored in: /workspaces/demo-car-yard/frontend/public/brands/

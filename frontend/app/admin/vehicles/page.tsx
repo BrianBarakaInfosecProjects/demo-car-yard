@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import Link from 'next/link';
 import { Car, Plus, Search, Edit, Trash2, Filter, Grid, List, ChevronDown } from 'lucide-react';
@@ -20,6 +21,7 @@ interface Vehicle {
 }
 
 export default function VehiclesPage() {
+  const router = useRouter();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,8 +37,8 @@ export default function VehiclesPage() {
 
   const fetchVehicles = async () => {
     try {
-      const data = await api.get('/vehicles');
-      setVehicles(data);
+      const response = await api.get('/vehicles/admin', { limit: 1000 });
+      setVehicles(response.vehicles || []);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching vehicles:', error);

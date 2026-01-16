@@ -1,5 +1,6 @@
 export interface Vehicle {
   id: string;
+  slug: string;
   make: string;
   model: string;
   year: number;
@@ -18,6 +19,12 @@ export interface Vehicle {
   featured: boolean;
   description: string;
   imageUrl: string;
+  images?: string[];
+  imagePublicIds?: string[];
+  viewCount?: number;
+  isDraft?: boolean;
+  scheduledAt?: string;
+  publishedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

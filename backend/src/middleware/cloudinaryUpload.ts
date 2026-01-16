@@ -72,7 +72,7 @@ export const uploadSingle = (fieldName: string = 'image') => {
 export const uploadMultiple = (fieldName: string = 'images', maxCount: number = 10) => {
   return (req: any, res: any, next: any) => {
     const uploadHandler = cloudinaryUpload.array(fieldName, maxCount);
-    
+
     uploadHandler(req, res, (err: any) => {
       if (err) {
         if (err instanceof multer.MulterError) {
@@ -92,18 +92,16 @@ export const uploadMultiple = (fieldName: string = 'images', maxCount: number = 
             });
           }
         }
-        
+
         return res.status(400).json({
           error: err.message || 'File upload failed',
         });
       }
-      
+
       if (!req.files || (Array.isArray(req.files) && req.files.length === 0)) {
-        return res.status(400).json({
-          error: 'No files uploaded',
-        });
+        req.files = [];
       }
-      
+
       next();
     });
   };

@@ -54,7 +54,7 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
     status: 'USED',
     featured: false,
     description: '',
-    isDraft: false,
+    isDraft: true,
     scheduledAt: '',
   });
 

@@ -46,12 +46,7 @@ export default function BrandFilter({ selectedBrand, onBrandSelect }: BrandFilte
                   src={brand.logo}
                   alt={brand.name}
                   className="brand-logo"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                  }}
                 />
-                <span className="brand-fallback">{brand.name}</span>
               </div>
             </button>
           ))}

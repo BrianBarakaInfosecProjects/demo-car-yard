@@ -1,6 +1,5 @@
-<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="50" cy="65" rx="35" ry="15" fill="none" stroke="white" stroke-width="3"/>
-  <path d="M30 50 Q35 50 40 50 Q40 55 35 45 L40 65 L40 75 L40 65 L45 50 75" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M40 65 L45 50 L60 50 L70 50 L75 50 70 65 L70 40 70 75 L70 50 75 L70 40 40 70 70 L70 50 75 L70 75 70 50 30 30 70 75 L70 60 60 70 70 40 40 70 30 70 75 L70 60 70 50 50 30 70 75 L70 60 70 50 50 30 30 50 75" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="50" y="90" text-anchor="middle" fill="white" font-size="11" font-weight="bold">HYUNDAI</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect x="5" y="5" width="90" height="90" rx="10" fill="#003478"/>
+  <text x="50" y="45" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial, sans-serif">Hyundai</text>
+  <rect x="20" y="55" width="60" height="12" fill="none" stroke="white" stroke-width="2"/>
 </svg>

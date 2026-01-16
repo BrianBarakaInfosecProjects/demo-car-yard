@@ -1,0 +1,20 @@
+ID,Brand Name,Key,Logo Path,Brand Color
+1,Toyota,toyota,/brands/toyota.svg,#EB0A1E
+2,Nissan,nissan,/brands/nissan.svg,#C3002F
+3,Subaru,subaru,/brands/subaru.svg,#005CA9
+4,Mazda,mazda,/brands/mazda.svg,#9D1BBB
+5,Honda,honda,/brands/honda.svg,#CC0000
+6,Mitsubishi,mitsubishi,/brands/mitsubishi.svg,#ED1B2E
+7,Mercedes-Benz,mercedes,/brands/mercedes.svg,#000000
+8,BMW,bmw,/brands/bmw.svg,#0066B1
+9,Audi,audi,/brands/audi.svg,#000000
+10,Hyundai,hyundai,/brands/hyundai.svg,#002C5F
+11,Kia,kia,/brands/kia.svg,#05141F
+12,Isuzu,isuzu,/brands/isuzu.svg,#CC0000
+13,Volkswagen,volkswagen,/brands/volkswagen.svg,#001E50
+14,Chevrolet,chevrolet,/brands/chevrolet.svg,#D4AF37
+15,Ford,ford,/brands/ford.svg,#003478
+16,Jeep,jeep,/brands/jeep.svg,#003300
+17,Lexus,lexus,/brands/lexus.svg,#1A1A1A
+18,Land Rover,landrover,/brands/landrover.svg,#004E33
+19,Tesla,tesla,/brands/tesla.svg,#E82127

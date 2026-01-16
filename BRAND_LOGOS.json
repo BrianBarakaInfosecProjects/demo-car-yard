@@ -1,0 +1,23 @@
+{
+  "brands": [
+    {"id": 1, "name": "Toyota", "key": "toyota", "path": "/brands/toyota.svg", "color": "#EB0A1E"},
+    {"id": 2, "name": "Nissan", "key": "nissan", "path": "/brands/nissan.svg", "color": "#C3002F"},
+    {"id": 3, "name": "Subaru", "key": "subaru", "path": "/brands/subaru.svg", "color": "#005CA9"},
+    {"id": 4, "name": "Mazda", "key": "mazda", "path": "/brands/mazda.svg", "color": "#9D1BBB"},
+    {"id": 5, "name": "Honda", "key": "honda", "path": "/brands/honda.svg", "color": "#CC0000"},
+    {"id": 6, "name": "Mitsubishi", "key": "mitsubishi", "path": "/brands/mitsubishi.svg", "color": "#ED1B2E"},
+    {"id": 7, "name": "Mercedes-Benz", "key": "mercedes", "path": "/brands/mercedes.svg", "color": "#000000"},
+    {"id": 8, "name": "BMW", "key": "bmw", "path": "/brands/bmw.svg", "color": "#0066B1"},
+    {"id": 9, "name": "Audi", "key": "audi", "path": "/brands/audi.svg", "color": "#000000"},
+    {"id": 10, "name": "Hyundai", "key": "hyundai", "path": "/brands/hyundai.svg", "color": "#002C5F"},
+    {"id": 11, "name": "Kia", "key": "kia", "path": "/brands/kia.svg", "color": "#05141F"},
+    {"id": 12, "name": "Isuzu", "key": "isuzu", "path": "/brands/isuzu.svg", "color": "#CC0000"},
+    {"id": 13, "name": "Volkswagen", "key": "volkswagen", "path": "/brands/volkswagen.svg", "color": "#001E50"},
+    {"id": 14, "name": "Chevrolet", "key": "chevrolet", "path": "/brands/chevrolet.svg", "color": "#D4AF37"},
+    {"id": 15, "name": "Ford", "key": "ford", "path": "/brands/ford.svg", "color": "#003478"},
+    {"id": 16, "name": "Jeep", "key": "jeep", "path": "/brands/jeep.svg", "color": "#003300"},
+    {"id": 17, "name": "Lexus", "key": "lexus", "path": "/brands/lexus.svg", "color": "#1A1A1A"},
+    {"id": 18, "name": "Land Rover", "key": "landrover", "path": "/brands/landrover.svg", "color": "#004E33"},
+    {"id": 19, "name": "Tesla", "key": "tesla", "path": "/brands/tesla.svg", "color": "#E82127"}
+  ]
+}

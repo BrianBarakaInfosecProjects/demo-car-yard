@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { body, param, validationResult } from 'express-validator';
 
 export const registerSchema = z.object({
   email: z.string().email('Invalid email format'),
@@ -29,9 +30,11 @@ export const vehicleSchema = z.object({
   featured: z.boolean().default(false),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   imageUrl: z.string().url('Invalid image URL'),
+  isDraft: z.boolean().default(true),
 });
 
 export const vehicleFilterSchema = z.object({
+  search: z.string().optional(),
   make: z.string().optional(),
   bodyType: z.enum(['SEDAN', 'SUV', 'TRUCK', 'COUPE', 'HATCHBACK', 'WAGON']).optional(),
   fuelType: z.enum(['GASOLINE', 'DIESEL', 'HYBRID', 'ELECTRIC']).optional(),
@@ -54,3 +57,40 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type VehicleInput = z.infer<typeof vehicleSchema>;
 export type VehicleFilter = z.infer<typeof vehicleFilterSchema>;
 export type InquiryInput = z.infer<typeof inquirySchema>;
+
+export const sanitizeVehicleInput = [
+  body('make').trim().escape(),
+  body('model').trim().escape(),
+  body('description').trim().escape(),
+  body('exteriorColor').trim().escape(),
+  body('interiorColor').trim().escape(),
+  body('engine').trim().escape(),
+  body('transmission').trim().escape(),
+  body('drivetrain').trim().escape(),
+  body('vin').trim().escape(),
+  body('location').optional().trim().escape(),
+];
+
+export const sanitizeInquiryInput = [
+  body('name').trim().escape(),
+  body('message').trim().escape(),
+];
+
+export const sanitizeUserInput = [
+  body('name').optional().trim().escape(),
+];
+
+export const validateRequest = (req: any, res: any, next: any) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        details: errors.array(),
+      },
+    });
+  }
+  next();
+};

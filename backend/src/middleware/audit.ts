@@ -4,14 +4,14 @@ import { AuthRequest } from './auth';
 
 export const auditLogger = (action: string, entityType: string) => {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
-    const oldJson = res.json;
-    
+    const oldJson = res.json.bind(res);
+
     res.json = function(data: any) {
       const authReq = req as AuthRequest;
-      
+
       if (authReq.user && res.statusCode < 400) {
         const entityId = req.params.id || (data.id && typeof data.id === 'string' ? data.id : undefined);
-        
+
         let changes = null;
         if (action === 'UPDATE' && req.body) {
           changes = JSON.stringify(req.body);
@@ -31,7 +31,9 @@ export const auditLogger = (action: string, entityType: string) => {
         }).catch((err) => console.error('Audit logging failed:', err));
       }
 
-      return oldJson.call(this, data);
+      const result = oldJson.call(this, data);
+      res.json = oldJson;
+      return result;
     };
 
     next();

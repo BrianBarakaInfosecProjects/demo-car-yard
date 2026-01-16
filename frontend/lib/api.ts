@@ -28,7 +28,9 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
-        console.error('API Error:', error.response?.data || error.message);
+        const errorMessage = error.response?.data?.error?.message || error.message;
+        const errorCode = error.response?.data?.error?.code || 'API_ERROR';
+        console.error('API Error:', { code: errorCode, message: errorMessage });
         return Promise.reject(error);
       }
     );
