@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { getSessionLogs as getSessionLogsService } from '../services/sessionLogService';
-import { getAuditLogs as getAuditLogsService } from '../services/analyticsService';
+import { getRecentAuditLogs as getAuditLogsService } from '../services/analyticsService';
 
 export const getSessionLogs = async (req: AuthRequest, res: Response) => {
   try {

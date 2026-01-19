@@ -28,11 +28,13 @@ export default function DashboardPage() {
         api.get('/inquiries'),
       ]);
 
+      const vehiclesArray = Array.isArray(vehicles) ? vehicles : [];
+
       setStats({
-        totalVehicles: vehicles.length,
+        totalVehicles: vehiclesArray.length,
         totalInquiries: inquiries.length,
-        featuredVehicles: vehicles.filter((v: any) => v.featured).length,
-        recentVehicles: vehicles.filter((v: any) => {
+        featuredVehicles: vehiclesArray.filter((v: any) => v.featured).length,
+        recentVehicles: vehiclesArray.filter((v: any) => {
           const createdAt = new Date(v.createdAt);
           const weekAgo = new Date();
           weekAgo.setDate(weekAgo.getDate() - 7);
@@ -305,57 +307,6 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white rounded-lg shadow-lg p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <Car size={24} className="text-blue-400" />
-              <span className="text-lg font-bold">TrustAuto Kenya</span>
-            </div>
-            <p className="text-gray-300 text-xs leading-relaxed">Your trusted partner for quality used cars in Kenya. Over 12 years providing customers with transparent pricing and excellent service.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-sm mb-3">Quick Links</h3>
-            <ul className="space-y-1.5 text-xs text-gray-300">
-              <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>
-              <li><Link href="/inventory" className="hover:text-blue-400 transition-colors">Browse Cars</Link></li>
-              <li><Link href="/services" className="hover:text-blue-400 transition-colors">Services</Link></li>
-              <li><Link href="/contact" className="hover:text-blue-400 transition-colors">Contact</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-sm mb-3">Contact Us</h3>
-            <ul className="space-y-1.5 text-xs text-gray-300">
-              <li>📍 Mombasa Road, Nairobi</li>
-              <li>📞 0722 000 000</li>
-              <li>✉️ info@trustauto.co.ke</li>
-              <li>💬 WhatsApp Us</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-sm mb-3">Business Hours</h3>
-            <ul className="space-y-1.5 text-xs text-gray-300">
-              <li>Mon - Fri: 8:00 AM - 6:00 PM</li>
-              <li>Saturday: 9:00 AM - 4:00 PM</li>
-              <li>Sunday: 10:00 AM - 2:00 PM</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-700 mt-6 pt-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400">
-          <p>© 2026 TrustAuto Kenya. All rights reserved.</p>
-          <div className="flex space-x-4 mt-3 sm:mt-0">
-            <a href="#" className="hover:text-blue-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-blue-400 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-blue-400 transition-colors">FAQ</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

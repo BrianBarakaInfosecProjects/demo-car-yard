@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { isAuthenticated as checkAuth, logout } from '@/lib/auth';
 import {
   LayoutDashboard, Car, Mail, Star, Settings, Users, LogOut,
-  ChevronRight, Home, Menu, X, Bell, Search, BarChart3, History
+  ChevronRight, Home, Menu, X, Search, BarChart3, History
 } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -32,6 +33,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   useEffect(() => {
     const auth = checkAuth();
     setIsAuthenticated(auth);
+    console.log('AdminLayout useEffect - auth:', auth, 'pathname:', pathname);
     
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
@@ -42,6 +44,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     }
 
     if (!auth && !pathname.includes('/auth/login')) {
+      console.log('AdminLayout - Redirecting to login');
       router.push('/auth/login');
     }
   }, [pathname, router]);
@@ -54,12 +57,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const breadcrumbs = pathname.split('/').filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-stretch">
+    <div className="min-h-screen bg-gray-50 flex items-stretch admin-page">
       {/* Sidebar */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:relative lg:transform-none lg:z-auto lg:flex lg:flex-shrink-0 lg:shadow-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:relative lg:inset-y-auto lg:transform-none lg:z-auto lg:flex lg:flex-shrink-0 lg:shadow-none lg:h-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="h-full flex flex-col">
+        <div className="flex flex-col h-full lg:h-[calc(100vh-64px)]">
           {/* Logo */}
           <div className="p-4 border-b border-gray-200">
             <Link href="/admin/dashboard" className="flex items-center space-x-2">
@@ -183,20 +186,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
 
                 {/* Notifications */}
-                <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors relative">
-                  <Bell size={20} />
-                  <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                    3
-                  </span>
-                </button>
+                <NotificationBell />
 
                  {/* Profile */}
                  <div className="hidden md:flex items-center space-x-2 pl-3 border-l border-gray-200">
-                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                     {user?.name?.charAt(0).toUpperCase() || 'A'}
-                   </div>
-                   <span className="text-sm font-medium text-gray-700">{user?.name || 'Admin'}</span>
-                 </div>
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                      {user?.name?.charAt(0).toUpperCase() || 'A'}
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">{user?.name || 'Admin'}</span>
+                  </div>
               </div>
             </div>
           </div>

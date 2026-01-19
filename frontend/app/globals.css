@@ -1313,6 +1313,13 @@ body {
   }
 }
 
+/* Hide public footer and navbar on admin pages */
+.admin-page .footer,
+.admin-page .navbar,
+.admin-page .whatsapp-float {
+  display: none !important;
+}
+
 /* Hero Section Enhancements */
 .hero-cta {
   margin-top: 1.5rem;

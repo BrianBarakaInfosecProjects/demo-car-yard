@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
 import Link from 'next/link';
-import { Car, Plus, Search, Edit, Trash2, Filter, Grid, List, ChevronDown } from 'lucide-react';
+import { Car, Plus, Search, Edit, Trash2, Filter, Grid, List, ChevronDown, Archive, RotateCcw } from 'lucide-react';
 
 interface Vehicle {
   id: string;
@@ -18,10 +16,10 @@ interface Vehicle {
   vin: string;
   createdAt: string;
   isDraft: boolean;
+  deletedAt?: string | null;
 }
 
 export default function VehiclesPage() {
-  const router = useRouter();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,8 +35,15 @@ export default function VehiclesPage() {
 
   const fetchVehicles = async () => {
     try {
-      const response = await api.get('/vehicles/admin', { limit: 1000 });
-      setVehicles(response.vehicles || []);
+      const response = await fetch('http://localhost:5000/api/vehicles?limit=1000&includeDrafts=true', {
+        headers: {
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
+        },
+      });
+      const data = await response.json();
+      // Filter out deleted vehicles for display
+      const activeVehicles = data.vehicles?.filter((v: Vehicle) => !v.deletedAt) || [];
+      setVehicles(activeVehicles);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
@@ -47,15 +52,75 @@ export default function VehiclesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this vehicle?')) {
+    if (!confirm('Are you sure you want to delete this vehicle? It will be archived and can be restored later.')) {
       return;
     }
 
     try {
-      await api.delete(`/vehicles/${id}`);
-      setVehicles(vehicles.filter(v => v.id !== id));
+      const response = await fetch(`http://localhost:5000/api/vehicles/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        setVehicles(vehicles.filter(v => v.id !== id));
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Failed to delete vehicle');
+      }
     } catch (error) {
       alert('Failed to delete vehicle');
+    }
+  };
+
+  const handleToggleFeatured = async (vehicle: Vehicle) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/vehicles/${vehicle.id}/featured`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ featured: !vehicle.featured }),
+      });
+
+      if (response.ok) {
+        setVehicles(vehicles.map(v =>
+          v.id === vehicle.id ? { ...v, featured: !v.featured } : v
+        ));
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Failed to update featured status');
+      }
+    } catch (error) {
+      alert('Failed to update featured status');
+    }
+  };
+
+  const handleUpdateStatus = async (id: string, status: string) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/vehicles/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (response.ok) {
+        setVehicles(vehicles.map(v =>
+          v.id === id ? { ...v, status } : v
+        ));
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Failed to update status');
+      }
+    } catch (error) {
+      alert('Failed to update status');
     }
   };
 
@@ -85,11 +150,7 @@ export default function VehiclesPage() {
     }
 
     try {
-      const apiURL = typeof window !== 'undefined'
-        ? `${window.location.protocol}//${window.location.hostname}:5000`
-        : 'http://localhost:5000';
-      
-      await fetch(`${apiURL}/api/bulk/vehicles`, {
+      await fetch('http://localhost:5000/api/bulk/vehicles', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
@@ -97,67 +158,12 @@ export default function VehiclesPage() {
         },
         body: JSON.stringify({ ids: Array.from(selectedVehicles) }),
       });
-      
+
       setVehicles(vehicles.filter(v => !selectedVehicles.has(v.id)));
       setSelectedVehicles(new Set());
       setShowBulkActions(false);
     } catch (error) {
       alert('Failed to delete vehicles');
-    }
-  };
-
-  const handleBulkUpdateStatus = async (status: string) => {
-    try {
-      await api.patch('/bulk/vehicles/status', { ids: Array.from(selectedVehicles), status });
-      setVehicles(vehicles.map(v => selectedVehicles.has(v.id) ? { ...v, status } : v));
-      setSelectedVehicles(new Set());
-      setShowBulkActions(false);
-    } catch (error) {
-      alert('Failed to update status');
-    }
-  };
-
-  const handleBulkUpdateLocation = async (location: string) => {
-    try {
-      await api.patch('/bulk/vehicles/location', { ids: Array.from(selectedVehicles), location });
-      setVehicles(vehicles.map(v => selectedVehicles.has(v.id) ? { ...v, location } : v));
-      setSelectedVehicles(new Set());
-      setShowBulkActions(false);
-    } catch (error) {
-      alert('Failed to update location');
-    }
-  };
-
-  const handleBulkPublish = async () => {
-    try {
-      await api.patch('/bulk/vehicles/publish', { ids: Array.from(selectedVehicles) });
-      setVehicles(vehicles.map(v => selectedVehicles.has(v.id) ? { ...v, isDraft: false } : v));
-      setSelectedVehicles(new Set());
-      setShowBulkActions(false);
-    } catch (error) {
-      alert('Failed to publish vehicles');
-    }
-  };
-
-  const handleBulkUnpublish = async () => {
-    try {
-      await api.patch('/bulk/vehicles/unpublish', { ids: Array.from(selectedVehicles) });
-      setVehicles(vehicles.map(v => selectedVehicles.has(v.id) ? { ...v, isDraft: true } : v));
-      setSelectedVehicles(new Set());
-      setShowBulkActions(false);
-    } catch (error) {
-      alert('Failed to unpublish vehicles');
-    }
-  };
-
-  const handleBulkSetFeatured = async (featured: boolean) => {
-    try {
-      await api.patch('/bulk/vehicles/featured', { ids: Array.from(selectedVehicles), featured });
-      setVehicles(vehicles.map(v => selectedVehicles.has(v.id) ? { ...v, featured } : v));
-      setSelectedVehicles(new Set());
-      setShowBulkActions(false);
-    } catch (error) {
-      alert('Failed to update featured status');
     }
   };
 
@@ -182,12 +188,18 @@ export default function VehiclesPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'NEW':
+      case 'AVAILABLE':
         return 'bg-green-100 text-green-700';
-      case 'ON_SALE':
+      case 'SOLD':
+        return 'bg-red-100 text-red-700';
+      case 'RESERVED':
         return 'bg-yellow-100 text-yellow-700';
-      case 'CERTIFIED_PRE_OWNED':
+      case 'NEW':
         return 'bg-blue-100 text-blue-700';
+      case 'ON_SALE':
+        return 'bg-purple-100 text-purple-700';
+      case 'CERTIFIED_PRE_OWNED':
+        return 'bg-orange-100 text-orange-700';
       default:
         return 'bg-gray-100 text-gray-700';
     }
@@ -202,7 +214,7 @@ export default function VehiclesPage() {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading vehicles...</p>
+          <p className="text-gray-600">Loading inventory...</p>
         </div>
       </div>
     );
@@ -210,82 +222,10 @@ export default function VehiclesPage() {
 
   return (
     <div className="w-full max-w-none space-y-6">
-      {/* Bulk Actions Bar */}
-      {showBulkActions && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
-          <span className="text-sm font-semibold text-blue-900">
-            {selectedVehicles.size} vehicle{selectedVehicles.size !== 1 ? 's' : ''} selected
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleBulkPublish}
-              className="flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-            >
-              Publish
-            </button>
-            <button
-              onClick={handleBulkUnpublish}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
-            >
-              Unpublish
-            </button>
-            <button
-              onClick={() => handleBulkSetFeatured(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium"
-            >
-              Feature
-            </button>
-            <button
-              onClick={() => handleBulkSetFeatured(false)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
-            >
-              Unfeature
-            </button>
-            <select
-              onChange={(e) => handleBulkUpdateStatus(e.target.value)}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Set Status...</option>
-              <option value="NEW">New</option>
-              <option value="USED">Used</option>
-              <option value="CERTIFIED_PRE_OWNED">Certified</option>
-              <option value="ON_SALE">On Sale</option>
-            </select>
-            <select
-              onChange={(e) => handleBulkUpdateLocation(e.target.value)}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Set Location...</option>
-              <option value="Nairobi Showroom">Nairobi Showroom</option>
-              <option value="Mombasa Road">Mombasa Road</option>
-              <option value="Westlands">Westlands</option>
-              <option value="Industrial Area">Industrial Area</option>
-              <option value="Karen">Karen</option>
-            </select>
-            <button
-              onClick={handleBulkDelete}
-              className="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-            >
-              <Trash2 size={16} />
-              Delete
-            </button>
-            <button
-              onClick={() => {
-                setSelectedVehicles(new Set());
-                setShowBulkActions(false);
-              }}
-              className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manage Vehicles</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Vehicle Inventory</h1>
           <p className="text-sm text-gray-600">
             {vehicles.length} vehicle{vehicles.length !== 1 ? 's' : ''} in inventory
           </p>
@@ -314,19 +254,6 @@ export default function VehiclesPage() {
             />
           </div>
 
-          {/* Select All */}
-          {filteredVehicles.length > 0 && (
-            <label className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-              <input
-                type="checkbox"
-                checked={selectedVehicles.size === filteredVehicles.length && filteredVehicles.length > 0}
-                onChange={toggleSelectAll}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700">Select All</span>
-            </label>
-          )}
-
           {/* Status Filter */}
           <div className="relative min-w-48">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -336,8 +263,10 @@ export default function VehiclesPage() {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer"
             >
               <option value="all">All Status</option>
+              <option value="AVAILABLE">Available</option>
+              <option value="SOLD">Sold</option>
+              <option value="RESERVED">Reserved</option>
               <option value="NEW">New</option>
-              <option value="USED">Used</option>
               <option value="CERTIFIED_PRE_OWNED">Certified Pre-Owned</option>
               <option value="ON_SALE">On Sale</option>
             </select>
@@ -383,41 +312,45 @@ export default function VehiclesPage() {
         </div>
       </div>
 
-      {/* Results Count */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600">
-          Showing <span className="font-semibold text-gray-900">{filteredVehicles.length}</span> vehicle{filteredVehicles.length !== 1 ? 's' : ''}
-          {searchTerm && <span className="ml-1">matching "{searchTerm}"</span>}
-        </p>
-      </div>
+      {/* Empty State */}
+      {filteredVehicles.length === 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+          <Car className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            {vehicles.length === 0 ? 'Your inventory is empty' : 'No vehicles found'}
+          </h3>
+          <p className="text-sm text-gray-600 mb-6">
+            {vehicles.length === 0
+              ? 'Add your first vehicle to get started'
+              : 'Try adjusting your search or filters'
+            }
+          </p>
+          <Link
+            href="/admin/vehicles/new"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            <Plus size={20} />
+            <span>{vehicles.length === 0 ? 'Add Your First Vehicle' : 'Add Vehicle'}</span>
+          </Link>
+        </div>
+      )}
 
       {/* Vehicles List - Grid View */}
-      {viewMode === 'grid' ? (
+      {viewMode === 'grid' && filteredVehicles.length > 0 && (
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
           {filteredVehicles.map((vehicle) => (
-            <div 
-              key={vehicle.id} 
+            <div
+              key={vehicle.id}
               className="w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group relative"
             >
-              {/* Checkbox */}
-              <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                <input
-                  type="checkbox"
-                  checked={selectedVehicles.has(vehicle.id)}
-                  onChange={() => toggleSelectVehicle(vehicle.id)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-
               {/* Image */}
-              <div className="relative h-48 bg-gray-100 cursor-pointer" onClick={() => router.push(`/admin/vehicles/new/${vehicle.id}`)}>
+              <div className="relative h-48 bg-gray-100 cursor-pointer">
                 <img
                   src={vehicle.imageUrl || 'https://via.placeholder.com/400x300'}
                   alt={`${vehicle.make} ${vehicle.model}`}
                   className="w-full h-full object-cover"
                 />
-                
+
                 {/* Status Badge */}
                 <div className="absolute top-2 right-2">
                   {vehicle.isDraft && (
@@ -444,7 +377,6 @@ export default function VehiclesPage() {
                   <Link
                     href={`/admin/vehicles/new/${vehicle.id}`}
                     className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-                    onClick={(e) => e.stopPropagation()}
                   >
                     <Edit size={18} />
                   </Link>
@@ -461,7 +393,7 @@ export default function VehiclesPage() {
               </div>
 
               {/* Content */}
-              <div className="p-4 cursor-pointer" onClick={() => router.push(`/admin/vehicles/new/${vehicle.id}`)}>
+              <div className="p-4">
                 <h3 className="text-base font-semibold text-gray-900 mb-1 truncate">
                   {vehicle.make} {vehicle.model}
                 </h3>
@@ -472,12 +404,37 @@ export default function VehiclesPage() {
                   </p>
                   <p className="text-xs text-gray-500">{vehicle.year}</p>
                 </div>
+
+                {/* Quick Actions */}
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                  <button
+                    onClick={() => handleToggleFeatured(vehicle)}
+                    className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
+                      vehicle.featured
+                        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {vehicle.featured ? '★ Featured' : '☆ Feature'}
+                  </button>
+                  <select
+                    value={vehicle.status}
+                    onChange={(e) => handleUpdateStatus(vehicle.id, e.target.value)}
+                    className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors cursor-pointer ${getStatusColor(vehicle.status)}`}
+                  >
+                    <option value="AVAILABLE">Available</option>
+                    <option value="RESERVED">Reserved</option>
+                    <option value="SOLD">Sold</option>
+                  </select>
+                </div>
               </div>
             </div>
           ))}
         </div>
-      ) : (
-        /* List View */
+      )}
+
+      {/* Vehicles List - List View */}
+      {viewMode === 'list' && filteredVehicles.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -501,12 +458,11 @@ export default function VehiclesPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredVehicles.map((vehicle) => (
-                  <tr 
-                    key={vehicle.id} 
+                  <tr
+                    key={vehicle.id}
                     className={`hover:bg-gray-50 transition-colors cursor-pointer ${selectedVehicles.has(vehicle.id) ? 'bg-blue-50' : ''}`}
-                    onClick={() => router.push(`/admin/vehicles/new/${vehicle.id}`)}
                   >
-                    <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-4 py-4">
                       <input
                         type="checkbox"
                         checked={selectedVehicles.has(vehicle.id)}
@@ -541,14 +497,12 @@ export default function VehiclesPage() {
                     </td>
                     <td className="px-6 py-4">
                       {vehicle.featured ? (
-                        <span className="text-yellow-600">
-                          ★ Featured
-                        </span>
+                        <span className="text-yellow-600">★ Featured</span>
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/admin/vehicles/new/${vehicle.id}`}
@@ -571,27 +525,6 @@ export default function VehiclesPage() {
               </tbody>
             </table>
           </div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {filteredVehicles.length === 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <Car className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No vehicles found</h3>
-          <p className="text-sm text-gray-600 mb-6">
-            {searchTerm
-              ? 'Try adjusting your search or filters'
-              : 'Get started by adding your first vehicle'
-            }
-          </p>
-          <Link
-            href="/admin/vehicles/new"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            <Plus size={20} />
-            <span>Add Your First Vehicle</span>
-          </Link>
         </div>
       )}
     </div>

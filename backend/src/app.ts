@@ -1,17 +1,26 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import authRoutes from './routes/auth';
 import vehicleRoutes from './routes/vehicles';
 import inquiryRoutes from './routes/inquiries';
 import analyticsRoutes from './routes/analytics';
 import bulkRoutes from './routes/bulk';
 import logsRoutes from './routes/logs';
+import notificationRoutes from './routes/notifications';
 import { errorHandler } from './middleware/errorHandler';
 import { limiter, authLimiter } from './middleware/rateLimiter';
 
 const app = express();
+
+// Request ID middleware for tracking
+app.use((req: Request, res: Response, next: NextFunction) => {
+  (req as any).id = req.get('x-request-id') || uuidv4();
+  res.setHeader('x-request-id', (req as any).id);
+  next();
+});
 
 app.use(helmet({
   contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
@@ -66,6 +75,7 @@ app.get('/', (req, res) => {
       analytics: '/api/analytics',
       bulk: '/api/bulk',
       logs: '/api/logs',
+      notifications: '/api/notifications',
     },
     documentation: 'See README.md for API documentation',
   });
@@ -78,6 +88,7 @@ app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/bulk', bulkRoutes);
 app.use('/api/logs', logsRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.use(errorHandler);
 

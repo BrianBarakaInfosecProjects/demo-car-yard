@@ -1,6 +1,22 @@
 import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
-const storage = multer.memoryStorage();
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  },
+});
 
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowedMimeTypes = [
@@ -18,7 +34,7 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
   cb(null, true);
 };
 
-export const cloudinaryUpload = multer({
+export const localUpload = multer({
   storage,
   fileFilter,
   limits: {
@@ -29,49 +45,9 @@ export const cloudinaryUpload = multer({
   },
 });
 
-export const uploadSingle = (fieldName: string = 'image') => {
+export const uploadMultipleLocal = (fieldName: string = 'images', maxCount: number = 10) => {
   return (req: any, res: any, next: any) => {
-    const uploadHandler = cloudinaryUpload.single(fieldName);
-    
-    uploadHandler(req, res, (err: any) => {
-      if (err) {
-        if (err instanceof multer.MulterError) {
-          if (err.code === 'LIMIT_FILE_SIZE') {
-            return res.status(413).json({
-              error: 'File too large. Maximum size is 5MB',
-            });
-          }
-          if (err.code === 'LIMIT_FILE_COUNT') {
-            return res.status(413).json({
-              error: 'Too many files. Maximum is 10 files',
-            });
-          }
-          if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-            return res.status(400).json({
-              error: `Unexpected field. Expected field name: ${fieldName}`,
-            });
-          }
-        }
-        
-        return res.status(400).json({
-          error: err.message || 'File upload failed',
-        });
-      }
-      
-      if (!req.file && !req.files) {
-        return res.status(400).json({
-          error: 'No file uploaded',
-        });
-      }
-      
-      next();
-    });
-  };
-};
-
-export const uploadMultiple = (fieldName: string = 'images', maxCount: number = 10) => {
-  return (req: any, res: any, next: any) => {
-    const uploadHandler = cloudinaryUpload.array(fieldName, maxCount);
+    const uploadHandler = localUpload.array(fieldName, maxCount);
 
     uploadHandler(req, res, (err: any) => {
       if (err) {
@@ -98,12 +74,18 @@ export const uploadMultiple = (fieldName: string = 'images', maxCount: number = 
         });
       }
 
-      // Allow empty files array - controller will handle it
       if (!req.files || (Array.isArray(req.files) && req.files.length === 0)) {
         req.files = [];
       }
 
-      console.log('Files received in uploadMultiple middleware:', req.files?.length || 0);
+      // Add base URL to each file
+      if (Array.isArray(req.files)) {
+        req.files = req.files.map((file: any) => ({
+          ...file,
+          url: `/uploads/${file.filename}`,
+        }));
+      }
+
       next();
     });
   };
