@@ -6,8 +6,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: ${POSTGRES_DB:-trustauto}
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -28,14 +26,14 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-trustauto}
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production-min-32-chars}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-      PORT: ${BACKEND_PORT:-5000}
+      PORT: 5000
       NODE_ENV: production
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
-    ports:
-      - "5000:5000"
+    # Internal access only - no external port
+    # Backend accessed via: http://backend:5000 (internal network)
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,12 +46,11 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:${BACKEND_PORT:-5000}/api
+        NEXT_PUBLIC_API_URL: http://backend:5000/api  # Internal service name
     container_name: trustauto-frontend
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:${BACKEND_PORT:-5000}/api
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+      NEXT_PUBLIC_API_URL: http://backend:5000/api  # Internal service name
+    # No external ports - Traefik handles routing
     depends_on:
       - backend
     restart: unless-stopped
