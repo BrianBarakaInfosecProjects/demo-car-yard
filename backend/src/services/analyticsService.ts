@@ -74,7 +74,7 @@ export const getInquiryTrends = async (days: number = 30) => {
 
   const dailyTrends: Record<string, { total: number; pending: number; resolved: number }> = {};
 
-  inquiries.forEach((inquiry) => {
+  inquiries.forEach((inquiry: any) => {
     const dateKey = inquiry.createdAt.toISOString().split('T')[0];
     if (!dailyTrends[dateKey]) {
       dailyTrends[dateKey] = { total: 0, pending: 0, resolved: 0 };
@@ -101,7 +101,7 @@ export const getVehicleStatsByStatus = async () => {
     _count: true,
   });
 
-  return statusStats.map((stat) => ({
+  return statusStats.map((stat: any) => ({
     status: stat.status,
     count: stat._count,
   }));
@@ -114,7 +114,7 @@ export const getVehicleStatsByBodyType = async () => {
     _count: true,
   });
 
-  return bodyTypeStats.map((stat) => ({
+  return bodyTypeStats.map((stat: any) => ({
     bodyType: stat.bodyType,
     count: stat._count,
   }));

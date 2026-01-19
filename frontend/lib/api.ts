@@ -4,8 +4,8 @@ class ApiClient {
   private client: AxiosInstance;
 
   constructor() {
-    const apiURL = typeof window !== 'undefined' 
-      ? `${window.location.protocol}//${window.location.hostname}:5000/api`
+    const apiURL = typeof window !== 'undefined'
+      ? `${window.location.protocol}//0.0.0.0:5000/api`
       : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api');
 
     this.client = axios.create({
@@ -13,6 +13,7 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
       },
+      timeout: 30000,
     });
 
     this.client.interceptors.request.use((config) => {

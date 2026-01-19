@@ -1,0 +1,16 @@
+version: '3.8'
+
+# Development override - Run services locally instead of Docker containers
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# This keeps PostgreSQL in Docker but runs Node services locally
+
+services:
+  # Backend service disabled - runs locally via npm run dev
+  backend:
+    profiles:
+      - docker
+
+  # Frontend service disabled - runs locally via npm run dev
+  frontend:
+    profiles:
+      - docker

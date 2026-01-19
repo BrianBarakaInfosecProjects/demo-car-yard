@@ -90,10 +90,10 @@ export const auditLogger = (action: string, entityType: string) => {
               inquiryId: entityType === 'INQUIRY' ? entityId : null,
               ipAddress,
             },
-          }).catch((err) => console.error('Audit logging failed:', err));
+          }).catch((err: any) => console.error('Audit logging failed:', err));
         };
 
-        doAsyncAudit().catch((err) => console.error('Audit async error:', err));
+        doAsyncAudit().catch((err: any) => console.error('Audit async error:', err));
       }
 
       const result = oldJson.call(this, data);
