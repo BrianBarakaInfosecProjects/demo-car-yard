@@ -39,6 +39,14 @@ app.use(cors({
       'https://opulent-orbit-694pjg559vqph4px5-3000.app.github.dev',
       'https://opulent-orbit-694pjg559vqph4px5.github.dev',
     ];
+
+    // Add HTTP/HTTPS versions of TRAEFIK URLs
+    const traefikHost = process.env.FRONTEND_HOST;
+    if (traefikHost) {
+      allowedOrigins.push(`http://${traefikHost}`);
+      allowedOrigins.push(`https://${traefikHost}`);
+    }
+
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
