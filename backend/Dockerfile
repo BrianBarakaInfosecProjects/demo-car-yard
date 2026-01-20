@@ -16,15 +16,14 @@ ENV NODE_ENV=production
 RUN apk add --no-cache openssl-dev openssl
 
 COPY package*.json ./
-RUN npm install --production && npm install --save ts-node
+RUN npm install --production
 
 COPY --from=base /app/dist ./dist
 COPY --from=base /app/prisma ./prisma
 
 RUN npx prisma generate
-RUN npx prisma migrate deploy
-RUN npx prisma db seed
 
 EXPOSE 5000
 
-CMD ["node", "dist/server.js"]
+# Run migrations and seed on startup
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node dist/server.js"]
