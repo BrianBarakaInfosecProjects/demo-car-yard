@@ -16,7 +16,7 @@ ENV NODE_ENV=production
 RUN apk add --no-cache openssl-dev openssl postgresql-client
 
 COPY package*.json ./
-RUN npm install --production
+RUN npm install --production ts-node
 
 COPY --from=base /app/dist ./dist
 COPY --from=base /app/prisma ./prisma

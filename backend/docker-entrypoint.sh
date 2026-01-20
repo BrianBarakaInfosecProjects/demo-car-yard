@@ -12,7 +12,7 @@ echo "PostgreSQL is up - applying migrations"
 npx prisma migrate deploy
 
 echo "Seeding database"
-npx ts-node prisma/seed.ts
+ts-node --transpile-only prisma/seed.ts
 
 echo "Starting server"
 node dist/server.js
