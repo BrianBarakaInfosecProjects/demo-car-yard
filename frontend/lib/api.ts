@@ -5,7 +5,7 @@ class ApiClient {
 
   constructor() {
     const apiURL = typeof window !== 'undefined'
-      ? `${window.location.protocol}//${window.location.hostname}/api`
+      ? (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')
       : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api');
 
     this.client = axios.create({

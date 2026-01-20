@@ -28,28 +28,16 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       PORT: 5000
       NODE_ENV: production
-      FRONTEND_URL: http://${FRONTEND_HOST:-localhost}
+      FRONTEND_URL: https://${FRONTEND_HOST:-localhost}
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
-    # Expose backend API for Traefik to route /api/*
-    ports:
-      - "5000:5000"
     depends_on:
       postgres:
         condition: service_healthy
     restart: unless-stopped
     networks:
       - trustauto-network
-    # Traefik labels for backend API routing
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=trustauto-network"
-      - "traefik.http.routers.backend.rule=Host(`${FRONTEND_HOST:-localhost}`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.services.backend.loadbalancer.server.port=5000"
-      - "traefik.http.routers.backend.tls=true"
-      - "traefik.http.routers.backend.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}"
 
   frontend:
     build:
@@ -57,26 +45,33 @@ services:
       dockerfile: Dockerfile
       args:
         # Frontend calls API via external URL (browser-based)
-        NEXT_PUBLIC_API_URL: http://${FRONTEND_HOST:-localhost}/api
+        NEXT_PUBLIC_API_URL: /api
     container_name: trustauto-frontend
     environment:
       # Frontend calls API via external URL (browser-based)
-      NEXT_PUBLIC_API_URL: http://${FRONTEND_HOST:-localhost}/api
-    # No external ports - Traefik handles routing
+      NEXT_PUBLIC_API_URL: /api
     depends_on:
       - backend
     restart: unless-stopped
     networks:
       - trustauto-network
-    # Traefik labels for frontend routing
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=trustauto-network"
-      - "traefik.http.routers.frontend.rule=Host(`${FRONTEND_HOST:-localhost}`)"
-      - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
-      - "traefik.http.routers.frontend.tls=true"
-      - "traefik.http.routers.frontend.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}"
+    expose:
+      - 3000
+
+  # Reverse proxy - single entry point
+  nginx:
+    image: nginx:alpine
+    container_name: trustauto-nginx
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - trustauto-network
 
 volumes:
   postgres_data:

@@ -15,6 +15,8 @@ import { limiter, authLimiter } from './middleware/rateLimiter';
 
 const app = express();
 
+app.set('trust proxy', process.env.TRUST_PROXY === 'true');
+
 // Request ID middleware for tracking
 app.use((req: Request, res: Response, next: NextFunction) => {
   (req as any).id = req.get('x-request-id') || uuidv4();
@@ -28,10 +30,20 @@ app.use(helmet({
 
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000,http://127.0.0.1:3000').split(',');
+    const allowedOrigins = [
+      ...(process.env.FRONTEND_URL || 'http://localhost:3000').split(','),
+      'http://localhost:3000',
+      'https://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://0.0.0.0:3000',
+      'https://opulent-orbit-694pjg559vqph4px5-3000.app.github.dev',
+      'https://opulent-orbit-694pjg559vqph4px5.github.dev',
+    ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('CORS blocked origin:', origin);
+      console.log('Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
