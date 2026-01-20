@@ -23,6 +23,8 @@ COPY --from=base /app/prisma ./prisma
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 RUN npx prisma generate
+# Use tsx instead of ts-node - more reliable
+RUN npm install --production tsx
 RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 5000
