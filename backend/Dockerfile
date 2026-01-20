@@ -23,6 +23,8 @@ COPY --from=base /app/prisma ./prisma
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 RUN npx prisma generate
+# Compile seed script to JS
+RUN npx -p typescript tsc prisma/seed.ts --outDir prisma --module commonjs --target es2020 --esModuleInterop
 RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 5000
