@@ -7,10 +7,10 @@ RUN npm install --production=false
 
 COPY . .
 
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+ ARG NEXT_PUBLIC_API_URL
+ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ ENV NEXT_TELEMETRY_DISABLED=1
+ RUN npm run build && ls -la /app/.next/
 
 FROM node:20-alpine AS production
 WORKDIR /app
