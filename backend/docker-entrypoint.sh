@@ -12,7 +12,7 @@ echo "PostgreSQL is up - applying migrations"
 npx prisma migrate deploy
 
 echo "Seeding database"
-node prisma/seed.js
+npx prisma db seed
 
 echo "Starting server"
 node dist/server.js
