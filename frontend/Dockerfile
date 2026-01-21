@@ -3,14 +3,15 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --production=false
+RUN npm ci
 
 COPY . .
 
- ARG NEXT_PUBLIC_API_URL
- ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
- ENV NEXT_TELEMETRY_DISABLED=1
- RUN npm run build && ls -la /app/.next/
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN npm run build
 
 FROM node:20-alpine AS production
 WORKDIR /app
