@@ -63,7 +63,7 @@ export default function FeaturedVehicles() {
           {featuredVehicles.map((vehicle) => (
             <Link
               key={vehicle.id}
-              href={vehicle.slug ? `/vehicles/${vehicle.slug}` : '/inventory'}
+              href={vehicle.slug ? `/cars/${vehicle.slug}` : '/inventory'}
               className="w-full"
             >
               <VehicleCard vehicle={vehicle} />
@@ -74,10 +74,10 @@ export default function FeaturedVehicles() {
         <div className="mt-10 text-center">
           <Link
             href="/inventory"
-            className="btn btn-primary btn-lg px-8 py-3 inline-flex items-center gap-2"
+            className="btn btn-primary inline-flex items-center gap-2"
           >
             <Car size={20} />
-            <span>Browse Full Inventory</span>
+            <span>Browse Full Showroom</span>
             <ArrowRight size={20} />
           </Link>
         </div>

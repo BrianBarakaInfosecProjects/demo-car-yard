@@ -33,18 +33,27 @@ interface SimilarVehiclesProps {
 export default function SimilarVehicles({ vehicles, loading = false }: SimilarVehiclesProps) {
   if (loading) {
     return (
-      <div className="similar-vehicles">
-        <div className="container">
-          <h2 className="similar-vehicles-title">Similar Vehicles</h2>
-          <div className="similar-vehicles-grid">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="similar-vehicle-item col-lg-3 col-md-4 col-sm-6">
-                <div className="skeleton-card" />
-              </div>
-            ))}
-          </div>
+      <div style={{ marginTop: '32px' }}>
+        <h2 style={{ fontFamily: 'var(--serif)', fontSize: '24px', fontWeight: 300, color: 'var(--gold)', marginBottom: '24px' }}>Similar Vehicles</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} style={{ background: 'var(--ink-soft)', borderRadius: '12px', height: '300px', border: '1px solid var(--border)' }} />
+          ))}
         </div>
       </div>
     );
   }
+
+  if (!vehicles || vehicles.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: '32px' }}>
+      <h2 style={{ fontFamily: 'var(--serif)', fontSize: '24px', fontWeight: 300, color: 'var(--gold)', marginBottom: '24px' }}>Similar Vehicles</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        {vehicles.map((vehicle) => (
+          <VehicleCard key={vehicle.id} vehicle={vehicle as any} />
+        ))}
+      </div>
+    </div>
+  );
 }

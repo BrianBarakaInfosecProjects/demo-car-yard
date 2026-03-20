@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
+import prisma from './config/database';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
@@ -10,6 +11,14 @@ import analyticsRoutes from './routes/analytics';
 import bulkRoutes from './routes/bulk';
 import logsRoutes from './routes/logs';
 import notificationRoutes from './routes/notifications';
+import userRoutes from './routes/users';
+import notifySubscriberRoutes from './routes/notifySubscribers';
+import softInterestRoutes from './routes/softInterests';
+import reservationRoutes from './routes/reservations';
+import mpesaRoutes from './routes/mpesa';
+import carReferenceRoutes from './routes/carReference';
+import settingsRoutes from './routes/settings';
+import exportRoutes from './routes/export';
 import { errorHandler } from './middleware/errorHandler';
 import { limiter, authLimiter } from './middleware/rateLimiter';
 
@@ -30,28 +39,39 @@ app.use(helmet({
 
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      ...(process.env.FRONTEND_URL || 'http://localhost:3000').split(','),
-      'http://localhost:3000',
-      'https://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://0.0.0.0:3000',
-      'https://opulent-orbit-694pjg559vqph4px5-3000.app.github.dev',
-      'https://opulent-orbit-694pjg559vqph4px5.github.dev',
-    ];
+    const frontendUrl = process.env.FRONTEND_URL;
+    const allowedOrigins: string[] = [];
 
-    // Add HTTP/HTTPS versions of TRAEFIK URLs
+    // Always allow the configured frontend URL
+    if (frontendUrl) {
+      allowedOrigins.push(...frontendUrl.split(','));
+    }
+
+    // Only allow localhost origins in development
+    if (process.env.NODE_ENV !== 'production') {
+      allowedOrigins.push(
+        'http://localhost:3000',
+        'https://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:3001'
+      );
+    }
+
+    // Add explicit FRONTEND_HOST if set
     const traefikHost = process.env.FRONTEND_HOST;
     if (traefikHost) {
       allowedOrigins.push(`http://${traefikHost}`);
       allowedOrigins.push(`https://${traefikHost}`);
     }
 
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
-      console.log('Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -68,17 +88,27 @@ const uploadsPath = process.env.NODE_ENV === 'production'
 
 app.use('/uploads', express.static(uploadsPath));
 
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-app.get('/health', (req, res) => {
-  res.json({
+// Health check endpoint with database verification
+app.get('/health', async (req, res) => {
+  let dbStatus = 'disconnected';
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    dbStatus = 'connected';
+  } catch (error) {
+    dbStatus = 'error';
+  }
+  
+  const health = {
     success: true,
-    status: 'ok',
+    status: dbStatus === 'connected' ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
-    database: 'connected',
+    database: dbStatus,
     environment: process.env.NODE_ENV || 'development',
     uptime: process.uptime(),
-  });
+  };
+  
+  res.status(dbStatus === 'connected' ? 200 : 503).json(health);
 });
 
 app.get('/', (req, res) => {
@@ -96,6 +126,7 @@ app.get('/', (req, res) => {
       bulk: '/api/bulk',
       logs: '/api/logs',
       notifications: '/api/notifications',
+      users: '/api/users',
     },
     documentation: 'See README.md for API documentation',
   });
@@ -105,10 +136,18 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/inquiries', inquiryRoutes);
+app.use('/api/notify-subscribers', notifySubscriberRoutes);
+app.use('/api/soft-interests', softInterestRoutes);
+app.use('/api/reservations', reservationRoutes);
+app.use('/api/mpesa', mpesaRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/bulk', bulkRoutes);
 app.use('/api/logs', logsRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/car-reference', carReferenceRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/export', exportRoutes);
 
 app.use(errorHandler);
 

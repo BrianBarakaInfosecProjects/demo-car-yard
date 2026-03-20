@@ -18,10 +18,11 @@ const limiter = rateLimit({
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
+  skipSuccessfulRequests: true,
   message: {
     success: false,
     error: {
-      message: 'Too many login attempts, please try again later.',
+      message: 'Too many login attempts. Please try again in 15 minutes.',
       code: 'AUTH_RATE_LIMIT_EXCEEDED',
     },
   },
@@ -29,4 +30,18 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-export { limiter, authLimiter };
+const inquiryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: {
+    success: false,
+    error: {
+      message: 'Too many inquiries submitted. Please try again later.',
+      code: 'INQUIRY_RATE_LIMIT_EXCEEDED',
+    },
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+export { limiter, authLimiter, inquiryLimiter };

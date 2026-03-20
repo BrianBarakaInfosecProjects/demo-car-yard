@@ -5,16 +5,24 @@ import { deleteMultipleFromCloudinary } from '../config/cloudinary';
 
 const MAX_FEATURED_VEHICLES = 6;
 
-function generateSlug(make: string, model: string, year: number): string {
-  const baseSlug = `${year}-${make.toLowerCase()}-${model.toLowerCase()}`
-    .replace(/[^a-z0-9]/g, '-')
+function parseVehicleImages(vehicle: any) {
+  return {
+    ...vehicle,
+    images: vehicle.images ? JSON.parse(vehicle.images) : [],
+    imagePublicIds: vehicle.imagePublicIds ? JSON.parse(vehicle.imagePublicIds) : [],
+  };
+}
+
+function generateSlug(make: string, model: string, year: number, colour?: string): string {
+  const colourPart = colour ? `-${colour.toLowerCase().replace(/[^a-z0-9]/g, '')}` : '';
+  const baseSlug = `${year}-${make.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${model.toLowerCase().replace(/[^a-z0-9]/g, '-')}${colourPart}`
     .replace(/-+/g, '-')
     .trim();
   return baseSlug;
 }
 
-async function ensureUniqueSlug(make: string, model: string, year: number, maxAttempts: number = 100): Promise<string> {
-  const baseSlug = generateSlug(make, model, year);
+async function ensureUniqueSlug(make: string, model: string, year: number, colour?: string, maxAttempts: number = 100): Promise<string> {
+  const baseSlug = generateSlug(make, model, year, colour);
   let slug = baseSlug;
   let counter = 1;
 
@@ -58,15 +66,17 @@ export const lifecycle = {
       },
     });
 
-    await notificationService.create({
-      type: 'SUCCESS',
-      message: `Vehicle marked as sold: ${vehicle.make} ${vehicle.model} (${vehicle.year})`,
-      userId,
-      action: 'VEHICLE_SOLD',
-      entityType: 'VEHICLE',
-      entityId: id,
-      vehicleId: id,
-    });
+    try {
+      await notificationService.create({
+        type: 'SUCCESS',
+        message: `Vehicle marked as sold: ${vehicle.make} ${vehicle.model} (${vehicle.year})`,
+        userId,
+        action: 'VEHICLE_SOLD',
+        entityType: 'VEHICLE',
+        entityId: id,
+        vehicleId: id,
+      });
+    } catch (e) { console.warn('Notification skipped in markAsSold', { error: (e as Error)?.message }); }
 
     return updated;
   },
@@ -142,10 +152,10 @@ export const lifecycle = {
     const vehicle = await prisma.vehicle.findUnique({ where: { id } });
     if (!vehicle) throw new Error('Vehicle not found');
 
-    // Delete images from Cloudinary
-    if (vehicle.imagePublicIds && vehicle.imagePublicIds.length > 0) {
+    const publicIds = vehicle.imagePublicIds ? JSON.parse(vehicle.imagePublicIds) : [];
+    if (publicIds.length > 0) {
       try {
-        await deleteMultipleFromCloudinary(vehicle.imagePublicIds);
+        await deleteMultipleFromCloudinary(publicIds);
       } catch (error) {
         console.error('Failed to delete images from Cloudinary:', error);
       }
@@ -203,15 +213,19 @@ export const lifecycle = {
       },
     });
 
-    await notificationService.create({
-      type: newFeaturedStatus ? 'SUCCESS' : 'INFO',
-      message: `Vehicle ${newFeaturedStatus ? 'featured' : 'unfeatured'}: ${vehicle.make} ${vehicle.model}`,
-      userId,
-      action: 'FEATURED_TOGGLED',
-      entityType: 'VEHICLE',
-      entityId: id,
-      vehicleId: id,
-    });
+    try {
+      await notificationService.create({
+        type: newFeaturedStatus ? 'SUCCESS' : 'INFO',
+        message: `Vehicle ${newFeaturedStatus ? 'featured' : 'unfeatured'}: ${vehicle.make} ${vehicle.model}`,
+        userId,
+        action: 'FEATURED_TOGGLED',
+        entityType: 'VEHICLE',
+        entityId: id,
+        vehicleId: id,
+      });
+    } catch (e) {
+      console.warn('Notification skipped in toggleFeatured');
+    }
 
     return updated;
   },
@@ -241,15 +255,19 @@ export const lifecycle = {
       data: updateData,
     });
 
-    await notificationService.create({
-      type: status === 'SOLD' ? 'SUCCESS' : 'INFO',
-      message: `Vehicle status updated to ${status}: ${vehicle.make} ${vehicle.model}`,
-      userId,
-      action: 'STATUS_UPDATED',
-      entityType: 'VEHICLE',
-      entityId: id,
-      vehicleId: id,
-    });
+    try {
+      await notificationService.create({
+        type: status === 'SOLD' ? 'SUCCESS' : 'INFO',
+        message: `Vehicle status updated to ${status}: ${vehicle.make} ${vehicle.model}`,
+        userId,
+        action: 'STATUS_UPDATED',
+        entityType: 'VEHICLE',
+        entityId: id,
+        vehicleId: id,
+      });
+    } catch (e) {
+      console.warn('Notification skipped in toggleFeatured');
+    }
 
     return updated;
   },
@@ -343,7 +361,7 @@ export const getVehicles = async (filters: VehicleFilter & { page?: number; limi
   ]);
 
   return {
-    vehicles,
+    vehicles: vehicles.map(parseVehicleImages),
     pagination: {
       page,
       limit,
@@ -353,7 +371,7 @@ export const getVehicles = async (filters: VehicleFilter & { page?: number; limi
   };
 };
 
-export const getVehicleById = async (id: string) => {
+export const getVehicleById = async (id: string, options?: { trackView?: boolean }) => {
   const vehicle = await prisma.vehicle.findUnique({
     where: { id, deletedAt: null },
   });
@@ -362,16 +380,20 @@ export const getVehicleById = async (id: string) => {
     throw new Error('Vehicle not found');
   }
 
-  await prisma.vehicle.update({
-    where: { id },
-    data: {
-      viewCount: {
-        increment: 1,
+  // Only increment view count when explicitly tracking a public view
+  // Not during admin operations or internal calls
+  let viewCount = vehicle.viewCount || 0;
+  if (options?.trackView) {
+    const updated = await prisma.vehicle.update({
+      where: { id },
+      data: {
+        viewCount: { increment: 1 },
       },
-    },
-  });
+    });
+    viewCount = updated.viewCount;
+  }
 
-  return vehicle;
+  return { ...parseVehicleImages(vehicle), viewCount };
 };
 
 export const getVehicleBySlug = async (slug: string) => {
@@ -383,7 +405,7 @@ export const getVehicleBySlug = async (slug: string) => {
     throw new Error('Vehicle not found');
   }
 
-  await prisma.vehicle.update({
+  const updated = await prisma.vehicle.update({
     where: { id: vehicle.id },
     data: {
       viewCount: {
@@ -392,10 +414,10 @@ export const getVehicleBySlug = async (slug: string) => {
     },
   });
 
-  return vehicle;
+  return { ...parseVehicleImages(vehicle), viewCount: updated.viewCount };
 };
 
-export const getSimilarVehicles = async (vehicleId: string, limit: number = 4) => {
+export const getSimilarVehicles = async (vehicleId: string, limit: number = 3) => {
   const vehicle = await prisma.vehicle.findFirst({
     where: { id: vehicleId, deletedAt: null },
   });
@@ -404,41 +426,105 @@ export const getSimilarVehicles = async (vehicleId: string, limit: number = 4) =
     return [];
   }
 
-  const similar = await prisma.vehicle.findMany({
+  const availableStatus = ['AVAILABLE', 'available'];
+  
+  // Priority 1: Same make + model
+  const sameMakeModel = await prisma.vehicle.findMany({
     where: {
       id: { not: vehicleId },
       deletedAt: null,
       isDraft: false,
-      OR: [
-        { make: vehicle.make },
-        { bodyType: vehicle.bodyType },
-        {
-          priceKES: {
-            gte: Math.floor(vehicle.priceKES * 0.8),
-            lte: Math.ceil(vehicle.priceKES * 1.2),
-          },
-        },
-      ],
+      status: { in: availableStatus },
+      make: vehicle.make,
+      model: vehicle.model,
     },
     orderBy: { createdAt: 'desc' },
     take: limit,
   });
 
-  return similar;
+  if (sameMakeModel.length >= limit) {
+    return sameMakeModel.map(parseVehicleImages);
+  }
+
+  // Priority 2: Same make + body type + price ±30%
+  const priceRange30 = {
+    gte: Math.floor(vehicle.priceKES * 0.7),
+    lte: Math.ceil(vehicle.priceKES * 1.3),
+  };
+
+  const sameMakeBodyType = await prisma.vehicle.findMany({
+    where: {
+      id: { not: vehicleId },
+      deletedAt: null,
+      isDraft: false,
+      status: { in: availableStatus },
+      make: vehicle.make,
+      bodyType: vehicle.bodyType,
+      priceKES: priceRange30,
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+
+  // Priority 3 & 4: Parallel queries for same body type and any available
+  const priceRange20 = {
+    gte: Math.floor(vehicle.priceKES * 0.8),
+    lte: Math.ceil(vehicle.priceKES * 1.2),
+  };
+
+  const [sameBodyType, anyAvailable] = await Promise.all([
+    prisma.vehicle.findMany({
+      where: {
+        id: { not: vehicleId },
+        deletedAt: null,
+        isDraft: false,
+        status: { in: availableStatus },
+        bodyType: vehicle.bodyType,
+        priceKES: priceRange20,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    }),
+    prisma.vehicle.findMany({
+      where: {
+        id: { not: vehicleId },
+        deletedAt: null,
+        isDraft: false,
+        status: { in: availableStatus },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    }),
+  ]);
+
+  const result = [...sameMakeModel];
+  const seen = new Set(result.map(v => v.id));
+
+  for (const v of [...sameMakeBodyType, ...sameBodyType, ...anyAvailable]) {
+    if (result.length >= limit) break;
+    if (!seen.has(v.id)) {
+      result.push(v);
+      seen.add(v.id);
+    }
+  }
+
+  return result.map(parseVehicleImages);
 };
 
 export const createVehicle = async (input: VehicleInput, userId: string) => {
-  const slug = await ensureUniqueSlug(input.make, input.model, input.year);
+  const slug = await ensureUniqueSlug(input.make, input.model, input.year, input.exteriorColor);
 
-  const { scheduledAt, ...inputWithoutScheduledAt } = input;
+  const { scheduledAt, images, imagePublicIds, ...inputWithoutScheduledAt } = input;
 
-  // Featured is opt-in only - default to false
   const vehicle = await prisma.vehicle.create({
     data: {
       ...inputWithoutScheduledAt,
       slug,
+      images: images ? JSON.stringify(images) : '[]',
+      imagePublicIds: imagePublicIds ? JSON.stringify(imagePublicIds) : '[]',
       isDraft: input.isDraft ?? true,
-      featured: false, // Never auto-feature vehicles
+      featured: false,
       scheduledAt: scheduledAt || null,
     },
   });
@@ -465,25 +551,40 @@ export const updateVehicle = async (id: string, input: Partial<VehicleInput>, us
     throw new Error('Vehicle not found');
   }
 
-  const { scheduledAt, ...inputWithoutScheduledAt } = input;
+  const { scheduledAt, images, imagePublicIds, ...inputWithoutScheduledAt } = input;
+  const updateData: any = {
+    ...inputWithoutScheduledAt,
+    scheduledAt: scheduledAt || null,
+  };
+
+  if (images !== undefined) {
+    updateData.images = images ? JSON.stringify(images) : '[]';
+  }
+  if (imagePublicIds !== undefined) {
+    updateData.imagePublicIds = imagePublicIds ? JSON.stringify(imagePublicIds) : '[]';
+  }
 
   const vehicle = await prisma.vehicle.update({
     where: { id },
-    data: {
-      ...inputWithoutScheduledAt,
-      scheduledAt: scheduledAt || null,
-    },
+    data: updateData,
   });
 
-  await notificationService.create({
-    type: 'INFO',
-    message: `Vehicle updated: ${vehicle.make} ${vehicle.model} (${vehicle.year})`,
-    userId,
-    action: 'VEHICLE_UPDATED',
-    entityType: 'VEHICLE',
-    entityId: id,
-    vehicleId: id,
-  });
+  // Only create notification if userId is valid
+  if (userId && userId !== 'admin-user-id') {
+    try {
+      await notificationService.create({
+        type: 'INFO',
+        message: `Vehicle updated: ${vehicle.make} ${vehicle.model} (${vehicle.year})`,
+        userId,
+        action: 'VEHICLE_UPDATED',
+        entityType: 'VEHICLE',
+        entityId: id,
+        vehicleId: id,
+      });
+    } catch (e) {
+      console.debug('Notification skipped:', e);
+    }
+  }
 
   return vehicle;
 };

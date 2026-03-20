@@ -18,9 +18,9 @@ export function useURLFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState<FilterState>({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Read filters from URL
     const newFilters: FilterState = {};
     
     if (searchParams.get('make')) {
@@ -48,7 +48,15 @@ export function useURLFilters() {
       newFilters.yearTo = searchParams.get('yearTo')!;
     }
 
-    setFilters(newFilters);
+    setFilters(prev => {
+      const prevStr = JSON.stringify(prev);
+      const newStr = JSON.stringify(newFilters);
+      if (prevStr !== newStr) {
+        return newFilters;
+      }
+      return prev;
+    });
+    setIsInitialized(true);
   }, [searchParams]);
 
   const updateFilter = (key: keyof FilterState, value: string | undefined) => {

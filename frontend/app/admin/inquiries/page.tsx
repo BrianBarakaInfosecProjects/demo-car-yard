@@ -24,6 +24,7 @@ interface Inquiry {
 export default function InquiriesPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'RESOLVED'>('ALL');
 
@@ -35,9 +36,12 @@ export default function InquiriesPage() {
     try {
       const data = await api.get('/inquiries');
       setInquiries(data);
+      setError(null);
       setLoading(false);
-    } catch (error) {
-      console.error('Error fetching inquiries:', error);
+    } catch (err: any) {
+      console.error('Error fetching inquiries:', err);
+      const errorMessage = err.response?.data?.error || err.message || 'Failed to load inquiries';
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -111,6 +115,24 @@ export default function InquiriesPage() {
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading inquiries...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-12 text-center">
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+          <span className="text-red-600 text-2xl">!</span>
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Error loading inquiries</h3>
+        <p className="text-sm text-gray-600 mb-4">{error}</p>
+        <button
+          onClick={fetchInquiries}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Try Again
+        </button>
       </div>
     );
   }

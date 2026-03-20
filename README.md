@@ -23,8 +23,8 @@ A modern, full-stack vehicle inventory management platform for Kenya's car yard 
 ## 🛠 Tech Stack
 
 ### Frontend
-- **Framework:** Next.js 16.1.1 with App Router
-- **UI Library:** React 19.2.3
+- **Framework:** Next.js 14.2.x with App Router
+- **UI Library:** React 18.2.x
 - **Styling:** Tailwind CSS + Bootstrap 5.3
 - **Forms:** React Hook Form with Zod validation
 - **Icons:** Lucide React + FontAwesome

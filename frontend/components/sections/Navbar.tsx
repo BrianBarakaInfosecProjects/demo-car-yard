@@ -60,7 +60,7 @@ export default function Navbar() {
         <Link href="/" className="navbar-brand">
           <div className="brand-icon-wrapper">
             <i className="fas fa-car"></i>
-            <span className="brand-text">TrustAuto</span>
+            <span className="brand-text">Sassy Auto Trading</span>
           </div>
         </Link>
 
@@ -91,12 +91,6 @@ export default function Navbar() {
                     <Link href="/inventory" className="dropdown-link">
                       <Car size={16} />
                       <span>Browse Cars</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/services" className="dropdown-link">
-                      <i className="fas fa-tools"></i>
-                      <span>Services</span>
                     </Link>
                   </li>
                   <li>

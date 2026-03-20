@@ -1,123 +1,88 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+import { detailImage, thumbnailImage } from '@/lib/cloudinary';
 
 interface VehicleGalleryProps {
   images: string[];
   title: string;
+  shareButton?: React.ReactNode;
 }
 
-export default function VehicleGallery({ images, title }: VehicleGalleryProps) {
+export default function VehicleGallery({ images, title, shareButton }: VehicleGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-
-  const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
-
-  const handleThumbnailClick = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const openLightbox = () => {
-    setIsLightboxOpen(true);
-  };
-
-  const closeLightbox = () => {
-    setIsLightboxOpen(false);
-  };
 
   if (!images || images.length === 0) {
     return (
-      <div className="vehicle-gallery">
-        <div className="gallery-placeholder">No images available</div>
+      <div className="aspect-[4/3] bg-brand-ink-soft rounded-xl flex items-center justify-center border border-border">
+        <p className="text-text-muted">No images available</p>
       </div>
     );
   }
 
   return (
-    <>
-      <div className="vehicle-gallery">
-        <div className="gallery-main">
-          <button
-            onClick={handlePrevious}
-            className="gallery-nav gallery-nav-prev"
-            aria-label="Previous image"
-            disabled={images.length <= 1}
-          >
-            <ChevronLeft size={24} />
-          </button>
-
-          <div className="gallery-image-wrapper">
-            <img
-              src={images[currentIndex] || ''}
-              alt={`${title} - Image ${currentIndex + 1}`}
-              className="gallery-main-image"
-            />
-            <button
-              onClick={openLightbox}
-              className="gallery-zoom-btn"
-              aria-label="View full size"
-            >
-              <Maximize2 size={20} />
-            </button>
-          </div>
-
-          <button
-            onClick={handleNext}
-            className="gallery-nav gallery-nav-next"
-            aria-label="Next image"
-            disabled={images.length <= 1}
-          >
-            <ChevronRight size={24} />
-          </button>
-
-          <div className="gallery-counter">
-            {currentIndex + 1} / {images.length}
-          </div>
-        </div>
-
+    <div className="flex flex-col gap-2">
+      <div className="relative aspect-[4/3] bg-brand-ink-soft rounded-xl overflow-hidden border border-border">
+        <Image
+          src={detailImage(images[currentIndex] || '')}
+          alt={`${title} - Image ${currentIndex + 1}`}
+          fill
+          sizes="(max-width: 768px) 100vw, 800px"
+          className="object-contain"
+          quality={92}
+          priority
+        />
+        
         {images.length > 1 && (
-          <div className="gallery-thumbnails">
-            {images.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => handleThumbnailClick(index)}
-                className={`gallery-thumbnail ${index === currentIndex ? 'active' : ''}`}
-                aria-label={`View image ${index + 1}`}
-              >
-                <img
-                  src={image}
-                  alt={`${title} - Thumbnail ${index + 1}`}
-                />
-              </button>
-            ))}
+          <>
+            <button
+              onClick={() => setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/80 border border-border rounded-full flex items-center justify-center text-brand-gold cursor-pointer hover:bg-black/60"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={() => setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/80 border border-border rounded-full flex items-center justify-center text-brand-gold cursor-pointer hover:bg-black/60"
+            >
+              <ChevronRight size={18} />
+            </button>
+            <div className="absolute bottom-2 right-2 bg-black/90 text-brand-gold text-xs px-3 py-1 rounded-full">
+              {currentIndex + 1} / {images.length}
+            </div>
+          </>
+        )}
+        
+        {shareButton && (
+          <div className="absolute top-3 right-3 z-10">
+            {shareButton}
           </div>
         )}
       </div>
 
-      {isLightboxOpen && (
-        <div className="gallery-lightbox" onClick={closeLightbox}>
-          <button
-            onClick={closeLightbox}
-            className="lightbox-close"
-            aria-label="Close lightbox"
-          >
-            ×
-          </button>
-          <img
-            src={images[currentIndex] || ''}
-            alt={`${title} - Full size`}
-            className="lightbox-image"
-            onClick={(e) => e.stopPropagation()}
-          />
+      {images.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+          {images.map((image, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`relative w-16 h-12 rounded-md overflow-hidden border-2 cursor-pointer flex-shrink-0 ${index === currentIndex ? 'border-brand-gold' : 'border-transparent'}`}
+              style={{ opacity: index === currentIndex ? 1 : 0.6 }}
+            >
+              <Image
+                src={thumbnailImage(image)}
+                alt={`${title} - Thumbnail ${index + 1}`}
+                fill
+                sizes="64px"
+                className="object-cover"
+                quality={85}
+              />
+            </button>
+          ))}
         </div>
       )}
-    </>
+    </div>
   );
 }

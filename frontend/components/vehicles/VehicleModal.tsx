@@ -92,7 +92,7 @@ export default function VehicleModal({
               <span>WhatsApp</span>
             </a>
             <a
-              href={`mailto:info@trustauto.co.ke?subject=${emailSubject}&body=${emailBody}`}
+              href={`mailto:info@sassyauto.co.ke?subject=${emailSubject}&body=${emailBody}`}
               className="d-flex align-items-center justify-content-center gap-2 btn btn-outline-primary py-3"
             >
               <Mail size={20} />

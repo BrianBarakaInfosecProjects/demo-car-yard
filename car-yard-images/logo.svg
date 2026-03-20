@@ -1,0 +1,55 @@
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+<!-- Black Circular Background -->
+<circle cx="250" cy="250" r="240" fill="#1A1A1A" />
+
+<!-- Red Arc accents from the Sassy Logo -->
+
+<path d="M 80 230 A 180 180 0 0 1 420 230" fill="none" stroke="#E31E24" stroke-width="12" stroke-linecap="round" />
+<path d="M 100 370 Q 250 440 400 370" fill="none" stroke="#E31E24" stroke-width="8" stroke-linecap="round" />
+
+<!-- Car Silhouette: Red body with Black Windows -->
+
+<g transform="translate(110, 150) scale(1.1)">
+<!-- Main Car Body -->
+<path d="M 10 70
+C 10 70 15 35 40 30
+C 70 25 100 0 145 0
+C 190 0 220 25 245 35
+C 270 45 275 70 275 70
+L 285 75
+C 285 85 270 90 250 90
+L 30 90
+C 10 90 -5 85 -5 75
+Z"
+fill="#E31E24" />
+
+<!-- Windows (Black) -->
+<path d="M 55 38 
+         L 55 65 
+         L 135 65 
+         L 135 15 
+         C 100 15 70 25 55 38 
+         Z" 
+      fill="#1A1A1A" />
+<path d="M 145 15 
+         L 145 65 
+         L 230 65 
+         L 230 45 
+         C 210 30 180 15 145 15 
+         Z" 
+      fill="#1A1A1A" />
+      
+<!-- Subtle Shine on Hood -->
+<path d="M 235 55 Q 255 58 265 70" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+
+
+</g>
+
+<!-- "SASSY AUTO" Text in Orange -->
+
+<text x="250" y="315" font-family="sans-serif" font-weight="900" font-size="44" fill="#F37021" text-anchor="middle" letter-spacing="2" font-style="italic">SASSY AUTO</text>
+
+<!-- "TRADING" Text in White -->
+
+<text x="250" y="355" font-family="sans-serif" font-weight="900" font-size="28" fill="#FFFFFF" text-anchor="middle" letter-spacing="10">TRADING</text>
+</svg>

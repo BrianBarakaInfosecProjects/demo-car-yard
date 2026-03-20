@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -12,7 +13,7 @@ model User {
   email          String          @unique
   password       String
   name           String?
-  role           Role            @default(ADMIN)
+  role           String          @default("CUSTOMER")
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   inquiries      Inquiry[]
@@ -31,8 +32,8 @@ model AuditLog {
   entityType   String
   entityId     String?
   changes      String?
-  beforeState  String?  @db.Text
-  afterState   String?  @db.Text
+  beforeState  String?
+  afterState   String?
   userId       String
   user         User     @relation(fields: [userId], references: [id])
   vehicleId    String?
@@ -54,14 +55,14 @@ model AuditLog {
 
 model Vehicle {
   id              String          @id @default(uuid())
-  slug            String?         @unique @db.VarChar(255)
+  slug            String?         @unique
   make            String
   model           String
   year            Int
   priceKES        Int
   mileage         Int
-  bodyType        BodyType
-  fuelType        FuelType
+  bodyType        String
+  fuelType        String
   transmission    String
   drivetrain      String
   exteriorColor   String
@@ -69,12 +70,12 @@ model Vehicle {
   engine          String
   vin             String?
   location        String?
-  status          Status          @default(USED)
+  status          String          @default("USED")
   featured        Boolean         @default(false)
   description     String
   imageUrl        String
-  images          String[]
-  imagePublicIds  String[]
+  images          String
+  imagePublicIds  String
   viewCount       Int             @default(0)
   isDraft         Boolean         @default(false)
   scheduledAt     DateTime?
@@ -86,6 +87,8 @@ model Vehicle {
   inquiries       Inquiry[]
   auditLogs       AuditLog[]
   notifications   Notification[]
+  softInterests   SoftInterest[]
+  reservations   Reservation[]
 
   @@index([slug])
   @@index([vin])
@@ -135,7 +138,7 @@ model SessionLog {
   username        String?
   role            String?
   ipAddress       String?
-  userAgent       String?    @db.Text
+  userAgent       String?
   sessionStart    DateTime?
   sessionEnd      DateTime?
   sessionDuration Int?
@@ -170,33 +173,87 @@ model Notification {
   @@index([userId, createdAt])
 }
 
-enum BodyType {
-  SEDAN
-  SUV
-  TRUCK
-  COUPE
-  HATCHBACK
-  WAGON
+model NotifySubscriber {
+  id              String   @id @default(uuid())
+  name            String
+  phone           String
+  maxBudget       Int      @default(0)
+  intentMake      String?
+  intentModel     String?
+  intentMaxPrice  Int      @default(0)
+  status          String   @default("ACTIVE")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@index([intentMake])
+  @@index([createdAt])
 }
 
-enum FuelType {
-  GASOLINE
-  DIESEL
-  HYBRID
-  ELECTRIC
+model SoftInterest {
+  id          String   @id @default(uuid())
+  name        String
+  phone       String
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  followedUp Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([vehicleId])
+  @@index([followedUp])
+  @@index([createdAt])
 }
 
-enum Status {
-  AVAILABLE
-  SOLD
-  RESERVED
-  NEW
-  USED
-  CERTIFIED_PRE_OWNED
-  ON_SALE
+model Reservation {
+  id              String    @id @default(uuid())
+  vehicleId       String
+  vehicle         Vehicle   @relation(fields: [vehicleId], references: [id])
+  buyerName       String
+  buyerPhone      String
+  amount          Int       @default(500)
+  mpesaReceipt    String?
+  checkoutRequestId String?
+  status          String    @default("ACTIVE")
+  expiresAt       DateTime
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([vehicleId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([createdAt])
 }
 
-enum Role {
-  ADMIN
-  STAFF
+model CarMake {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  key       String     @unique
+  logoUrl   String?
+  models    CarModel[]
+  createdAt DateTime   @default(now())
+}
+
+model Settings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CarModel {
+  id            String   @id @default(uuid())
+  makeId        String
+  make          CarMake  @relation(fields: [makeId], references: [id])
+  name          String
+  yearStart     Int
+  yearEnd       Int?
+  bodyTypes     String
+  fuelTypes     String
+  transmissions String
+  engines       String
+  createdAt     DateTime @default(now())
+
+  @@unique([makeId, name, yearStart])
 }

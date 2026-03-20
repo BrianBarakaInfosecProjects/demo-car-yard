@@ -1,6 +1,6 @@
 'use client';
 
-import { Fuel, Gauge, Settings, MapPin, Calendar, Shield } from 'lucide-react';
+import { Fuel, Gauge, Settings, MapPin } from 'lucide-react';
 
 interface VehicleHeaderProps {
   vehicle: {
@@ -63,89 +63,60 @@ export default function VehicleHeader({ vehicle, status }: VehicleHeaderProps) {
   };
 
   return (
-    <div className="vehicle-header">
-      <div className="vehicle-header-main">
-        <h1 className="vehicle-title">
-          {vehicle.year} {vehicle.make} {vehicle.model}
-        </h1>
-
-        <div className="vehicle-price-section">
-          <div className="vehicle-price">{formatPrice(vehicle.priceKES)}</div>
-          <div
-            className="vehicle-status-badge"
-            style={{ backgroundColor: getStatusColor() }}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'var(--ink-soft)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+          <span
+            style={{ padding: '4px 12px', fontSize: '11px', fontWeight: 700, color: 'white', borderRadius: '20px', textTransform: 'uppercase', backgroundColor: getStatusColor() }}
           >
             {getStatusLabel()}
-          </div>
+          </span>
         </div>
+        <h1 style={{ fontFamily: 'var(--serif)', fontSize: '28px', fontWeight: 700, color: '#ffffff', lineHeight: 1.2 }}>
+          {vehicle.year} {vehicle.make} {vehicle.model}
+        </h1>
+        <p style={{ fontFamily: 'var(--serif)', fontSize: '28px', fontWeight: 700, color: 'var(--gold)', marginTop: '4px' }}>
+          {formatPrice(vehicle.priceKES)}
+        </p>
       </div>
 
-      <div className="vehicle-specs">
-        <div className="spec-item">
-          <Fuel className="spec-icon" size={18} />
-          <div className="spec-content">
-            <span className="spec-label">Fuel</span>
-            <span className="spec-value">{vehicle.fuelType}</span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+        <div style={{ background: 'var(--ink)', borderRadius: '8px', padding: '12px', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+            <Fuel size={12} style={{ color: 'var(--gold)' }} />
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 700, letterSpacing: '0.1em' }}>Fuel</span>
           </div>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>{vehicle.fuelType}</p>
         </div>
-
-        <div className="spec-item">
-          <Gauge className="spec-icon" size={18} />
-          <div className="spec-content">
-            <span className="spec-label">Mileage</span>
-            <span className="spec-value">{formatMileage(vehicle.mileage)} km</span>
+        <div style={{ background: 'var(--ink)', borderRadius: '8px', padding: '12px', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+            <Gauge size={12} style={{ color: 'var(--gold)' }} />
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 700, letterSpacing: '0.1em' }}>Mileage</span>
           </div>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>{formatMileage(vehicle.mileage)} km</p>
         </div>
-
-        <div className="spec-item">
-          <Settings className="spec-icon" size={18} />
-          <div className="spec-content">
-            <span className="spec-label">Transmission</span>
-            <span className="spec-value">{vehicle.transmission}</span>
+        <div style={{ background: 'var(--ink)', borderRadius: '8px', padding: '12px', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+            <Settings size={12} style={{ color: 'var(--gold)' }} />
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 700, letterSpacing: '0.1em' }}>Transmission</span>
           </div>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>{vehicle.transmission}</p>
         </div>
-
-        <div className="spec-item">
-          <Shield className="spec-icon" size={18} />
-          <div className="spec-content">
-            <span className="spec-label">Body Type</span>
-            <span className="spec-value">{vehicle.bodyType}</span>
+        <div style={{ background: 'var(--ink)', borderRadius: '8px', padding: '12px', border: '1px solid var(--border)' }}>
+          <div style={{ marginBottom: '2px' }}>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 700, letterSpacing: '0.1em' }}>Body</span>
           </div>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>{vehicle.bodyType}</p>
         </div>
-
         {vehicle.location && (
-          <div className="spec-item">
-            <MapPin className="spec-icon" size={18} />
-            <div className="spec-content">
-              <span className="spec-label">Location</span>
-              <span className="spec-value">{vehicle.location}</span>
+          <div style={{ background: 'var(--ink)', borderRadius: '8px', padding: '12px', border: '1px solid var(--border)', gridColumn: 'span 2' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+              <MapPin size={12} style={{ color: 'var(--gold)' }} />
+              <span style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 700, letterSpacing: '0.1em' }}>Location</span>
             </div>
+            <p style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff' }}>{vehicle.location}</p>
           </div>
         )}
-      </div>
-
-      <div className="vehicle-ctas">
-        <button className="cta-btn cta-primary" aria-label="Contact dealer">
-          <span>Contact Dealer</span>
-        </button>
-
-        <a
-          href={`https://wa.me/254700000000?text=Hi, I'm interested in the ${vehicle.year} ${vehicle.make} ${vehicle.model}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cta-btn cta-whatsapp"
-          aria-label="Contact via WhatsApp"
-        >
-          <span>WhatsApp</span>
-        </a>
-
-        <button className="cta-btn cta-secondary" aria-label="Schedule test drive">
-          <span>Schedule Test Drive</span>
-        </button>
-
-        <button className="cta-btn cta-tertiary" aria-label="Request financing">
-          <span>Request Financing</span>
-        </button>
       </div>
     </div>
   );

@@ -8,10 +8,10 @@ async function main() {
   // Create admin user only
   const admin = await prisma.user.upsert({
     where: { email: 'admin@trustauto.co.ke' },
-    update: {},
+    update: { password: '$2a$10$djJIiiNR1YHfAx6hlgy4b.t91llQPX5l7R0IC8WkuGsjVXvwLFNym' },
     create: {
       email: 'admin@trustauto.co.ke',
-      password: '$2a$10$BEytcMDkTdWgFRedt2fl1O.Etc3jpY61ppFPsKa5LSZVRcQwWkFKS',
+      password: '$2a$10$djJIiiNR1YHfAx6hlgy4b.t91llQPX5l7R0IC8WkuGsjVXvwLFNym',
       name: 'Admin User',
       role: 'ADMIN',
     },

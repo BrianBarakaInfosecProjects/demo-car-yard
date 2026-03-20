@@ -103,7 +103,7 @@ export const uploadMultiple = (fieldName: string = 'images', maxCount: number = 
         req.files = [];
       }
 
-      console.log('Files received in uploadMultiple middleware:', req.files?.length || 0);
+      console.debug('Files received in uploadMultiple middleware:', req.files?.length || 0);
       next();
     });
   };

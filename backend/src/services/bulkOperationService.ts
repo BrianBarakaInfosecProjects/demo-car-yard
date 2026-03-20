@@ -12,8 +12,9 @@ export const bulkDeleteVehicles = async (ids: string[]) => {
   const { deleteMultipleFromCloudinary } = await import('../config/cloudinary');
   
   for (const vehicle of vehicles) {
-    if (vehicle.imagePublicIds && vehicle.imagePublicIds.length > 0) {
-      await deleteMultipleFromCloudinary(vehicle.imagePublicIds);
+    const publicIds = vehicle.imagePublicIds ? JSON.parse(vehicle.imagePublicIds) : [];
+    if (publicIds.length > 0) {
+      await deleteMultipleFromCloudinary(publicIds);
     }
   }
 

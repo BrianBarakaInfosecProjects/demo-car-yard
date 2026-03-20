@@ -1,312 +1,321 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
-import { Car, Mail, Star, Plus, List, RefreshCw, TrendingUp, TrendingDown, Calendar, X, Download, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const [timeRange, setTimeRange] = useState('month');
-  const [loading, setLoading] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(true);
   const [stats, setStats] = useState({
     totalVehicles: 0,
     totalInquiries: 0,
+    pendingInquiries: 0,
     featuredVehicles: 0,
-    recentVehicles: 0,
     soldThisMonth: 0,
   });
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [agingVehicles, setAgingVehicles] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const chartsInited = useRef(false);
 
   useEffect(() => {
-    fetchStats();
+    fetchData();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     try {
-      const [vehicles, inquiries] = await Promise.all([
+      setError(null);
+      
+      // Fetch real analytics data
+      const [analytics, vehicles, inquiries, auditLogs] = await Promise.all([
+        api.get('/analytics/dashboard'),
         api.get('/vehicles'),
         api.get('/inquiries'),
+        api.get('/analytics/audit-logs?limit=5').catch(() => ({ logs: [] })),
       ]);
+      
+      const vehiclesArray = Array.isArray(vehicles) ? vehicles : vehicles.vehicles || [];
+      const inquiriesArray = Array.isArray(inquiries) ? inquiries : inquiries.inquiries || [];
+      
+      // Calculate aging vehicles (60+ days listed)
+      const now = new Date();
+      const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+      
+      const aging = vehiclesArray.filter((v: any) => {
+        const created = new Date(v.createdAt || Date.now());
+        return created < sixtyDaysAgo;
+      }).slice(0, 2);
 
-      const vehiclesArray = Array.isArray(vehicles) ? vehicles : [];
-
+      // Use analytics data for stats
       setStats({
-        totalVehicles: vehiclesArray.length,
-        totalInquiries: inquiries.length,
-        featuredVehicles: vehiclesArray.filter((v: any) => v.featured).length,
-        recentVehicles: vehiclesArray.filter((v: any) => {
-          const createdAt = new Date(v.createdAt);
-          const weekAgo = new Date();
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          return createdAt > weekAgo;
-        }).length,
-        soldThisMonth: Math.floor(Math.random() * 5),
+        totalVehicles: analytics?.totalVehicles || vehiclesArray.length,
+        totalInquiries: analytics?.totalInquiries || inquiriesArray.length,
+        pendingInquiries: analytics?.pendingInquiries || inquiriesArray.filter((i: any) => i.status === 'PENDING' || i.status === 'NEW').length,
+        featuredVehicles: analytics?.featuredVehicles || vehiclesArray.filter((v: any) => v.featured).length,
+        soldThisMonth: analytics?.soldThisMonth || 0,
       });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
+
+      setAgingVehicles(aging);
+
+      // Use real audit logs if available, otherwise empty
+      const activity = (auditLogs?.logs || auditLogs || []).map((log: any) => ({
+        type: log.action || 'info',
+        color: '#1a56db',
+        message: log.description || log.action || 'Activity recorded',
+        time: log.createdAt ? new Date(log.createdAt).toLocaleString() : 'Recent',
+      }));
+      
+      if (activity.length === 0) {
+        // Fallback empty state
+        setRecentActivity([]);
+      } else {
+        setRecentActivity(activity);
+      }
+
+      initCharts();
+    } catch (err: any) {
+      console.error('Error fetching data:', err);
+      const errorMessage = err.response?.data?.error || err.message || 'Failed to load dashboard data';
+      setError(errorMessage);
     }
   };
 
-  const handleRefresh = () => {
-    setLoading(true);
-    fetchStats();
-    setTimeout(() => setLoading(false), 1000);
-  };
+  const initCharts = () => {
+    if (chartsInited.current) return;
+    chartsInited.current = true;
 
-  const handleExport = () => {
-    alert('Exporting dashboard report...');
-  };
+    const loadChart = () => {
+      if (typeof window === 'undefined') return;
+      
+      const Chart = (window as any).Chart;
+      if (!Chart) {
+        setTimeout(loadChart, 100);
+        return;
+      }
 
-  const statsData = [
-    { 
-      label: 'Total Vehicles', 
-      value: stats.totalVehicles.toString(), 
-      trend: 'up', 
-      change: '+3',
-      percentage: '+13%',
-      period: 'this month',
-      badge: '2 aging 60+ days',
-      badgeColor: 'bg-orange-100 text-orange-700',
-      link: '/admin/vehicles',
-      icon: Car,
-      iconBg: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-    },
-    { 
-      label: 'Total Inquiries', 
-      value: stats.totalInquiries.toString(), 
-      trend: 'neutral', 
-      change: stats.totalInquiries.toString(),
-      percentage: '',
-      period: 'pending',
-      badge: 'Hot Leads',
-      badgeColor: 'bg-red-100 text-red-700',
-      link: '/admin/inquiries',
-      icon: Mail,
-      iconBg: 'bg-green-50',
-      iconColor: 'text-green-600',
-    },
-    { 
-      label: 'Featured Vehicles', 
-      value: stats.featuredVehicles.toString(), 
-      trend: 'up', 
-      change: '+1',
-      percentage: '',
-      period: 'active listings',
-      badge: 'High Views',
-      badgeColor: 'bg-green-100 text-green-700',
-      link: '/admin/vehicles',
-      icon: Star,
-      iconBg: 'bg-orange-50',
-      iconColor: 'text-orange-600',
+      const blue = '#1a56db', green = '#10b981', amber = '#f59e0b';
+      const gridColor = 'rgba(0,0,0,0.06)';
+      const textColor = '#6b7280';
+
+      const baseOpts = { 
+        responsive: true, 
+        maintainAspectRatio: false, 
+        plugins: { legend: { display: false }, tooltip: { bodyFont: { size: 11 } } } 
+      };
+
+      const salesChartEl = document.getElementById('salesChart');
+      if (salesChartEl) {
+        new Chart(salesChartEl, {
+          type: 'bar',
+          data: { 
+            labels: ['Oct','Nov','Dec','Jan','Feb','Mar'], 
+            datasets: [{ data: [3,5,2,4,6, stats.soldThisMonth], backgroundColor: blue, borderRadius: 4, barThickness: 20 }] 
+          },
+          options: { 
+            ...baseOpts, 
+            scales: { 
+              x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } }, 
+              y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 }, stepSize: 2 }, beginAtZero: true } 
+            } 
+          }
+        });
+      }
+
+      const sparkConfigs = [
+        { id: 'spark1', data: [2,5,3,7,6, stats.totalVehicles], color: green },
+        { id: 'spark2', data: [1,4,2,6,3, stats.totalInquiries], color: amber },
+        { id: 'spark3', data: [0,1,0,2,3, stats.soldThisMonth], color: blue },
+      ];
+
+      sparkConfigs.forEach(({ id, data, color }) => {
+        const el = document.getElementById(id);
+        if (el) {
+          new Chart(el, { 
+            type: 'line', 
+            data: { 
+              labels: ['','','','','',''], 
+              datasets: [{ data, borderColor: color, borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: false }] 
+            }, 
+            options: { 
+              ...baseOpts, 
+              scales: { x: { display: false }, y: { display: false } } 
+            } 
+          });
+        }
+      });
+    };
+
+    if (document.readyState === 'complete') {
+      loadChart();
+    } else {
+      window.addEventListener('load', loadChart);
     }
-  ];
+  };
 
-  const recentActivities = [
-    { type: 'inquiry', message: 'New inquiry received', detail: 'Toyota Harrier 2019', time: '2 hours ago', icon: Mail },
-    { type: 'sale', message: 'Vehicle sold', detail: 'Honda Fit 2018', time: '5 hours ago', icon: Car },
-    { type: 'featured', message: 'Vehicle featured', detail: 'Mercedes C200 2020', time: '1 day ago', icon: Star }
-  ];
+  useEffect(() => {
+    initCharts();
+  }, [stats]);
 
-  const quickStats = [
-    { label: `${stats.recentVehicles} vehicles added`, period: 'this week' },
-    { label: `${stats.soldThisMonth} sold`, period: 'this month' },
-    { label: '3 pending test drives', period: 'scheduled' }
-  ];
-
-  const upcomingAppointments = [
-    { title: 'Test Drive - BMW X5', date: 'Today', time: '3:00 PM', customer: 'John Kamau' },
-    { title: 'Vehicle Viewing', date: 'Tomorrow', time: '10:00 AM', customer: 'Mary Wanjiru' },
-    { title: 'Service Inspection', date: 'Jan 15', time: '2:00 PM', customer: 'Land Cruiser' }
+  const quickActions = [
+    { label: 'Add vehicle', icon: '+', href: '/admin/vehicles/new' },
+    { label: 'View inquiries', icon: '✉', href: '/admin/inquiries' },
+    { label: 'Manage featured', icon: '★', href: '/admin/featured' },
+    { label: 'Analytics', icon: '↗', href: '/admin/analytics' },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="text-sm text-gray-600">Welcome back, Admin</p>
+    <div>
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-md px-3 py-2 mb-4 text-[11px] text-red-800 flex items-center justify-between">
+          <span>Error: {error}</span>
+          <button onClick={fetchData} className="underline">Retry</button>
         </div>
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={handleRefresh}
-            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            disabled={loading}
-          >
-            <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
-          </button>
-          <button 
-            onClick={handleExport}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
-            <Download size={16} />
-            <span>Export</span>
-          </button>
+      )}
+
+      {/* Alert Bar */}
+      {(stats.pendingInquiries > 0 || agingVehicles.length > 0) && (
+        <div className="bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mb-4 text-[11px] text-amber-800 flex items-center gap-2">
+          ⚠ {agingVehicles.length} vehicles aging 60+ days · {stats.pendingInquiries} test drives pending confirmation · 
+          <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>View all alerts</span>
         </div>
-      </div>
+      )}
 
-      {/* Quick Stats Bar */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg px-6 py-3">
-        <div className="flex items-center justify-center flex-wrap gap-4 text-sm">
-          {quickStats.map((stat, index) => (
-            <div key={index} className="flex items-center gap-1">
-              <span className="font-semibold text-blue-900">{stat.label}</span>
-              <span className="text-blue-600">{stat.period}</span>
-              {index < quickStats.length - 1 && <span className="text-blue-300 ml-4">|</span>}
-            </div>
-          ))}
+      {/* KPI Grid */}
+      <div className="grid grid-cols-4 gap-2.5 mb-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-3.5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] text-gray-500">Total vehicles</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">+13%</span>
+          </div>
+          <div className="text-[22px] font-medium text-gray-900 mb-1">{stats.totalVehicles}</div>
+          <div className="flex items-center gap-2 text-[11px] text-gray-500">
+            <span>+3 this month</span>
+            <canvas id="spark1" className="w-20 h-7"></canvas>
+          </div>
         </div>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {statsData.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Link
-              key={index}
-              href={stat.link}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group block"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-lg ${stat.iconBg}`}>
-                  <Icon className={stat.iconColor} size={20} />
-                </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${stat.badgeColor}`}>
-                  {stat.badge}
-                </span>
-              </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-3.5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] text-gray-500">Total inquiries</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">{stats.pendingInquiries} pending</span>
+          </div>
+          <div className="text-[22px] font-medium text-gray-900 mb-1">{stats.totalInquiries}</div>
+          <div className="flex items-center gap-2 text-[11px] text-gray-500">
+            <span>8 this week</span>
+            <canvas id="spark2" className="w-20 h-7"></canvas>
+          </div>
+        </div>
 
-              <h3 className="text-gray-600 text-xs font-medium mb-1">{stat.label}</h3>
-              
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</p>
-                  <div className="flex items-center gap-1">
-                    {stat.trend === 'up' ? (
-                      <div className="flex items-center text-green-600 text-xs">
-                        <TrendingUp size={14} />
-                        <span className="ml-1 font-semibold">{stat.change}</span>
-                        {stat.percentage && <span className="ml-1">{stat.percentage}</span>}
-                      </div>
-                    ) : (
-                      <span className="text-gray-600 text-xs font-semibold">{stat.change}</span>
-                    )}
-                    <span className="text-gray-500 text-xs">{stat.period}</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+        <div className="bg-white border border-gray-200 rounded-lg p-3.5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] text-gray-500">Vehicles sold</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">+8%</span>
+          </div>
+          <div className="text-[22px] font-medium text-gray-900 mb-1">{stats.soldThisMonth}</div>
+          <div className="flex items-center gap-2 text-[11px] text-gray-500">
+            <span>this month</span>
+            <canvas id="spark3" className="w-20 h-7"></canvas>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-3.5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] text-gray-500">Featured listings</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">Active</span>
+          </div>
+          <div className="text-[22px] font-medium text-gray-900 mb-1">{stats.featuredVehicles}</div>
+          <div className="text-[11px] text-gray-500">1 expiring soon</div>
+        </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-        <h2 className="text-base font-bold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <Link 
-            href="/admin/vehicles/new"
-            className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+      <div className="text-[12px] font-medium text-gray-500 uppercase tracking-wide mb-2 mt-4">Quick actions</div>
+      <div className="grid grid-cols-4 gap-2 mb-3">
+        {quickActions.map((action, i) => (
+          <Link
+            key={i}
+            href={action.href}
+            className="bg-white border border-gray-200 rounded-md py-3 text-center cursor-pointer text-[11px] text-gray-500 hover:bg-gray-50 transition-colors"
           >
-            <Plus size={18} className="mr-2" />
-            Add New Vehicle
+            <div className="text-[16px] mb-1">{action.icon}</div>
+            {action.label}
           </Link>
-          <Link 
-            href="/admin/inquiries"
-            className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-          >
-            <Mail size={18} className="mr-2" />
-            View Inquiries
-          </Link>
-          <button className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
-            <Star size={18} className="mr-2" />
-            Manage Featured
-          </button>
-          <Link 
-            href="/admin/inquiries"
-            className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-          >
-            <List size={18} className="mr-2" />
-            View All Inquiries
-          </Link>
+        ))}
+      </div>
+
+      {/* Two Column: Sales Chart + Activity */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="bg-white border border-gray-200 rounded-lg p-3.5">
+          <div className="text-[12px] font-medium text-gray-900 mb-3 flex items-center justify-between">
+            Monthly sales <span className="text-[10px] font-normal text-gray-500">last 6 months</span>
+          </div>
+          <div className="relative h-40"><canvas id="salesChart"></canvas></div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-3.5">
+          <div className="text-[12px] font-medium text-gray-900 mb-3">Recent activity</div>
+          <div className="space-y-2">
+            {recentActivity.length > 0 ? (
+              recentActivity.map((item, i) => (
+                <div key={i} className="flex gap-2.5 py-2 border-b border-gray-100 last:border-0">
+                  <div className="w-2 h-2 rounded-full mt-1 flex-shrink-0" style={{ background: item.color }}></div>
+                  <div>
+                    <div className="text-[11px] text-gray-900">{item.message}</div>
+                    <div className="text-[10px] text-gray-500 mt-0.5">{item.time}</div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-[11px] text-gray-500 py-4 text-center">No recent activity</div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Activity Feed + Calendar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Activity Feed */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-gray-900">Recent Activity</h3>
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">Live</span>
-          </div>
-          <div className="space-y-2">
-            {recentActivities.map((activity, index) => {
-              const Icon = activity.icon;
-              return (
-                <div 
-                  key={index} 
-                  className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
-                >
-                  <div className={`p-2 rounded-lg ${
-                    activity.type === 'inquiry' ? 'bg-green-100' :
-                    activity.type === 'sale' ? 'bg-blue-100' :
-                    'bg-orange-100'
-                  }`}>
-                    <Icon className={`${
-                      activity.type === 'inquiry' ? 'text-green-600' :
-                      activity.type === 'sale' ? 'text-blue-600' :
-                      'text-orange-600'
-                    }`} size={16} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{activity.message}</p>
-                    <p className="text-xs text-gray-600 mt-0.5">{activity.detail}</p>
-                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      {/* Aging Showroom */}
+      <div className="bg-white border border-gray-200 rounded-lg p-3.5">
+        <div className="text-[12px] font-medium text-gray-900 mb-3 flex items-center justify-between">
+          Aging inventory 
+          {agingVehicles.length > 0 && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700">{agingVehicles.length} flagged</span>
+          )}
         </div>
-
-        {/* Calendar Widget */}
-        {showCalendar && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-gray-900">Upcoming</h3>
-              <button 
-                onClick={() => setShowCalendar(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="space-y-2">
-              {upcomingAppointments.map((apt, index) => (
-                <div 
-                  key={index}
-                  className="p-3 bg-blue-50 border-l-4 border-blue-600 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-start space-x-2">
-                    <Calendar className="text-blue-600 mt-0.5 flex-shrink-0" size={14} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-gray-900 truncate">{apt.title}</p>
-                      <p className="text-xs text-gray-600 mt-0.5 truncate">{apt.customer}</p>
-                      <p className="text-xs text-blue-600 font-medium mt-1">{apt.date} • {apt.time}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button className="w-full mt-3 py-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-medium rounded-lg transition-colors">
-              View Full Calendar
-            </button>
+        {agingVehicles.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-[11px]">
+              <thead>
+                <tr>
+                  <th className="text-left py-2 px-2.5 text-gray-500 font-medium border-b border-gray-100">Vehicle</th>
+                  <th className="text-left py-2 px-2.5 text-gray-500 font-medium border-b border-gray-100">Listed date</th>
+                  <th className="text-left py-2 px-2.5 text-gray-500 font-medium border-b border-gray-100">Days listed</th>
+                  <th className="text-left py-2 px-2.5 text-gray-500 font-medium border-b border-gray-100">Views</th>
+                  <th className="text-left py-2 px-2.5 text-gray-500 font-medium border-b border-gray-100">Price</th>
+                  <th className="text-left py-2 px-2.5 text-gray-500 font-medium border-b border-gray-100">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {agingVehicles.map((v: any, i: number) => (
+                  <tr key={i}>
+                    <td className="py-2 px-2.5 font-medium">{v.year} {v.make} {v.model}</td>
+                    <td className="py-2 px-2.5">{new Date(v.createdAt).toLocaleDateString()}</td>
+                    <td className="py-2 px-2.5 text-red-600 font-medium">72 days</td>
+                    <td className="py-2 px-2.5">{v.viewCount || 0}</td>
+                    <td className="py-2 px-2.5">KES {(v.priceKES / 1000000).toFixed(1)}M</td>
+                    <td className="py-2 px-2.5">
+                      <button className="px-2 py-1 text-[10px] border border-gray-300 rounded bg-white hover:bg-gray-50">Feature</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+        ) : (
+          <div className="text-[11px] text-gray-500 py-4 text-center">No aging vehicles</div>
         )}
       </div>
+
+      {/* Load Chart.js */}
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     </div>
   );
 }

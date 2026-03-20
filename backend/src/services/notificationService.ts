@@ -12,6 +12,19 @@ export interface CreateNotificationInput {
 
 export const notificationService = {
   create: async (input: CreateNotificationInput) => {
+    // Skip if userId is invalid (like default 'admin-user-id')
+    if (!input.userId || input.userId === 'admin-user-id') {
+      console.debug('Skipping notification - invalid userId');
+      return null;
+    }
+    
+    // Verify user exists
+    const user = await prisma.user.findUnique({ where: { id: input.userId } });
+    if (!user) {
+      console.debug('Skipping notification - user not found:', input.userId);
+      return null;
+    }
+    
     const notification = await prisma.notification.create({
       data: {
         type: input.type,

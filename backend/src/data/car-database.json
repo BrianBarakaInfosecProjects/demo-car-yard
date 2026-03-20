@@ -1,0 +1,1103 @@
+{
+  "makes": [
+    {
+      "name": "Toyota",
+      "key": "toyota",
+      "models": [
+        {
+          "name": "Corolla",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "HATCHBACK"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "1ZZ-FE", "displacement": "1.8L", "cylinders": 4, "horsepower": 132, "torque_nm": 171, "fuelType": "GASOLINE" },
+            { "code": "2ZR-FE", "displacement": "1.8L", "cylinders": 4, "horsepower": 140, "torque_nm": 172, "fuelType": "GASOLINE" },
+            { "code": "2ZR-FXE", "displacement": "1.8L", "cylinders": 4, "horsepower": 99, "torque_nm": 142, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Axio",
+          "yearStart": 2006, "yearEnd": null,
+          "bodyTypes": ["SEDAN"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "1NZ-FE", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 141, "fuelType": "GASOLINE" },
+            { "code": "1NZ-FXE", "displacement": "1.5L", "cylinders": 4, "horsepower": 73, "torque_nm": 111, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Fielder",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["WAGON"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "1NZ-FE", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 141, "fuelType": "GASOLINE" },
+            { "code": "2ZR-FXE", "displacement": "1.8L", "cylinders": 4, "horsepower": 100, "torque_nm": 142, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Premio",
+          "yearStart": 2001, "yearEnd": null,
+          "bodyTypes": ["SEDAN"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "1ZZ-FE", "displacement": "1.8L", "cylinders": 4, "horsepower": 132, "torque_nm": 171, "fuelType": "GASOLINE" },
+            { "code": "1AZ-FE", "displacement": "2.0L", "cylinders": 4, "horsepower": 152, "torque_nm": 196, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Allion",
+          "yearStart": 2001, "yearEnd": null,
+          "bodyTypes": ["SEDAN"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "1ZZ-FE", "displacement": "1.8L", "cylinders": 4, "horsepower": 132, "torque_nm": 171, "fuelType": "GASOLINE" },
+            { "code": "1AZ-FE", "displacement": "2.0L", "cylinders": 4, "horsepower": 152, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "3ZZ-FE", "displacement": "1.6L", "cylinders": 4, "horsepower": 110, "torque_nm": 150, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Camry",
+          "yearStart": 2001, "yearEnd": null,
+          "bodyTypes": ["SEDAN"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "2AZ-FE", "displacement": "2.4L", "cylinders": 4, "horsepower": 158, "torque_nm": 220, "fuelType": "GASOLINE" },
+            { "code": "2GR-FE", "displacement": "3.5L", "cylinders": 6, "horsepower": 268, "torque_nm": 340, "fuelType": "GASOLINE" },
+            { "code": "2AR-FXE", "displacement": "2.5L", "cylinders": 4, "horsepower": 176, "torque_nm": 213, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Vitz",
+          "yearStart": 1999, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "1KR-FE", "displacement": "1.0L", "cylinders": 3, "horsepower": 68, "torque_nm": 91, "fuelType": "GASOLINE" },
+            { "code": "1NZ-FE", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 141, "fuelType": "GASOLINE" },
+            { "code": "2SZ-FE", "displacement": "1.3L", "cylinders": 4, "horsepower": 86, "torque_nm": 121, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "RAV4",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "CVT"],
+          "engines": [
+            { "code": "2AZ-FE", "displacement": "2.4L", "cylinders": 4, "horsepower": 162, "torque_nm": 224, "fuelType": "GASOLINE" },
+            { "code": "2AR-FE", "displacement": "2.5L", "cylinders": 4, "horsepower": 176, "torque_nm": 233, "fuelType": "GASOLINE" },
+            { "code": "M20A-FXS", "displacement": "2.5L", "cylinders": 4, "horsepower": 219, "torque_nm": 221, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Land Cruiser",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "1GR-FE", "displacement": "4.0L", "cylinders": 6, "horsepower": 271, "torque_nm": 381, "fuelType": "GASOLINE" },
+            { "code": "2UZ-FE", "displacement": "4.7L", "cylinders": 8, "horsepower": 288, "torque_nm": 436, "fuelType": "GASOLINE" },
+            { "code": "3UR-FE", "displacement": "5.7L", "cylinders": 8, "horsepower": 381, "torque_nm": 530, "fuelType": "GASOLINE" },
+            { "code": "1VD-FTV", "displacement": "4.5L", "cylinders": 8, "horsepower": 261, "torque_nm": 650, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Land Cruiser Prado",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "1GR-FE", "displacement": "4.0L", "cylinders": 6, "horsepower": 245, "torque_nm": 381, "fuelType": "GASOLINE" },
+            { "code": "2TR-FE", "displacement": "2.7L", "cylinders": 4, "horsepower": 163, "torque_nm": 246, "fuelType": "GASOLINE" },
+            { "code": "1KD-FTV", "displacement": "3.0L", "cylinders": 4, "horsepower": 163, "torque_nm": 410, "fuelType": "DIESEL" },
+            { "code": "2KD-FTV", "displacement": "2.5L", "cylinders": 4, "horsepower": 102, "torque_nm": 260, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Harrier",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "CVT"],
+          "engines": [
+            { "code": "2AZ-FE", "displacement": "2.4L", "cylinders": 4, "horsepower": 158, "torque_nm": 220, "fuelType": "GASOLINE" },
+            { "code": "3MZ-FE", "displacement": "3.3L", "cylinders": 6, "horsepower": 208, "torque_nm": 305, "fuelType": "GASOLINE" },
+            { "code": "M20A-FXS", "displacement": "2.5L", "cylinders": 4, "horsepower": 222, "torque_nm": 221, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Fortuner",
+          "yearStart": 2005, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "1TR-FE", "displacement": "2.7L", "cylinders": 4, "horsepower": 160, "torque_nm": 246, "fuelType": "GASOLINE" },
+            { "code": "2TR-FE", "displacement": "2.7L", "cylinders": 4, "horsepower": 163, "torque_nm": 246, "fuelType": "GASOLINE" },
+            { "code": "2GR-FE", "displacement": "4.0L", "cylinders": 6, "horsepower": 276, "torque_nm": 361, "fuelType": "GASOLINE" },
+            { "code": "1KD-FTV", "displacement": "3.0L", "cylinders": 4, "horsepower": 163, "torque_nm": 343, "fuelType": "DIESEL" },
+            { "code": "2GD-FTV", "displacement": "2.8L", "cylinders": 4, "horsepower": 177, "torque_nm": 450, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Hilux",
+          "yearStart": 2001, "yearEnd": null,
+          "bodyTypes": ["TRUCK"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "2TR-FE", "displacement": "2.7L", "cylinders": 4, "horsepower": 160, "torque_nm": 246, "fuelType": "GASOLINE" },
+            { "code": "1GR-FE", "displacement": "4.0L", "cylinders": 6, "horsepower": 236, "torque_nm": 376, "fuelType": "GASOLINE" },
+            { "code": "2KD-FTV", "displacement": "2.5L", "cylinders": 4, "horsepower": 102, "torque_nm": 260, "fuelType": "DIESEL" },
+            { "code": "1KD-FTV", "displacement": "3.0L", "cylinders": 4, "horsepower": 163, "torque_nm": 343, "fuelType": "DIESEL" },
+            { "code": "2GD-FTV", "displacement": "2.8L", "cylinders": 4, "horsepower": 177, "torque_nm": 450, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Noah",
+          "yearStart": 2001, "yearEnd": null,
+          "bodyTypes": ["WAGON"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "CVT"],
+          "engines": [
+            { "code": "3ZZ-FE", "displacement": "1.8L", "cylinders": 4, "horsepower": 127, "torque_nm": 168, "fuelType": "GASOLINE" },
+            { "code": "1AZ-FE", "displacement": "2.0L", "cylinders": 4, "horsepower": 152, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "2ZR-FXE", "displacement": "1.8L", "cylinders": 4, "horsepower": 99, "torque_nm": 142, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "IST",
+          "yearStart": 2002, "yearEnd": 2016,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "1NZ-FE", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 141, "fuelType": "GASOLINE" },
+            { "code": "1ZZ-FE", "displacement": "1.8L", "cylinders": 4, "horsepower": 125, "torque_nm": 170, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Wish",
+          "yearStart": 2003, "yearEnd": 2017,
+          "bodyTypes": ["WAGON"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "1ZZ-FE", "displacement": "1.8L", "cylinders": 4, "horsepower": 125, "torque_nm": 170, "fuelType": "GASOLINE" },
+            { "code": "1AZ-FSE", "displacement": "2.0L", "cylinders": 4, "horsepower": 152, "torque_nm": 200, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Alphard",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["WAGON"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "2AZ-FE", "displacement": "2.4L", "cylinders": 4, "horsepower": 163, "torque_nm": 224, "fuelType": "GASOLINE" },
+            { "code": "2GR-FE", "displacement": "3.5L", "cylinders": 6, "horsepower": 277, "torque_nm": 346, "fuelType": "GASOLINE" },
+            { "code": "2AR-FXE", "displacement": "2.5L", "cylinders": 4, "horsepower": 182, "torque_nm": 213, "fuelType": "HYBRID" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Nissan",
+      "key": "nissan",
+      "models": [
+        {
+          "name": "Note",
+          "yearStart": 2005, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "HR15DE", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 148, "fuelType": "GASOLINE" },
+            { "code": "HR12DDR", "displacement": "1.2L", "cylinders": 3, "horsepower": 79, "torque_nm": 103, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "March",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "CR12DE", "displacement": "1.2L", "cylinders": 3, "horsepower": 78, "torque_nm": 109, "fuelType": "GASOLINE" },
+            { "code": "HR15DE", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 148, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Tiida",
+          "yearStart": 2004, "yearEnd": 2018,
+          "bodyTypes": ["SEDAN", "HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "HR15DE", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 148, "fuelType": "GASOLINE" },
+            { "code": "MR18DE", "displacement": "1.8L", "cylinders": 4, "horsepower": 130, "torque_nm": 175, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "X-Trail",
+          "yearStart": 2001, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "QR25DE", "displacement": "2.5L", "cylinders": 4, "horsepower": 171, "torque_nm": 226, "fuelType": "GASOLINE" },
+            { "code": "MR20DE", "displacement": "2.0L", "cylinders": 4, "horsepower": 140, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "QR20DD", "displacement": "2.0L", "cylinders": 4, "horsepower": 150, "torque_nm": 320, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Juke",
+          "yearStart": 2010, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "MR16DDT", "displacement": "1.6L", "cylinders": 4, "horsepower": 117, "torque_nm": 210, "fuelType": "GASOLINE" },
+            { "code": "HR15DE", "displacement": "1.5L", "cylinders": 4, "horsepower": 114, "torque_nm": 154, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Murano",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "CVT"],
+          "engines": [
+            { "code": "QR25DE", "displacement": "2.5L", "cylinders": 4, "horsepower": 171, "torque_nm": 233, "fuelType": "GASOLINE" },
+            { "code": "VQ35DE", "displacement": "3.5L", "cylinders": 6, "horsepower": 265, "torque_nm": 329, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Navara",
+          "yearStart": 2005, "yearEnd": null,
+          "bodyTypes": ["TRUCK"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "VQ40DE", "displacement": "4.0L", "cylinders": 6, "horsepower": 265, "torque_nm": 385, "fuelType": "GASOLINE" },
+            { "code": "YD25DDTi", "displacement": "2.5L", "cylinders": 4, "horsepower": 174, "torque_nm": 403, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Patrol",
+          "yearStart": 2004, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "VK56VD", "displacement": "5.6L", "cylinders": 8, "horsepower": 400, "torque_nm": 560, "fuelType": "GASOLINE" },
+            { "code": "TB48DE", "displacement": "4.8L", "cylinders": 6, "horsepower": 272, "torque_nm": 451, "fuelType": "GASOLINE" },
+            { "code": "ZD30DDTi", "displacement": "3.0L", "cylinders": 6, "horsepower": 158, "torque_nm": 380, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mazda",
+      "key": "mazda",
+      "models": [
+        {
+          "name": "Demio",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "ZJ-VE", "displacement": "1.3L", "cylinders": 4, "horsepower": 91, "torque_nm": 121, "fuelType": "GASOLINE" },
+            { "code": "ZY-VE", "displacement": "1.5L", "cylinders": 4, "horsepower": 113, "torque_nm": 144, "fuelType": "GASOLINE" },
+            { "code": "P3-VPS", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 146, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Axela",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "LF-VE", "displacement": "2.0L", "cylinders": 4, "horsepower": 148, "torque_nm": 189, "fuelType": "GASOLINE" },
+            { "code": "L3-VE", "displacement": "2.3L", "cylinders": 4, "horsepower": 166, "torque_nm": 210, "fuelType": "GASOLINE" },
+            { "code": "P5-VPS", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 146, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Atenza",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "WAGON"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "LF-VE", "displacement": "2.0L", "cylinders": 4, "horsepower": 148, "torque_nm": 189, "fuelType": "GASOLINE" },
+            { "code": "PY-VPS", "displacement": "2.5L", "cylinders": 4, "horsepower": 192, "torque_nm": 258, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "CX-5",
+          "yearStart": 2012, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "PE-VPS", "displacement": "2.0L", "cylinders": 4, "horsepower": 155, "torque_nm": 200, "fuelType": "GASOLINE" },
+            { "code": "PY-VPS", "displacement": "2.5L", "cylinders": 4, "horsepower": 187, "torque_nm": 252, "fuelType": "GASOLINE" },
+            { "code": "SH-VPTS", "displacement": "2.2L", "cylinders": 4, "horsepower": 175, "torque_nm": 420, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "CX-3",
+          "yearStart": 2015, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "P5-VPS", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 146, "fuelType": "GASOLINE" },
+            { "code": "S5-DPTS", "displacement": "1.5L", "cylinders": 4, "horsepower": 104, "torque_nm": 270, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Subaru",
+      "key": "subaru",
+      "models": [
+        {
+          "name": "Impreza",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "EJ15", "displacement": "1.5L", "cylinders": 4, "horsepower": 103, "torque_nm": 138, "fuelType": "GASOLINE" },
+            { "code": "EJ20", "displacement": "2.0L", "cylinders": 4, "horsepower": 140, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "FB16", "displacement": "1.6L", "cylinders": 4, "horsepower": 115, "torque_nm": 150, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "WRX",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["SEDAN"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "EJ205", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 227, "torque_nm": 294, "fuelType": "GASOLINE" },
+            { "code": "EJ257", "displacement": "2.5L Turbo", "cylinders": 4, "horsepower": 305, "torque_nm": 406, "fuelType": "GASOLINE" },
+            { "code": "FA20DIT", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 268, "torque_nm": 350, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Forester",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "EJ20", "displacement": "2.0L", "cylinders": 4, "horsepower": 140, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "EJ25", "displacement": "2.5L", "cylinders": 4, "horsepower": 173, "torque_nm": 235, "fuelType": "GASOLINE" },
+            { "code": "FB20", "displacement": "2.0L", "cylinders": 4, "horsepower": 150, "torque_nm": 198, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Outback",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["WAGON"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "EJ25", "displacement": "2.5L", "cylinders": 4, "horsepower": 173, "torque_nm": 235, "fuelType": "GASOLINE" },
+            { "code": "EZ36D", "displacement": "3.6L", "cylinders": 6, "horsepower": 260, "torque_nm": 350, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Legacy",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "WAGON"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "EJ20", "displacement": "2.0L", "cylinders": 4, "horsepower": 140, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "EJ25", "displacement": "2.5L", "cylinders": 4, "horsepower": 173, "torque_nm": 235, "fuelType": "GASOLINE" },
+            { "code": "EZ30D", "displacement": "3.0L", "cylinders": 6, "horsepower": 245, "torque_nm": 300, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "XV",
+          "yearStart": 2012, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "FB20", "displacement": "2.0L", "cylinders": 4, "horsepower": 150, "torque_nm": 198, "fuelType": "GASOLINE" },
+            { "code": "FB20 Hybrid", "displacement": "2.0L", "cylinders": 4, "horsepower": 145, "torque_nm": 188, "fuelType": "HYBRID" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Honda",
+      "key": "honda",
+      "models": [
+        {
+          "name": "Fit",
+          "yearStart": 2001, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "L13A", "displacement": "1.3L", "cylinders": 4, "horsepower": 83, "torque_nm": 119, "fuelType": "GASOLINE" },
+            { "code": "L15A", "displacement": "1.5L", "cylinders": 4, "horsepower": 118, "torque_nm": 145, "fuelType": "GASOLINE" },
+            { "code": "LEB", "displacement": "1.5L", "cylinders": 4, "horsepower": 110, "torque_nm": 134, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Civic",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "HATCHBACK", "COUPE"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "D16V1", "displacement": "1.6L", "cylinders": 4, "horsepower": 110, "torque_nm": 148, "fuelType": "GASOLINE" },
+            { "code": "R18A", "displacement": "1.8L", "cylinders": 4, "horsepower": 140, "torque_nm": 174, "fuelType": "GASOLINE" },
+            { "code": "K20C1", "displacement": "1.5L Turbo", "cylinders": 4, "horsepower": 182, "torque_nm": 240, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Accord",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SEDAN"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "K24A", "displacement": "2.4L", "cylinders": 4, "horsepower": 166, "torque_nm": 220, "fuelType": "GASOLINE" },
+            { "code": "J30A", "displacement": "3.0L", "cylinders": 6, "horsepower": 240, "torque_nm": 295, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "CR-V",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "K24A", "displacement": "2.4L", "cylinders": 4, "horsepower": 166, "torque_nm": 220, "fuelType": "GASOLINE" },
+            { "code": "R20A", "displacement": "2.0L", "cylinders": 4, "horsepower": 150, "torque_nm": 190, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "HR-V",
+          "yearStart": 2014, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual", "CVT"],
+          "engines": [
+            { "code": "L15B", "displacement": "1.5L", "cylinders": 4, "horsepower": 130, "torque_nm": 155, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Freed",
+          "yearStart": 2008, "yearEnd": null,
+          "bodyTypes": ["WAGON"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "CVT"],
+          "engines": [
+            { "code": "L15A", "displacement": "1.5L", "cylinders": 4, "horsepower": 118, "torque_nm": 145, "fuelType": "GASOLINE" },
+            { "code": "LEB", "displacement": "1.5L", "cylinders": 4, "horsepower": 110, "torque_nm": 134, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Stream",
+          "yearStart": 2001, "yearEnd": 2014,
+          "bodyTypes": ["WAGON"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "R18A", "displacement": "1.8L", "cylinders": 4, "horsepower": 140, "torque_nm": 174, "fuelType": "GASOLINE" },
+            { "code": "K20A", "displacement": "2.0L", "cylinders": 4, "horsepower": 152, "torque_nm": 186, "fuelType": "GASOLINE" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mitsubishi",
+      "key": "mitsubishi",
+      "models": [
+        {
+          "name": "Colt",
+          "yearStart": 2002, "yearEnd": 2012,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "4A90", "displacement": "1.3L", "cylinders": 4, "horsepower": 95, "torque_nm": 118, "fuelType": "GASOLINE" },
+            { "code": "4G15", "displacement": "1.5L", "cylinders": 4, "horsepower": 109, "torque_nm": 141, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Outlander",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "CVT"],
+          "engines": [
+            { "code": "4B11", "displacement": "2.0L", "cylinders": 4, "horsepower": 148, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "4B12", "displacement": "2.4L", "cylinders": 4, "horsepower": 168, "torque_nm": 222, "fuelType": "GASOLINE" },
+            { "code": "4J12 Hybrid", "displacement": "2.4L", "cylinders": 4, "horsepower": 135, "torque_nm": 211, "fuelType": "HYBRID" }
+          ]
+        },
+        {
+          "name": "Pajero",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "6G74", "displacement": "3.5L", "cylinders": 6, "horsepower": 200, "torque_nm": 319, "fuelType": "GASOLINE" },
+            { "code": "6G75", "displacement": "3.8L", "cylinders": 6, "horsepower": 218, "torque_nm": 329, "fuelType": "GASOLINE" },
+            { "code": "4M41", "displacement": "3.2L", "cylinders": 4, "horsepower": 165, "torque_nm": 373, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Pajero Sport",
+          "yearStart": 2009, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "6B31", "displacement": "3.0L", "cylinders": 6, "horsepower": 200, "torque_nm": 270, "fuelType": "GASOLINE" },
+            { "code": "4D56", "displacement": "2.5L", "cylinders": 4, "horsepower": 136, "torque_nm": 314, "fuelType": "DIESEL" },
+            { "code": "4N15", "displacement": "2.4L", "cylinders": 4, "horsepower": 181, "torque_nm": 430, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "L200 Triton",
+          "yearStart": 2006, "yearEnd": null,
+          "bodyTypes": ["TRUCK"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "4D56", "displacement": "2.5L", "cylinders": 4, "horsepower": 136, "torque_nm": 314, "fuelType": "DIESEL" },
+            { "code": "4N15", "displacement": "2.4L", "cylinders": 4, "horsepower": 178, "torque_nm": 430, "fuelType": "DIESEL" },
+            { "code": "6G74", "displacement": "3.5L", "cylinders": 6, "horsepower": 175, "torque_nm": 294, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Eclipse Cross",
+          "yearStart": 2017, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic", "CVT"],
+          "engines": [
+            { "code": "4B40", "displacement": "1.5L Turbo", "cylinders": 4, "horsepower": 148, "torque_nm": 250, "fuelType": "GASOLINE" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Isuzu",
+      "key": "isuzu",
+      "models": [
+        {
+          "name": "D-Max",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["TRUCK"],
+          "fuelTypes": ["DIESEL", "GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "4JK1-TCX", "displacement": "2.5L", "cylinders": 4, "horsepower": 134, "torque_nm": 320, "fuelType": "DIESEL" },
+            { "code": "4JJ1-TCX", "displacement": "3.0L", "cylinders": 4, "horsepower": 163, "torque_nm": 380, "fuelType": "DIESEL" },
+            { "code": "4JJ3-TCX", "displacement": "1.9L", "cylinders": 4, "horsepower": 163, "torque_nm": 360, "fuelType": "DIESEL" },
+            { "code": "6VE1", "displacement": "3.5L", "cylinders": 6, "horsepower": 204, "torque_nm": 315, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "MU-X",
+          "yearStart": 2013, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "4JJ1-TCX", "displacement": "3.0L", "cylinders": 4, "horsepower": 177, "torque_nm": 380, "fuelType": "DIESEL" },
+            { "code": "4JJ3-TCX", "displacement": "1.9L", "cylinders": 4, "horsepower": 163, "torque_nm": 360, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mercedes-Benz",
+      "key": "mercedes-benz",
+      "models": [
+        {
+          "name": "C-Class",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "COUPE"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "M271 DE18 AL", "displacement": "1.8L Turbo", "cylinders": 4, "horsepower": 184, "torque_nm": 270, "fuelType": "GASOLINE" },
+            { "code": "M274 DE20 AL", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 184, "torque_nm": 300, "fuelType": "GASOLINE" },
+            { "code": "OM651 DE22 LA", "displacement": "2.2L", "cylinders": 4, "horsepower": 170, "torque_nm": 400, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "E-Class",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "WAGON"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "M272 E35", "displacement": "3.5L", "cylinders": 6, "horsepower": 272, "torque_nm": 350, "fuelType": "GASOLINE" },
+            { "code": "M276 DE35 LA", "displacement": "3.5L Turbo", "cylinders": 6, "horsepower": 333, "torque_nm": 480, "fuelType": "GASOLINE" },
+            { "code": "OM651 DE22 LA", "displacement": "2.2L", "cylinders": 4, "horsepower": 204, "torque_nm": 500, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "GLC",
+          "yearStart": 2015, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "M274 DE20 AL", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 211, "torque_nm": 350, "fuelType": "GASOLINE" },
+            { "code": "OM654 DE20 LA", "displacement": "2.0L", "cylinders": 4, "horsepower": 194, "torque_nm": 400, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "GLE",
+          "yearStart": 2015, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "M276 DE35 LA", "displacement": "3.5L Turbo", "cylinders": 6, "horsepower": 333, "torque_nm": 480, "fuelType": "GASOLINE" },
+            { "code": "M176 DE40 AL", "displacement": "4.0L Turbo", "cylinders": 8, "horsepower": 469, "torque_nm": 700, "fuelType": "GASOLINE" },
+            { "code": "OM656 DE30 LA", "displacement": "3.0L", "cylinders": 6, "horsepower": 272, "torque_nm": 700, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "ML",
+          "yearStart": 2005, "yearEnd": 2015,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "M272 E35", "displacement": "3.5L", "cylinders": 6, "horsepower": 272, "torque_nm": 350, "fuelType": "GASOLINE" },
+            { "code": "OM642 DE30 LA", "displacement": "3.0L", "cylinders": 6, "horsepower": 258, "torque_nm": 620, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BMW",
+      "key": "bmw",
+      "models": [
+        {
+          "name": "3 Series",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "COUPE", "WAGON"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "N46B20", "displacement": "2.0L", "cylinders": 4, "horsepower": 150, "torque_nm": 200, "fuelType": "GASOLINE" },
+            { "code": "N52B25", "displacement": "2.5L", "cylinders": 6, "horsepower": 218, "torque_nm": 250, "fuelType": "GASOLINE" },
+            { "code": "B48B20", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 184, "torque_nm": 290, "fuelType": "GASOLINE" },
+            { "code": "B47D20", "displacement": "2.0L", "cylinders": 4, "horsepower": 190, "torque_nm": 400, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "5 Series",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "WAGON"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "N52B30", "displacement": "3.0L", "cylinders": 6, "horsepower": 258, "torque_nm": 300, "fuelType": "GASOLINE" },
+            { "code": "B48B20", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 184, "torque_nm": 290, "fuelType": "GASOLINE" },
+            { "code": "N57D30", "displacement": "3.0L", "cylinders": 6, "horsepower": 258, "torque_nm": 580, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "X3",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "B48B20", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 184, "torque_nm": 290, "fuelType": "GASOLINE" },
+            { "code": "N52B30", "displacement": "3.0L", "cylinders": 6, "horsepower": 231, "torque_nm": 300, "fuelType": "GASOLINE" },
+            { "code": "B47D20", "displacement": "2.0L", "cylinders": 4, "horsepower": 190, "torque_nm": 400, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "X5",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "N52B30", "displacement": "3.0L", "cylinders": 6, "horsepower": 258, "torque_nm": 300, "fuelType": "GASOLINE" },
+            { "code": "N63B44", "displacement": "4.4L Turbo", "cylinders": 8, "horsepower": 407, "torque_nm": 600, "fuelType": "GASOLINE" },
+            { "code": "N57D30", "displacement": "3.0L", "cylinders": 6, "horsepower": 258, "torque_nm": 580, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Volkswagen",
+      "key": "volkswagen",
+      "models": [
+        {
+          "name": "Golf",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "CZCA", "displacement": "1.4L TSI", "cylinders": 4, "horsepower": 122, "torque_nm": 200, "fuelType": "GASOLINE" },
+            { "code": "DFBA", "displacement": "2.0L TSI", "cylinders": 4, "horsepower": 245, "torque_nm": 370, "fuelType": "GASOLINE" },
+            { "code": "CUNA", "displacement": "2.0L TDI", "cylinders": 4, "horsepower": 150, "torque_nm": 340, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Polo",
+          "yearStart": 2002, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK", "SEDAN"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "CHYB", "displacement": "1.0L TSI", "cylinders": 3, "horsepower": 95, "torque_nm": 175, "fuelType": "GASOLINE" },
+            { "code": "CZCA", "displacement": "1.4L TSI", "cylinders": 4, "horsepower": 125, "torque_nm": 200, "fuelType": "GASOLINE" },
+            { "code": "CUSA", "displacement": "1.6L TDI", "cylinders": 4, "horsepower": 90, "torque_nm": 230, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Passat",
+          "yearStart": 2005, "yearEnd": null,
+          "bodyTypes": ["SEDAN", "WAGON"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "CZPA", "displacement": "1.8L TSI", "cylinders": 4, "horsepower": 170, "torque_nm": 250, "fuelType": "GASOLINE" },
+            { "code": "CGPA", "displacement": "2.0L TDI", "cylinders": 4, "horsepower": 140, "torque_nm": 320, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Tiguan",
+          "yearStart": 2007, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "CZPA", "displacement": "1.4L TSI", "cylinders": 4, "horsepower": 150, "torque_nm": 250, "fuelType": "GASOLINE" },
+            { "code": "DFGA", "displacement": "2.0L TSI", "cylinders": 4, "horsepower": 220, "torque_nm": 350, "fuelType": "GASOLINE" },
+            { "code": "DBUA", "displacement": "2.0L TDI", "cylinders": 4, "horsepower": 150, "torque_nm": 340, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Amarok",
+          "yearStart": 2010, "yearEnd": null,
+          "bodyTypes": ["TRUCK"],
+          "fuelTypes": ["DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "CDCA", "displacement": "2.0L TDI", "cylinders": 4, "horsepower": 120, "torque_nm": 340, "fuelType": "DIESEL" },
+            { "code": "CRCA", "displacement": "2.0L TDI BiTurbo", "cylinders": 4, "horsepower": 180, "torque_nm": 420, "fuelType": "DIESEL" },
+            { "code": "DDXB", "displacement": "3.0L TDI", "cylinders": 6, "horsepower": 258, "torque_nm": 580, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hyundai",
+      "key": "hyundai",
+      "models": [
+        {
+          "name": "i10",
+          "yearStart": 2007, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "G4HG", "displacement": "1.1L", "cylinders": 4, "horsepower": 65, "torque_nm": 98, "fuelType": "GASOLINE" },
+            { "code": "G4LA", "displacement": "1.2L", "cylinders": 4, "horsepower": 87, "torque_nm": 120, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Elantra",
+          "yearStart": 2001, "yearEnd": null,
+          "bodyTypes": ["SEDAN"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "G4GB", "displacement": "1.6L", "cylinders": 4, "horsepower": 105, "torque_nm": 151, "fuelType": "GASOLINE" },
+            { "code": "G4FG", "displacement": "1.6L GDI", "cylinders": 4, "horsepower": 132, "torque_nm": 161, "fuelType": "GASOLINE" },
+            { "code": "G4NA", "displacement": "2.0L", "cylinders": 4, "horsepower": 155, "torque_nm": 196, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Tucson",
+          "yearStart": 2004, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "G4NA", "displacement": "2.0L", "cylinders": 4, "horsepower": 155, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "G4KH", "displacement": "2.4L GDI", "cylinders": 4, "horsepower": 175, "torque_nm": 226, "fuelType": "GASOLINE" },
+            { "code": "D4EA", "displacement": "2.0L CRDi", "cylinders": 4, "horsepower": 140, "torque_nm": 305, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Santa Fe",
+          "yearStart": 2000, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "G6DB", "displacement": "3.3L", "cylinders": 6, "horsepower": 270, "torque_nm": 318, "fuelType": "GASOLINE" },
+            { "code": "G4KE", "displacement": "2.4L", "cylinders": 4, "horsepower": 175, "torque_nm": 226, "fuelType": "GASOLINE" },
+            { "code": "D4HB", "displacement": "2.2L CRDi", "cylinders": 4, "horsepower": 197, "torque_nm": 440, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "ix35",
+          "yearStart": 2010, "yearEnd": 2017,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "G4NA", "displacement": "2.0L", "cylinders": 4, "horsepower": 155, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "D4FD", "displacement": "1.7L CRDi", "cylinders": 4, "horsepower": 115, "torque_nm": 260, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kia",
+      "key": "kia",
+      "models": [
+        {
+          "name": "Picanto",
+          "yearStart": 2004, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "G4HG", "displacement": "1.1L", "cylinders": 4, "horsepower": 65, "torque_nm": 98, "fuelType": "GASOLINE" },
+            { "code": "G4LA", "displacement": "1.2L", "cylinders": 4, "horsepower": 87, "torque_nm": 120, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Sportage",
+          "yearStart": 2004, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "G4FJ", "displacement": "1.6L Turbo", "cylinders": 4, "horsepower": 177, "torque_nm": 265, "fuelType": "GASOLINE" },
+            { "code": "G4NA", "displacement": "2.0L", "cylinders": 4, "horsepower": 155, "torque_nm": 196, "fuelType": "GASOLINE" },
+            { "code": "D4FD", "displacement": "1.7L CRDi", "cylinders": 4, "horsepower": 141, "torque_nm": 340, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Sorento",
+          "yearStart": 2003, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "G6DA", "displacement": "3.5L", "cylinders": 6, "horsepower": 272, "torque_nm": 331, "fuelType": "GASOLINE" },
+            { "code": "G4KH", "displacement": "2.4L GDI", "cylinders": 4, "horsepower": 175, "torque_nm": 226, "fuelType": "GASOLINE" },
+            { "code": "D4HB", "displacement": "2.2L CRDi", "cylinders": 4, "horsepower": 197, "torque_nm": 440, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Land Rover",
+      "key": "land-rover",
+      "models": [
+        {
+          "name": "Discovery",
+          "yearStart": 2004, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "30DDTX", "displacement": "3.0L", "cylinders": 6, "horsepower": 249, "torque_nm": 600, "fuelType": "DIESEL" },
+            { "code": "448DT", "displacement": "2.0L", "cylinders": 4, "horsepower": 240, "torque_nm": 500, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Defender",
+          "yearStart": 2019, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "P300", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 296, "torque_nm": 400, "fuelType": "GASOLINE" },
+            { "code": "P400", "displacement": "3.0L Turbo", "cylinders": 6, "horsepower": 394, "torque_nm": 550, "fuelType": "GASOLINE" },
+            { "code": "D200", "displacement": "2.0L", "cylinders": 4, "horsepower": 197, "torque_nm": 430, "fuelType": "DIESEL" },
+            { "code": "D300", "displacement": "3.0L", "cylinders": 6, "horsepower": 296, "torque_nm": 650, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Range Rover Sport",
+          "yearStart": 2005, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "448DT", "displacement": "3.0L SDV6", "cylinders": 6, "horsepower": 306, "torque_nm": 700, "fuelType": "DIESEL" },
+            { "code": "508PS", "displacement": "5.0L V8", "cylinders": 8, "horsepower": 510, "torque_nm": 625, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Freelander",
+          "yearStart": 2003, "yearEnd": 2015,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "224DT", "displacement": "2.2L TD4", "cylinders": 4, "horsepower": 150, "torque_nm": 400, "fuelType": "DIESEL" },
+            { "code": "204PT", "displacement": "3.2L", "cylinders": 6, "horsepower": 233, "torque_nm": 317, "fuelType": "GASOLINE" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ford",
+      "key": "ford",
+      "models": [
+        {
+          "name": "Ranger",
+          "yearStart": 2006, "yearEnd": null,
+          "bodyTypes": ["TRUCK"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "P5AT", "displacement": "2.0L EcoBlue", "cylinders": 4, "horsepower": 170, "torque_nm": 420, "fuelType": "DIESEL" },
+            { "code": "P4AT", "displacement": "3.2L TDCi", "cylinders": 5, "horsepower": 200, "torque_nm": 470, "fuelType": "DIESEL" },
+            { "code": "Cyclone", "displacement": "2.5L", "cylinders": 4, "horsepower": 166, "torque_nm": 226, "fuelType": "GASOLINE" }
+          ]
+        },
+        {
+          "name": "Everest",
+          "yearStart": 2015, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["DIESEL"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "P5AT", "displacement": "2.0L EcoBlue", "cylinders": 4, "horsepower": 213, "torque_nm": 500, "fuelType": "DIESEL" },
+            { "code": "P4AT", "displacement": "3.2L TDCi", "cylinders": 5, "horsepower": 200, "torque_nm": 470, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Explorer",
+          "yearStart": 2011, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "EcoBoost 2.3", "displacement": "2.3L Turbo", "cylinders": 4, "horsepower": 300, "torque_nm": 420, "fuelType": "GASOLINE" },
+            { "code": "EcoBoost 3.5", "displacement": "3.5L Turbo", "cylinders": 6, "horsepower": 365, "torque_nm": 475, "fuelType": "GASOLINE" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jeep",
+      "key": "jeep",
+      "models": [
+        {
+          "name": "Wrangler",
+          "yearStart": 2007, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "ERB", "displacement": "3.6L Pentastar", "cylinders": 6, "horsepower": 285, "torque_nm": 347, "fuelType": "GASOLINE" },
+            { "code": "EKG", "displacement": "2.0L Turbo", "cylinders": 4, "horsepower": 270, "torque_nm": 400, "fuelType": "GASOLINE" },
+            { "code": "VM Motori", "displacement": "2.2L CRD", "cylinders": 4, "horsepower": 200, "torque_nm": 450, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Grand Cherokee",
+          "yearStart": 2010, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "ERB", "displacement": "3.6L Pentastar", "cylinders": 6, "horsepower": 295, "torque_nm": 353, "fuelType": "GASOLINE" },
+            { "code": "EZB", "displacement": "5.7L Hemi", "cylinders": 8, "horsepower": 360, "torque_nm": 528, "fuelType": "GASOLINE" },
+            { "code": "VM Motori", "displacement": "3.0L CRD", "cylinders": 6, "horsepower": 240, "torque_nm": 570, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "Cherokee",
+          "yearStart": 2014, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic"],
+          "engines": [
+            { "code": "ED6", "displacement": "2.4L", "cylinders": 4, "horsepower": 184, "torque_nm": 232, "fuelType": "GASOLINE" },
+            { "code": "EKF", "displacement": "3.2L Pentastar", "cylinders": 6, "horsepower": 271, "torque_nm": 315, "fuelType": "GASOLINE" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Peugeot",
+      "key": "peugeot",
+      "models": [
+        {
+          "name": "208",
+          "yearStart": 2012, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "ELECTRIC"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "EB2DT", "displacement": "1.2L Turbo", "cylinders": 3, "horsepower": 100, "torque_nm": 205, "fuelType": "GASOLINE" },
+            { "code": "DV6FE", "displacement": "1.6L BlueHDi", "cylinders": 4, "horsepower": 100, "torque_nm": 254, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "308",
+          "yearStart": 2007, "yearEnd": null,
+          "bodyTypes": ["HATCHBACK"],
+          "fuelTypes": ["GASOLINE", "DIESEL"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "EB2DT", "displacement": "1.2L Turbo", "cylinders": 3, "horsepower": 130, "torque_nm": 230, "fuelType": "GASOLINE" },
+            { "code": "EP6CDT", "displacement": "1.6L THP", "cylinders": 4, "horsepower": 150, "torque_nm": 240, "fuelType": "GASOLINE" },
+            { "code": "DW10CTED4", "displacement": "2.0L HDi", "cylinders": 4, "horsepower": 150, "torque_nm": 370, "fuelType": "DIESEL" }
+          ]
+        },
+        {
+          "name": "3008",
+          "yearStart": 2016, "yearEnd": null,
+          "bodyTypes": ["SUV"],
+          "fuelTypes": ["GASOLINE", "DIESEL", "HYBRID"],
+          "transmissions": ["Automatic", "Manual"],
+          "engines": [
+            { "code": "EB2DT", "displacement": "1.2L Turbo", "cylinders": 3, "horsepower": 130, "torque_nm": 230, "fuelType": "GASOLINE" },
+            { "code": "EP6DT", "displacement": "1.6L THP", "cylinders": 4, "horsepower": 165, "torque_nm": 240, "fuelType": "GASOLINE" },
+            { "code": "DW10FE", "displacement": "2.0L BlueHDi", "cylinders": 4, "horsepower": 150, "torque_nm": 370, "fuelType": "DIESEL" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,9 @@
 import prisma from '../config/database';
 
 export const getDashboardStats = async () => {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
   const [
     totalVehicles,
     publishedVehicles,
@@ -10,6 +13,7 @@ export const getDashboardStats = async () => {
     resolvedInquiries,
     totalUsers,
     featuredVehicles,
+    soldThisMonth,
   ] = await Promise.all([
     prisma.vehicle.count(),
     prisma.vehicle.count({ where: { isDraft: false } }),
@@ -19,6 +23,12 @@ export const getDashboardStats = async () => {
     prisma.inquiry.count({ where: { status: 'RESOLVED' } }),
     prisma.user.count(),
     prisma.vehicle.count({ where: { featured: true, isDraft: false } }),
+    prisma.vehicle.count({ 
+      where: { 
+        status: 'SOLD',
+        soldAt: { gte: startOfMonth }
+      } 
+    }),
   ]);
 
   return {
@@ -30,6 +40,7 @@ export const getDashboardStats = async () => {
     resolvedInquiries,
     totalUsers,
     featuredVehicles,
+    soldThisMonth,
   };
 };
 

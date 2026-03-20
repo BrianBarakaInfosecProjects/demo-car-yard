@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Save, ArrowLeft, Upload, X, Image as ImageIcon, AlertCircle, Car, Check } from 'lucide-react';
 
@@ -114,8 +114,11 @@ const PRESETS = {
 
 export default function VehicleFormPage({ params }: { params: { id?: string } }) {
   const router = useRouter();
-  const vehicleId = params?.id;
-  const [isEditing, setIsEditing] = useState(!!vehicleId);
+  const searchParams = useSearchParams();
+  const queryId = searchParams.get('id');
+  const vehicleId = params?.id || queryId || undefined;
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -174,7 +177,7 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
       if (data.images && data.images.length > 0) {
         const apiURL = typeof window !== 'undefined'
           ? `${window.location.protocol}//${window.location.hostname}:5000`
-          : 'http://localhost:5000';
+          : process.env.NEXT_PUBLIC_API_URL;
         setImagePreviews(data.images.map((img: string) => `${apiURL}${img}`));
       }
     } catch (error) {
@@ -454,23 +457,61 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {isEditing ? 'Edit Vehicle' : 'Add New Vehicle'}
-          </h1>
-          <p className="text-base text-gray-600">
-            {isEditing ? 'Update vehicle information' : 'Select a vehicle or enter details manually'}
-          </p>
+      {/* Header with Step Indicator */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {isEditing ? 'Edit Vehicle' : 'Add New Vehicle'}
+            </h1>
+            <p className="text-base text-gray-600">
+              {isEditing ? 'Update vehicle information' : 'Fill in the vehicle details below'}
+            </p>
+          </div>
+          <Link
+            href="/admin/vehicles"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            <ArrowLeft size={18} />
+            <span>Cancel</span>
+          </Link>
         </div>
-        <Link
-          href="/admin/vehicles"
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-        >
-          <ArrowLeft size={18} />
-          <span>Cancel</span>
-        </Link>
+
+        {/* Step Indicator */}
+        <div className="flex items-center justify-center gap-2 py-4">
+          {[
+            { num: 1, label: 'Vehicle Details' },
+            { num: 2, label: 'Pricing' },
+            { num: 3, label: 'Photos' },
+            { num: 4, label: 'Review' }
+          ].map((step, idx) => (
+            <div key={step.num} className="flex items-center">
+              <button
+                type="button"
+                onClick={() => step.num < currentStep && setCurrentStep(step.num)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
+                  currentStep === step.num
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : step.num < currentStep
+                    ? 'bg-white border-gray-300 text-gray-700 hover:border-blue-400 cursor-pointer'
+                    : 'bg-white border-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
+                  currentStep === step.num ? 'bg-white text-blue-600' : 'bg-gray-200 text-gray-600'
+                }`}>
+                  {step.num < currentStep ? '✓' : step.num}
+                </span>
+                <span className={`text-sm font-medium ${currentStep === step.num ? 'text-white' : ''}`}>
+                  {step.label}
+                </span>
+              </button>
+              {idx < 3 && (
+                <div className={`w-8 h-0.5 mx-1 ${step.num < currentStep ? 'bg-blue-600' : 'bg-gray-200'}`} />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Error Display */}
@@ -486,536 +527,769 @@ export default function VehicleFormPage({ params }: { params: { id?: string } })
 
       {/* Form Card */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} noValidate autoComplete="off" className="p-6 space-y-8">
-
-          {/* Quick Select Section */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-              Quick Vehicle Selection
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Make */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Make</label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.make}
-                  onChange={(e) => handleInputChange('make', e.target.value)}
-                >
-                  <option value="">Select Make</option>
-                  {PRESETS.makes.map(make => (
-                    <option key={make} value={make}>{make}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Model */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Model</label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.model}
-                  onChange={(e) => handleInputChange('model', e.target.value)}
-                  disabled={!formData.make}
-                >
-                  <option value="">
-                    {formData.make ? `Select ${formData.make} Model` : 'Select Make First'}
-                  </option>
-                  {formData.make && PRESETS.models[formData.make as keyof typeof PRESETS.models]?.map(model => (
-                    <option key={model} value={model}>{model}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Year */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Year</label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.year}
-                  onChange={(e) => handleInputChange('year', parseInt(e.target.value))}
-                >
-                  {Array.from({ length: new Date().getFullYear() - 1989 + 1 }, (_, i) => (
-                    <option key={i} value={new Date().getFullYear() - i}>{new Date().getFullYear() - i}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Body Type */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Body Type</label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.bodyType}
-                  onChange={(e) => handleInputChange('bodyType', e.target.value)}
-                >
-                  {PRESETS.bodyTypes.map(type => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Fuel Type */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Fuel Type</label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.fuelType}
-                  onChange={(e) => handleInputChange('fuelType', e.target.value)}
-                >
-                  {PRESETS.fuelTypes.map(type => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Essential Fields (User must type) */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200 flex items-center gap-2">
-              <Car size={20} />
-              Essential Information
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Price */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Price (KSh) <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-gray-500 text-sm">KSh</span>
-                  <input
-                    type="number"
-                    className="w-full pl-12 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    value={formData.priceKES}
-                    onChange={(e) => handleInputChange('priceKES', parseInt(e.target.value))}
-                    min="0"
-                    required
-                    placeholder="Enter price..."
-                  />
-                </div>
-              </div>
-
-              {/* Mileage */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Mileage (km) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.mileage}
-                  onChange={(e) => handleInputChange('mileage', parseInt(e.target.value))}
-                  min="0"
-                  placeholder="Enter mileage..."
-                  required
-                />
-              </div>
-
-              {/* VIN */}
-              <div className="md:col-span-2 lg:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">VIN (Optional)</label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base uppercase"
-                  value={formData.vin}
-                  onChange={(e) => handleInputChange('vin', e.target.value)}
-                  placeholder="e.g., JH4KA3150K000000"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Vehicle Specs (Rich Dropdowns) */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-              Vehicle Specifications
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Transmission */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Transmission</label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.transmission}
-                  onChange={(e) => handleInputChange('transmission', e.target.value)}
-                >
-                  {PRESETS.transmissions.map(trans => (
-                    <option key={trans} value={trans}>{trans}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Drivetrain */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Drivetrain</label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.drivetrain}
-                  onChange={(e) => handleInputChange('drivetrain', e.target.value)}
-                >
-                  {PRESETS.drivetrains.map(drive => (
-                    <option key={drive.value} value={drive.value} title={drive.description}>
-                      {drive.label} - {drive.description}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Engine */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Engine</label>
-                <div className="flex gap-2">
+        {currentStep === 1 && (
+          <div className="p-6 space-y-8">
+            {/* Quick Select Section */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Quick Vehicle Selection
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Make */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Make</label>
                   <select
-                    className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    value={formData.engine}
-                    onChange={(e) => handleInputChange('engine', e.target.value)}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.make}
+                    onChange={(e) => handleInputChange('make', e.target.value)}
                   >
-                    <option value="">Select Engine</option>
-                    {PRESETS.enginePresets.map(engine => (
-                      <option key={engine} value={engine}>{engine}</option>
+                    <option value="">Select Make</option>
+                    {PRESETS.makes.map(make => (
+                      <option key={make} value={make}>{make}</option>
                     ))}
                   </select>
-                  <input
-                    type="text"
-                    className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    placeholder="Or enter custom engine"
-                    value={formData.engine}
-                    onChange={(e) => handleInputChange('engine', e.target.value)}
-                  />
                 </div>
-              </div>
 
-              {/* Location */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.location || ''}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                >
-                  <option value="">Select Location</option>
-                  {PRESETS.locations.map(loc => (
-                    <option key={loc} value={loc}>{loc}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Colors with Autocomplete */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-              Colors
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Exterior Color */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Exterior Color</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    list="exterior-colors"
-                    className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    value={formData.exteriorColor}
-                    onChange={(e) => handleInputChange('exteriorColor', e.target.value)}
-                    placeholder="Select or type color..."
-                  />
-                  <datalist id="exterior-colors">
-                    {PRESETS.colors.map(color => (
-                      <option key={color} value={color}>{color}</option>
+                {/* Model */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Model</label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.model}
+                    onChange={(e) => handleInputChange('model', e.target.value)}
+                    disabled={!formData.make}
+                  >
+                    <option value="">
+                      {formData.make ? `Select ${formData.make} Model` : 'Select Make First'}
+                    </option>
+                    {formData.make && PRESETS.models[formData.make as keyof typeof PRESETS.models]?.map(model => (
+                      <option key={model} value={model}>{model}</option>
                     ))}
-                  </datalist>
+                  </select>
                 </div>
-              </div>
 
-              {/* Interior Color */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Interior Color</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    list="interior-colors"
-                    className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    value={formData.interiorColor}
-                    onChange={(e) => handleInputChange('interiorColor', e.target.value)}
-                    placeholder="Select or type color..."
-                  />
-                  <datalist id="interior-colors">
-                    {PRESETS.colors.map(color => (
-                      <option key={color} value={color}>{color}</option>
+                {/* Year */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Year</label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.year}
+                    onChange={(e) => handleInputChange('year', parseInt(e.target.value))}
+                  >
+                    {Array.from({ length: new Date().getFullYear() - 1989 + 1 }, (_, i) => (
+                      <option key={i} value={new Date().getFullYear() - i}>{new Date().getFullYear() - i}</option>
                     ))}
-                  </datalist>
+                  </select>
+                </div>
+
+                {/* Body Type */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Body Type</label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.bodyType}
+                    onChange={(e) => handleInputChange('bodyType', e.target.value)}
+                  >
+                    {PRESETS.bodyTypes.map(type => (
+                      <option key={type.value} value={type.value}>{type.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Fuel Type */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Fuel Type</label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.fuelType}
+                    onChange={(e) => handleInputChange('fuelType', e.target.value)}
+                  >
+                    {PRESETS.fuelTypes.map(type => (
+                      <option key={type.value} value={type.value}>{type.label}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Status & Publishing */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-              Status & Publishing
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Status */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {PRESETS.statuses.map(status => (
-                    <button
-                      key={status.value}
-                      type="button"
-                      onClick={() => handleInputChange('status', status.value)}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg border transition-all ${
-                        formData.status === status.value
-                          ? status.color
-                          : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
-                      }`}
+            {/* Vehicle Specs (Rich Dropdowns) */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Vehicle Specifications
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Transmission */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Transmission</label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.transmission}
+                    onChange={(e) => handleInputChange('transmission', e.target.value)}
+                  >
+                    {PRESETS.transmissions.map(trans => (
+                      <option key={trans} value={trans}>{trans}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Drivetrain */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Drivetrain</label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.drivetrain}
+                    onChange={(e) => handleInputChange('drivetrain', e.target.value)}
+                  >
+                    {PRESETS.drivetrains.map(drive => (
+                      <option key={drive.value} value={drive.value} title={drive.description}>
+                        {drive.label} - {drive.description}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Engine */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Engine</label>
+                  <div className="flex gap-2">
+                    <select
+                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                      value={formData.engine}
+                      onChange={(e) => handleInputChange('engine', e.target.value)}
                     >
-                      {status.label}
-                    </button>
-                  ))}
+                      <option value="">Select Engine</option>
+                      {PRESETS.enginePresets.map(engine => (
+                        <option key={engine} value={engine}>{engine}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                      placeholder="Or enter custom engine"
+                      value={formData.engine}
+                      onChange={(e) => handleInputChange('engine', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.location || ''}
+                    onChange={(e) => handleInputChange('location', e.target.value)}
+                  >
+                    <option value="">Select Location</option>
+                    {PRESETS.locations.map(loc => (
+                      <option key={loc} value={loc}>{loc}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
+            </div>
 
-              {/* Featured */}
-              <div className="flex items-center pt-6">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    checked={formData.featured}
-                    onChange={(e) => handleInputChange('featured', e.target.checked)}
-                  />
-                  <span className="text-sm font-medium text-gray-700">Featured Vehicle</span>
-                </label>
-              </div>
+            {/* Colors with Autocomplete */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Colors
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Exterior Color */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Exterior Color</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      list="exterior-colors"
+                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                      value={formData.exteriorColor}
+                      onChange={(e) => handleInputChange('exteriorColor', e.target.value)}
+                      placeholder="Select or type color..."
+                    />
+                    <datalist id="exterior-colors">
+                      {PRESETS.colors.map(color => (
+                        <option key={color} value={color}>{color}</option>
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
 
-              {/* Draft */}
-              <div className="flex items-center pt-6">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    checked={formData.isDraft}
-                    onChange={(e) => handleInputChange('isDraft', e.target.checked)}
-                  />
-                  <span className="text-sm font-medium text-gray-700">Save as Draft</span>
-                </label>
-              </div>
-
-              {/* Schedule */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Schedule Publish</label>
-                <input
-                  type="datetime-local"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  value={formData.scheduledAt}
-                  onChange={(e) => handleInputChange('scheduledAt', e.target.value)}
-                  disabled={formData.isDraft}
-                />
-                <p className="text-xs text-gray-500 mt-1">Leave empty to publish immediately</p>
+                {/* Interior Color */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Interior Color</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      list="interior-colors"
+                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                      value={formData.interiorColor}
+                      onChange={(e) => handleInputChange('interiorColor', e.target.value)}
+                      placeholder="Select or type color..."
+                    />
+                    <datalist id="interior-colors">
+                      {PRESETS.colors.map(color => (
+                        <option key={color} value={color}>{color}</option>
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Description */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-semibold text-gray-700">
-                Description
-              </label>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleInputChange('description', generateDescription());
-                }}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Auto-fill Description
-              </button>
-            </div>
-            <textarea
-              rows={4}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="Enter vehicle description or click 'Auto-fill Description'..."
-            />
-            <p className="text-xs text-gray-500 mt-1">Click 'Auto-fill Description' to generate based on vehicle selections.</p>
-          </div>
-
-          {/* Image Upload */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-              Vehicle Images
-            </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Upload up to 8 images. Images are stored in Cloudinary CDN.
-              Leave empty to use a default stock image.
-            </p>
-            <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
-                dragActive
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-300 bg-gray-50 hover:border-gray-400'
-              }`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-            >
-              {imagePreviews.length > 0 ? (
-                <div className="w-full">
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4">
-                    {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={preview}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-40 object-cover rounded-lg shadow-sm"
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            removeImage(index);
-                          }}
-                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        >
-                          <X size={16} />
-                        </button>
-                        {index === 0 && (
-                          <span className="absolute bottom-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded">
-                            Primary
-                          </span>
-                        )}
-                      </div>
+            {/* Status & Publishing */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Status & Publishing
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Status */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {PRESETS.statuses.map(status => (
+                      <button
+                        key={status.value}
+                        type="button"
+                        onClick={() => handleInputChange('status', status.value)}
+                        className={`px-3 py-2 text-sm font-medium rounded-lg border transition-all ${
+                          formData.status === status.value
+                            ? status.color
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                        }`}
+                      >
+                        {status.label}
+                      </button>
                     ))}
                   </div>
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer font-medium"
+                </div>
+
+                {/* Featured */}
+                <div className="flex items-center pt-6">
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      checked={formData.featured}
+                      onChange={(e) => handleInputChange('featured', e.target.checked)}
+                    />
+                    <span className="text-sm font-medium text-gray-700">Featured Vehicle</span>
+                  </label>
+                </div>
+
+                {/* Draft */}
+                <div className="flex items-center pt-6">
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      checked={formData.isDraft}
+                      onChange={(e) => handleInputChange('isDraft', e.target.checked)}
+                    />
+                    <span className="text-sm font-medium text-gray-700">Save as Draft</span>
+                  </label>
+                </div>
+
+                {/* Schedule */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Schedule Publish</label>
+                  <input
+                    type="datetime-local"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.scheduledAt}
+                    onChange={(e) => handleInputChange('scheduledAt', e.target.value)}
+                    disabled={formData.isDraft}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Leave empty to publish immediately</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Description
+                </label>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleInputChange('description', generateDescription());
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Auto-fill Description
+                </button>
+              </div>
+              <textarea
+                rows={4}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Enter vehicle description or click 'Auto-fill Description'..."
+              />
+              <p className="text-xs text-gray-500 mt-1">Click 'Auto-fill Description' to generate based on vehicle selections.</p>
+            </div>
+
+            {/* Step 1 Navigation */}
+            <div className="flex justify-end pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => setCurrentStep(2)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                <span>Next: Pricing</span>
+                <span>→</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 2 && (
+          <div className="p-6 space-y-8">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200 flex items-center gap-2">
+                <Car size={20} />
+                Pricing Information
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Price */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Price (KSh) <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-gray-500 text-sm">KSh</span>
+                    <input
+                      type="number"
+                      className="w-full pl-12 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                      value={formData.priceKES}
+                      onChange={(e) => handleInputChange('priceKES', parseInt(e.target.value))}
+                      min="0"
+                      required
+                      placeholder="Enter price..."
+                    />
+                  </div>
+                </div>
+
+                {/* Mileage */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Mileage (km) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    value={formData.mileage}
+                    onChange={(e) => handleInputChange('mileage', parseInt(e.target.value))}
+                    min="0"
+                    placeholder="Enter mileage..."
+                    required
+                  />
+                </div>
+
+                {/* VIN */}
+                <div className="md:col-span-2 lg:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">VIN (Optional)</label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base uppercase"
+                    value={formData.vin}
+                    onChange={(e) => handleInputChange('vin', e.target.value)}
+                    placeholder="e.g., JH4KA3150K000000"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 Navigation */}
+            <div className="flex justify-between pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => setCurrentStep(1)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
+                <span>←</span>
+                <span>Back</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentStep(3)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                <span>Next: Photos</span>
+                <span>→</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 3 && (
+          <div className="p-6 space-y-8">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Vehicle Images
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Upload up to 8 images. Images are stored in Cloudinary CDN.
+                Leave empty to use a default stock image.
+              </p>
+              <div
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+                  dragActive
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-300 bg-gray-50 hover:border-gray-400'
+                }`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                {imagePreviews.length > 0 ? (
+                  <div className="w-full">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4">
+                      {imagePreviews.map((preview, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={preview}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-40 object-cover rounded-lg shadow-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              removeImage(index);
+                            }}
+                            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                          {index === 0 && (
+                            <span className="absolute bottom-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded">
+                              Primary
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer font-medium"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const hiddenInput = document.createElement('input');
+                          hiddenInput.type = 'file';
+                          hiddenInput.accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp';
+                          hiddenInput.multiple = true;
+                          hiddenInput.onchange = (ev) => {
+                            const event = ev as Event;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            const files = (ev.target as HTMLInputElement).files;
+                            if (files) {
+                              addFiles(Array.from(files));
+                            }
+                          };
+                          hiddenInput.click();
+                        }}
+                      >
+                        <Upload size={18} />
+                        <span>Add More</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          clearAllImages();
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-300 cursor-pointer font-medium"
+                      >
+                        <X size={18} />
+                        <span>Clear All</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex justify-center mb-4">
+                      <div className="p-4 bg-blue-50 rounded-full">
+                        <ImageIcon className="text-blue-600" size={48} />
+                      </div>
+                    </div>
+                    <h6 className="text-lg font-semibold text-gray-900 mb-2">
+                      Drag & Drop images here
+                    </h6>
+                    <p className="text-sm text-gray-600 mb-4">or click to browse files</p>
+                    <div
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors font-medium"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        const hiddenInput = document.createElement('input');
-                        hiddenInput.type = 'file';
-                        hiddenInput.accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp';
-                        hiddenInput.multiple = true;
-                        hiddenInput.onchange = (ev) => {
-                          const event = ev as Event;
-                          event.preventDefault();
-                          event.stopPropagation();
-                          const files = (ev.target as HTMLInputElement).files;
-                          if (files) {
-                            addFiles(Array.from(files));
-                          }
-                        };
-                        hiddenInput.click();
+                        fileInputRef.current?.click();
                       }}
                     >
                       <Upload size={18} />
-                      <span>Add More</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
+                      <span>Select Images</span>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      className="hidden"
+                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                      multiple
+                      onChange={(e) => {
                         e.preventDefault();
-                        clearAllImages();
+                        e.stopPropagation();
+                        handleImageChange(e);
                       }}
-                      className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-300 cursor-pointer font-medium"
-                    >
-                      <X size={18} />
-                      <span>Clear All</span>
-                    </button>
+                    />
                   </div>
+                )}
+              </div>
+              <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
+                <div className="flex items-center gap-1">
+                  <span>Accepted formats:</span>
+                  <span className="font-medium">JPEG, PNG, GIF, WebP (Max 5MB per file)</span>
                 </div>
-              ) : (
+                <span className="font-medium">{imagePreviews.length}/8 images</span>
+              </div>
+            </div>
+
+            {/* Step 3 Navigation */}
+            <div className="flex justify-between pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => setCurrentStep(2)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
+                <span>←</span>
+                <span>Back</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentStep(4)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                <span>Next: Review</span>
+                <span>→</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 4 && (
+          <div className="p-6 space-y-8">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6 pb-2 border-b border-gray-200 flex items-center gap-2">
+                <Check size={20} />
+                Review Your Vehicle
+              </h2>
+              
+              {/* Summary Card */}
+              <div className="bg-gray-50 rounded-lg p-6 space-y-6">
+                {/* Vehicle Info */}
                 <div>
-                  <div className="flex justify-center mb-4">
-                    <div className="p-4 bg-blue-50 rounded-full">
-                      <ImageIcon className="text-blue-600" size={48} />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Vehicle Information</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                      <span className="text-sm text-gray-500">Make/Model</span>
+                      <p className="font-medium text-gray-900">{formData.make} {formData.model}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Year</span>
+                      <p className="font-medium text-gray-900">{formData.year}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Body Type</span>
+                      <p className="font-medium text-gray-900">{PRESETS.bodyTypes.find(b => b.value === formData.bodyType)?.label}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Fuel Type</span>
+                      <p className="font-medium text-gray-900">{PRESETS.fuelTypes.find(f => f.value === formData.fuelType)?.label}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Transmission</span>
+                      <p className="font-medium text-gray-900">{formData.transmission}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Drivetrain</span>
+                      <p className="font-medium text-gray-900">{formData.drivetrain}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Engine</span>
+                      <p className="font-medium text-gray-900">{formData.engine || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Location</span>
+                      <p className="font-medium text-gray-900">{formData.location || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">VIN</span>
+                      <p className="font-medium text-gray-900 uppercase">{formData.vin || 'Not specified'}</p>
                     </div>
                   </div>
-                  <h6 className="text-lg font-semibold text-gray-900 mb-2">
-                    Drag & Drop images here
-                  </h6>
-                  <p className="text-sm text-gray-600 mb-4">or click to browse files</p>
-                  <div
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors font-medium"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      fileInputRef.current?.click();
-                    }}
-                  >
-                    <Upload size={18} />
-                    <span>Select Images</span>
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                    multiple
-                    onChange={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleImageChange(e);
-                    }}
-                  />
                 </div>
-              )}
-            </div>
-            <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
-              <div className="flex items-center gap-1">
-                <span>Accepted formats:</span>
-                <span className="font-medium">JPEG, PNG, GIF, WebP (Max 5MB per file)</span>
-              </div>
-              <span className="font-medium">{imagePreviews.length}/8 images</span>
-            </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
-            <Link
-              href="/admin/vehicles"
-              className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-            >
-              <X size={18} />
-              <span>Cancel</span>
-            </Link>
-            <button
-              type="submit"
-              disabled={loading || submitStatus === 'submitting'}
-              className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
-            >
-              {submitStatus === 'submitting' ? (
-                <>
-                  <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Saving...</span>
-                </>
-              ) : submitStatus === 'success' ? (
-                <>
-                  <div className="w-5 h-5 text-green-400">
-                    <Check size={20} />
+                {/* Colors */}
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Colors</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm text-gray-500">Exterior Color</span>
+                      <p className="font-medium text-gray-900">{formData.exteriorColor || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Interior Color</span>
+                      <p className="font-medium text-gray-900">{formData.interiorColor || 'Not specified'}</p>
+                    </div>
                   </div>
-                  <span>Saved!</span>
-                </>
-              ) : (
-                <>
-                  <Save size={20} />
-                  <span>{isEditing ? 'Update Vehicle' : 'Add Vehicle'}</span>
-                </>
-              )}
-            </button>
+                </div>
+
+                {/* Pricing & Mileage */}
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Pricing & Mileage</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                      <span className="text-sm text-gray-500">Price</span>
+                      <p className="font-bold text-xl text-green-600">{formatPrice(formData.priceKES)}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Mileage</span>
+                      <p className="font-medium text-gray-900">{formData.mileage.toLocaleString()} km</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Status & Publishing</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <span className="text-sm text-gray-500">Status</span>
+                      <p className="font-medium text-gray-900">{PRESETS.statuses.find(s => s.value === formData.status)?.label}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Featured</span>
+                      <p className="font-medium text-gray-900">{formData.featured ? 'Yes' : 'No'}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Draft</span>
+                      <p className="font-medium text-gray-900">{formData.isDraft ? 'Yes' : 'No'}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">Schedule</span>
+                      <p className="font-medium text-gray-900">{formData.scheduledAt ? new Date(formData.scheduledAt).toLocaleString() : 'Immediate'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">{formData.description || 'No description provided'}</p>
+                </div>
+
+                {/* Images */}
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Images ({imagePreviews.length})</h3>
+                  {imagePreviews.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                      {imagePreviews.map((preview, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={preview}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-20 object-cover rounded-lg"
+                          />
+                          {index === 0 && (
+                            <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-blue-600 text-white text-xs font-medium rounded">
+                              Primary
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No images uploaded - default stock image will be used</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Step 4 Navigation */}
+            <div className="flex justify-between pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => setCurrentStep(3)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
+                <span>←</span>
+                <span>Back</span>
+              </button>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/admin/vehicles"
+                  className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  <X size={18} />
+                  <span>Cancel</span>
+                </Link>
+                <button
+                  type="submit"
+                  disabled={loading || submitStatus === 'submitting'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const fakeEvent = {
+                      preventDefault: () => {},
+                      stopPropagation: () => {},
+                      nativeEvent: { submitter: e.currentTarget },
+                    } as unknown as React.FormEvent<HTMLFormElement>;
+                    handleSubmit(fakeEvent);
+                  }}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                >
+                  {submitStatus === 'submitting' ? (
+                    <>
+                      <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Saving...</span>
+                    </>
+                  ) : submitStatus === 'success' ? (
+                    <>
+                      <div className="w-5 h-5 text-green-400">
+                        <Check size={20} />
+                      </div>
+                      <span>Saved!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save size={20} />
+                      <span>{isEditing ? 'Update Vehicle' : 'Create Vehicle'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
-        </form>
+        )}
+
+        {currentStep < 4 && (
+          <div className="px-6 pb-6">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+              <Link
+                href="/admin/vehicles"
+                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
+                <X size={18} />
+                <span>Cancel</span>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Car, Plus, Search, Edit, Trash2, Filter, Grid, List, ChevronDown, Archive, RotateCcw } from 'lucide-react';
+import Image from 'next/image';
+import { Car, Plus, Search, Edit, Trash2, Filter, Grid, List, ChevronDown, Archive, RotateCcw, Camera, DollarSign, Star, Check, X } from 'lucide-react';
+import { adminThumbnail } from '@/lib/cloudinary';
+import ShareButton from '@/components/ShareButton';
 
 interface Vehicle {
   id: string;
@@ -11,6 +14,7 @@ interface Vehicle {
   year: number;
   priceKES: number;
   imageUrl: string;
+  images?: string[];
   status: string;
   featured: boolean;
   vin: string;
@@ -18,6 +22,14 @@ interface Vehicle {
   isDraft: boolean;
   deletedAt?: string | null;
 }
+
+const getAuthHeader = () => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
+};
 
 export default function VehiclesPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -28,6 +40,13 @@ export default function VehiclesPage() {
   const [sortBy, setSortBy] = useState('newest');
   const [selectedVehicles, setSelectedVehicles] = useState<Set<string>>(new Set());
   const [showBulkActions, setShowBulkActions] = useState(false);
+  
+  // Quick edit modal state
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [editPrice, setEditPrice] = useState<number>(0);
+  const [editStatus, setEditStatus] = useState<string>('');
+  const [editFeatured, setEditFeatured] = useState<boolean>(false);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     fetchVehicles();
@@ -35,10 +54,8 @@ export default function VehiclesPage() {
 
   const fetchVehicles = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/vehicles?limit=1000&includeDrafts=true', {
-        headers: {
-          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
-        },
+      const response = await fetch('${process.env.NEXT_PUBLIC_API_URL}/vehicles?limit=1000&includeDrafts=true', {
+        headers: getAuthHeader(),
       });
       const data = await response.json();
       // Filter out deleted vehicles for display
@@ -57,12 +74,9 @@ export default function VehiclesPage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/vehicles/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vehicles/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeader(),
       });
 
       if (response.ok) {
@@ -78,49 +92,101 @@ export default function VehiclesPage() {
 
   const handleToggleFeatured = async (vehicle: Vehicle) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/vehicles/${vehicle.id}/featured`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
-          'Content-Type': 'application/json',
-        },
+      // Use PUT endpoint for better compatibility
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vehicles/${vehicle.id}`, {
+        method: 'PUT',
+        headers: getAuthHeader(),
         body: JSON.stringify({ featured: !vehicle.featured }),
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
         setVehicles(vehicles.map(v =>
           v.id === vehicle.id ? { ...v, featured: !v.featured } : v
         ));
       } else {
-        const error = await response.json();
-        alert(error.message || 'Failed to update featured status');
+        console.error('Featured update failed:', data);
+        alert(data.error?.message || data.message || 'Failed to update featured status');
       }
     } catch (error) {
+      console.error('Featured update error:', error);
       alert('Failed to update featured status');
     }
   };
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/vehicles/${id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
-          'Content-Type': 'application/json',
-        },
+      // Use PUT endpoint for better compatibility
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vehicles/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeader(),
         body: JSON.stringify({ status }),
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
         setVehicles(vehicles.map(v =>
           v.id === id ? { ...v, status } : v
         ));
       } else {
-        const error = await response.json();
-        alert(error.message || 'Failed to update status');
+        console.error('Status update failed:', data);
+        alert(data.error?.message || data.message || 'Failed to update status');
       }
     } catch (error) {
+      console.error('Status update error:', error);
       alert('Failed to update status');
+    }
+  };
+
+  const openQuickEdit = (vehicle: Vehicle) => {
+    setEditingVehicle(vehicle);
+    setEditPrice(vehicle.priceKES);
+    setEditStatus(vehicle.status);
+    setEditFeatured(vehicle.featured);
+  };
+
+  const closeQuickEdit = () => {
+    setEditingVehicle(null);
+    setEditPrice(0);
+    setEditStatus('');
+    setEditFeatured(false);
+  };
+
+  const saveQuickEdit = async () => {
+    if (!editingVehicle) return;
+    setSavingEdit(true);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vehicles/${editingVehicle.id}`, {
+        method: 'PUT',
+        headers: getAuthHeader(),
+        body: JSON.stringify({
+          priceKES: editPrice,
+          status: editStatus,
+          featured: editFeatured,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setVehicles(vehicles.map(v =>
+          v.id === editingVehicle.id
+            ? { ...v, priceKES: editPrice, status: editStatus, featured: editFeatured }
+            : v
+        ));
+        closeQuickEdit();
+      } else {
+        console.error('Quick edit failed:', data);
+        alert(data.error?.message || data.message || 'Failed to update vehicle');
+      }
+    } catch (error) {
+      console.error('Quick edit error:', error);
+      alert('Failed to update vehicle');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -150,12 +216,9 @@ export default function VehiclesPage() {
     }
 
     try {
-      await fetch('http://localhost:5000/api/bulk/vehicles', {
+      await fetch('${process.env.NEXT_PUBLIC_API_URL}/bulk/vehicles', {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeader(),
         body: JSON.stringify({ ids: Array.from(selectedVehicles) }),
       });
 
@@ -225,7 +288,7 @@ export default function VehiclesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vehicle Inventory</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Vehicle Showroom</h1>
           <p className="text-sm text-gray-600">
             {vehicles.length} vehicle{vehicles.length !== 1 ? 's' : ''} in inventory
           </p>
@@ -345,11 +408,16 @@ export default function VehiclesPage() {
             >
               {/* Image */}
               <div className="relative h-48 bg-gray-100 cursor-pointer">
-                <img
-                  src={vehicle.imageUrl || 'https://via.placeholder.com/400x300'}
-                  alt={`${vehicle.make} ${vehicle.model}`}
-                  className="w-full h-full object-cover"
-                />
+                <Link href={`/admin/vehicles/${vehicle.id}`}>
+                  <Image
+                    src={adminThumbnail(vehicle.imageUrl || 'https://via.placeholder.com/400x300')}
+                    alt={`${vehicle.make} ${vehicle.model}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    quality={80}
+                  />
+                </Link>
 
                 {/* Status Badge */}
                 <div className="absolute top-2 right-2">
@@ -374,20 +442,37 @@ export default function VehiclesPage() {
 
                 {/* Actions Overlay */}
                 <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  {(vehicle.status === 'AVAILABLE' || vehicle.status === 'ON_SALE') && (
+                    <ShareButton
+                      car={{
+                        make: vehicle.make,
+                        model: vehicle.model,
+                        year: vehicle.year,
+                        price: vehicle.priceKES,
+                        imageUrl: vehicle.images?.[0] ?? vehicle.imageUrl ?? '',
+                        slug: vehicle.slug || '',
+                        mileage: undefined,
+                        fuelType: undefined,
+                      }}
+                      variant="icon-only"
+                    />
+                  )}
                   <Link
-                    href={`/admin/vehicles/new/${vehicle.id}`}
-                    className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                    href={`/admin/vehicles/${vehicle.id}`}
+                    className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                    title="Manage Vehicle"
                   >
-                    <Edit size={18} />
+                    <Edit size={20} />
                   </Link>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(vehicle.id);
                     }}
-                    className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                    className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                    title="Delete"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={20} />
                   </button>
                 </div>
               </div>
@@ -425,7 +510,17 @@ export default function VehiclesPage() {
                     <option value="AVAILABLE">Available</option>
                     <option value="RESERVED">Reserved</option>
                     <option value="SOLD">Sold</option>
+                    <option value="NEW">New</option>
+                    <option value="CERTIFIED_PRE_OWNED">CPO</option>
+                    <option value="ON_SALE">On Sale</option>
                   </select>
+                  <Link
+                    href={`/admin/vehicles/${vehicle.id}`}
+                    className="text-xs px-3 py-1.5 rounded-full font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors flex items-center gap-1"
+                  >
+                    <Edit size={12} />
+                    Manage
+                  </Link>
                 </div>
               </div>
             </div>
@@ -471,43 +566,86 @@ export default function VehiclesPage() {
                       />
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={vehicle.imageUrl || 'https://via.placeholder.com/100x80'}
-                          alt={`${vehicle.make} ${vehicle.model}`}
-                          className="w-16 h-12 object-cover rounded"
-                        />
+                      <Link href={`/admin/vehicles/${vehicle.id}`} className="flex items-center gap-3">
+                        <div className="relative w-16 h-12 rounded overflow-hidden">
+                          <Image
+                            src={adminThumbnail(vehicle.imageUrl || 'https://via.placeholder.com/100x80')}
+                            alt={`${vehicle.make} ${vehicle.model}`}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                            quality={80}
+                          />
+                        </div>
                         <div>
-                          <p className="font-semibold text-gray-900">
+                          <p className="font-semibold text-gray-900 hover:text-blue-600">
                             {vehicle.make} {vehicle.model}
                             {vehicle.isDraft && <span className="ml-2 px-2 py-0.5 text-xs bg-gray-400 text-white rounded">Draft</span>}
                           </p>
                           <p className="text-xs text-gray-500">{vehicle.vin}</p>
                         </div>
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">{vehicle.year}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-blue-600">
-                      {formatPrice(vehicle.priceKES)}
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => openQuickEdit(vehicle)}
+                        className="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                      >
+                        {formatPrice(vehicle.priceKES)}
+                        <Edit size={12} />
+                      </button>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(vehicle.status)}`}>
-                        {getStatusLabel(vehicle.status)}
-                      </span>
+                      <select
+                        value={vehicle.status}
+                        onChange={(e) => handleUpdateStatus(vehicle.id, e.target.value)}
+                        className={`text-xs px-2 py-1 rounded-full font-medium cursor-pointer ${getStatusColor(vehicle.status)}`}
+                      >
+                        <option value="AVAILABLE">Available</option>
+                        <option value="RESERVED">Reserved</option>
+                        <option value="SOLD">Sold</option>
+                        <option value="NEW">New</option>
+                        <option value="CERTIFIED_PRE_OWNED">CPO</option>
+                        <option value="ON_SALE">On Sale</option>
+                      </select>
                     </td>
                     <td className="px-6 py-4">
-                      {vehicle.featured ? (
-                        <span className="text-yellow-600">★ Featured</span>
-                      ) : (
-                        <span className="text-gray-400">—</span>
-                      )}
+                      <button
+                        onClick={() => handleToggleFeatured(vehicle)}
+                        className={`text-sm ${vehicle.featured ? 'text-yellow-600' : 'text-gray-400 hover:text-yellow-600'}`}
+                      >
+                        {vehicle.featured ? '★ Featured' : '☆'}
+                      </button>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/admin/vehicles/new/${vehicle.id}`}
+                        {(vehicle.status === 'AVAILABLE' || vehicle.status === 'ON_SALE') && (
+                          <ShareButton
+                            car={{
+                              make: vehicle.make,
+                              model: vehicle.model,
+                              year: vehicle.year,
+                              price: vehicle.priceKES,
+                              imageUrl: vehicle.images?.[0] ?? vehicle.imageUrl ?? '',
+                              slug: vehicle.slug || '',
+                              mileage: undefined,
+                              fuelType: undefined,
+                            }}
+                            variant="icon-only"
+                          />
+                        )}
+                        <button
+                          onClick={() => openQuickEdit(vehicle)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit"
+                          title="Quick Edit"
+                        >
+                          <DollarSign size={18} />
+                        </button>
+                        <Link
+                          href={`/admin/vehicles/new?id=${vehicle.id}`}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Full Edit"
                         >
                           <Edit size={18} />
                         </Link>
@@ -524,6 +662,137 @@ export default function VehiclesPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Edit Modal */}
+      {editingVehicle && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Quick Edit: {editingVehicle.make} {editingVehicle.model}
+              </h3>
+              <button
+                onClick={closeQuickEdit}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              {/* Price Edit */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Price (KSh)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">KSh</span>
+                  <input
+                    type="number"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(parseInt(e.target.value) || 0)}
+                    className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="AVAILABLE">Available</option>
+                  <option value="RESERVED">Reserved</option>
+                  <option value="SOLD">Sold</option>
+                  <option value="NEW">New</option>
+                  <option value="CERTIFIED_PRE_OWNED">Certified Pre-Owned</option>
+                  <option value="ON_SALE">On Sale</option>
+                </select>
+              </div>
+
+              {/* Featured Toggle */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Star size={18} className={editFeatured ? 'text-yellow-500' : 'text-gray-400'} />
+                  <span className="text-sm font-medium text-gray-700">Featured Vehicle</span>
+                </div>
+                <button
+                  onClick={() => setEditFeatured(!editFeatured)}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                    editFeatured ? 'bg-yellow-400' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      editFeatured ? 'left-7' : 'left-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Current Image Preview */}
+              {editingVehicle.imageUrl && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Current Photo
+                  </label>
+                  <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                    <Image
+                      src={adminThumbnail(editingVehicle.imageUrl)}
+                      alt={`${editingVehicle.make} ${editingVehicle.model}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      quality={80}
+                    />
+                  </div>
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50">
+              <Link
+                href={`/admin/vehicles/${editingVehicle.id}`}
+                className="flex items-center gap-2 px-4 py-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              >
+                <Car size={18} />
+                <span>Full Management</span>
+              </Link>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={closeQuickEdit}
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveQuickEdit}
+                  disabled={savingEdit}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {savingEdit ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Check size={18} />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

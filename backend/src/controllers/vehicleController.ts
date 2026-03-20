@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as vehicleService from '../services/vehicleService';
 import { uploadMultipleToCloudinary, deleteMultipleFromCloudinary } from '../config/cloudinary';
 import { AuthRequest } from '../middleware/auth';
+import prisma from '../config/database';
 
 export const getVehicles = async (req: Request, res: Response) => {
   try {
@@ -76,15 +77,15 @@ export const createVehicle = async (req: Request, res: Response) => {
 
     const files = (req as any).files as Express.Multer.File[];
 
-    console.log('Files received:', files?.length || 0);
+    console.debug('Files received:', files?.length || 0);
 
     if (files && files.length > 0) {
       try {
         const uploadedImages = await uploadMultipleToCloudinary(files);
-        vehicleData.images = uploadedImages.map(img => img.url);
+        vehicleData.images = JSON.stringify(uploadedImages.map(img => img.url));
         vehicleData.imageUrl = uploadedImages[0].url;
-        vehicleData.imagePublicIds = uploadedImages.map(img => img.publicId);
-        console.log('Successfully uploaded images to Cloudinary:', uploadedImages.length);
+        vehicleData.imagePublicIds = JSON.stringify(uploadedImages.map(img => img.publicId));
+        console.debug('Successfully uploaded images to Cloudinary:', uploadedImages.length);
       } catch (uploadError: any) {
         console.error('Cloudinary upload failed:', uploadError);
         if (uploadError.message?.includes('cloud_name')) {
@@ -109,18 +110,18 @@ export const createVehicle = async (req: Request, res: Response) => {
         }
         const defaultImageUrl = 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
         vehicleData.imageUrl = defaultImageUrl;
-        vehicleData.images = [defaultImageUrl];
-        console.log('Using default image due to Cloudinary error');
+        vehicleData.images = JSON.stringify([defaultImageUrl]);
+        console.debug('Using default image due to Cloudinary error');
       }
     } else {
       const defaultImageUrl = 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
       vehicleData.imageUrl = defaultImageUrl;
-      vehicleData.images = [defaultImageUrl];
-      vehicleData.imagePublicIds = [];
-      console.log('No images uploaded, using default image:', defaultImageUrl);
+      vehicleData.images = JSON.stringify([defaultImageUrl]);
+      vehicleData.imagePublicIds = JSON.stringify([]);
+      console.debug('No images uploaded, using default image:', defaultImageUrl);
     }
 
-    console.log('Creating vehicle with data:', {
+    console.debug('Creating vehicle with data:', {
       make: vehicleData.make,
       model: vehicleData.model,
       year: vehicleData.year,
@@ -152,10 +153,13 @@ export const createVehicle = async (req: Request, res: Response) => {
 
 export const getAdminVehicles = async (req: Request, res: Response) => {
   try {
+    const page = Math.max(parseInt((req.query.page as string) || '1'), 1);
+    const limit = Math.min(parseInt((req.query.limit as string) || '50'), 100);
+    
     const filters = {
       ...req.query,
-      page: parseInt((req.query.page as string) || '1'),
-      limit: parseInt((req.query.limit as string) || '1000'),
+      page,
+      limit,
       priceMin: req.query.minPrice ? parseInt(req.query.minPrice as string) : undefined,
       priceMax: req.query.maxPrice ? parseInt(req.query.maxPrice as string) : undefined,
       minYear: req.query.minYear ? parseInt(req.query.minYear as string) : undefined,
@@ -174,6 +178,8 @@ export const updateVehicle = async (req: Request, res: Response) => {
   try {
     const authReq = req as AuthRequest;
     const userId = authReq.user?.userId || 'admin-user-id';
+    const userRole = authReq.user?.role || 'UNKNOWN';
+
 
     const vehicleData = { ...req.body };
 
@@ -202,14 +208,14 @@ export const updateVehicle = async (req: Request, res: Response) => {
       }
 
       const uploadedImages = await uploadMultipleToCloudinary(files);
-      vehicleData.images = uploadedImages.map(img => img.url);
+      vehicleData.images = JSON.stringify(uploadedImages.map(img => img.url));
       vehicleData.imageUrl = uploadedImages[0].url;
-      vehicleData.imagePublicIds = uploadedImages.map(img => img.publicId);
+      vehicleData.imagePublicIds = JSON.stringify(uploadedImages.map(img => img.publicId));
     } else if (!vehicleData.imageUrl && !vehicleData.images) {
       const existingVehicle = await vehicleService.getVehicleById(req.params.id);
       vehicleData.imageUrl = existingVehicle.imageUrl;
-      vehicleData.images = existingVehicle.images || [existingVehicle.imageUrl];
-      vehicleData.imagePublicIds = existingVehicle.imagePublicIds || [];
+      vehicleData.images = JSON.stringify(existingVehicle.images?.length ? existingVehicle.images : [existingVehicle.imageUrl]);
+      vehicleData.imagePublicIds = JSON.stringify(existingVehicle.imagePublicIds || []);
     } else if (vehicleData.images && vehicleData.images.length > 0) {
       vehicleData.imageUrl = vehicleData.images[0];
     }
@@ -273,8 +279,8 @@ export const getVehicleSuggestions = async (req: Request, res: Response) => {
 
 export const toggleFeatured = async (req: Request, res: Response) => {
   try {
-    const authReq = req as any;
-    const userId = authReq.user?.id || 'admin-user-id';
+    const authReq = req as AuthRequest;
+    const userId = authReq.user?.userId || 'admin-user-id';
 
     const vehicle = await vehicleService.lifecycle.toggleFeatured(req.params.id, userId);
     res.json(vehicle);
@@ -285,8 +291,8 @@ export const toggleFeatured = async (req: Request, res: Response) => {
 
 export const updateStatus = async (req: Request, res: Response) => {
   try {
-    const authReq = req as any;
-    const userId = authReq.user?.id || 'admin-user-id';
+    const authReq = req as AuthRequest;
+    const userId = authReq.user?.userId || 'admin-user-id';
 
     const { status } = req.body;
     if (!status) {
@@ -295,6 +301,27 @@ export const updateStatus = async (req: Request, res: Response) => {
 
     const vehicle = await vehicleService.lifecycle.updateStatus(req.params.id, status, userId);
     res.json(vehicle);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const incrementViewCount = async (req: Request, res: Response) => {
+  try {
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { id: req.params.id }
+    });
+
+    if (!vehicle) {
+      return res.status(404).json({ error: 'Vehicle not found' });
+    }
+
+    const updated = await prisma.vehicle.update({
+      where: { id: req.params.id },
+      data: { viewCount: { increment: 1 } }
+    });
+
+    res.json({ views: updated.viewCount });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

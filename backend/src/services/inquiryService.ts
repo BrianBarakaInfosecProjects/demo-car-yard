@@ -2,8 +2,29 @@ import prisma from '../config/database';
 import { InquiryInput } from '../utils/validators';
 
 export const createInquiry = async (input: InquiryInput) => {
+  // Only include fields that are defined and valid
+  const data: any = {
+    name: input.name,
+    email: input.email,
+    phone: input.phone,
+    message: input.message,
+  };
+  
+  // Only add vehicleId if it's a valid UUID
+  if (input.vehicleId && input.vehicleId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+    data.vehicleId = input.vehicleId;
+  }
+  
+  // Only add userId if it's a valid UUID and exists in the database
+  if (input.userId && input.userId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+    const userExists = await prisma.user.findUnique({ where: { id: input.userId } });
+    if (userExists) {
+      data.userId = input.userId;
+    }
+  }
+  
   const inquiry = await prisma.inquiry.create({
-    data: input,
+    data,
   });
 
   return inquiry;

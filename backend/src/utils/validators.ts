@@ -1,9 +1,15 @@
 import { z } from 'zod';
 import { body, param, validationResult } from 'express-validator';
 
+const passwordSchema = z.string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number');
+
 export const registerSchema = z.object({
   email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: passwordSchema,
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
 });
 
@@ -54,6 +60,7 @@ export const inquirySchema = z.object({
   phone: z.string().min(10, 'Phone number is required'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
   vehicleId: z.string().uuid().optional(),
+  userId: z.string().uuid().optional(),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
