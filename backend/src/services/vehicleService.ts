@@ -517,12 +517,29 @@ export const createVehicle = async (input: VehicleInput, userId: string) => {
 
   const { scheduledAt, images, imagePublicIds, ...inputWithoutScheduledAt } = input;
 
+  // Handle imagePublicIds - could be array, string, or undefined
+  const parseImagePublicIds = (value: any): string[] => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const parsedImagePublicIds = parseImagePublicIds(imagePublicIds);
+
   const vehicle = await prisma.vehicle.create({
     data: {
       ...inputWithoutScheduledAt,
       slug,
       images: images ? JSON.stringify(images) : '[]',
-      imagePublicIds: imagePublicIds || [],
+      imagePublicIds: parsedImagePublicIds,
       isDraft: input.isDraft ?? true,
       featured: false,
       scheduledAt: scheduledAt || null,
@@ -557,11 +574,26 @@ export const updateVehicle = async (id: string, input: Partial<VehicleInput>, us
     scheduledAt: scheduledAt || null,
   };
 
+  // Handle imagePublicIds - could be array, string, or undefined
+  const parseImagePublicIds = (value: any): string[] => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
   if (images !== undefined) {
     updateData.images = images ? JSON.stringify(images) : '[]';
   }
   if (imagePublicIds !== undefined) {
-    updateData.imagePublicIds = imagePublicIds || [];
+    updateData.imagePublicIds = parseImagePublicIds(imagePublicIds);
   }
 
   const vehicle = await prisma.vehicle.update({
