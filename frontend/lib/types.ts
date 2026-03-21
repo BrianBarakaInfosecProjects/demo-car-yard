@@ -28,6 +28,7 @@ export interface Vehicle {
   publishedAt?: string;
   soldAt?: string;
   createdAt: string;
+  slug?: string;
   updatedAt: string;
 }
 
@@ -37,6 +38,7 @@ export interface User {
   name?: string;
   role: 'ADMIN' | 'STAFF' | 'CUSTOMER';
   createdAt: string;
+  slug?: string;
   updatedAt: string;
 }
 
@@ -49,6 +51,7 @@ export interface Inquiry {
   vehicleId?: string;
   status: 'NEW' | 'PENDING' | 'RESOLVED' | 'CLOSED';
   createdAt: string;
+  slug?: string;
 }
 
 export interface VehicleFilter {

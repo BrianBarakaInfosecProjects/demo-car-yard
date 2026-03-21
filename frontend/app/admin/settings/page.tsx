@@ -298,7 +298,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-gray-400 mt-0.5">{item.desc}</p>
               </div>
             </div>
-            {item.isPhone ? (
+            (item as any).isPhone ? (
               <div className="flex items-center gap-2 shrink-0">
                 <input
                   type="tel"
@@ -317,14 +317,14 @@ export default function SettingsPage() {
               </div>
             ) : (
               <button
-                onClick={() => toggleSetting(item.key)}
+                onClick={() => toggleSetting(item.key as any)}
                 className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
-                  settings[item.key] ? 'bg-blue-600' : 'bg-gray-200'
+                  (settings as any)[item.key] ? 'bg-blue-600' : 'bg-gray-200'
                 }`}
               >
                 <span
                   className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                    settings[item.key] ? 'translate-x-5' : 'translate-x-0'
+                    (settings as any)[item.key] ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
               </button>

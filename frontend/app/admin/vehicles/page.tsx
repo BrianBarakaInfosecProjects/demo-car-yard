@@ -8,6 +8,7 @@ import { adminThumbnail } from '@/lib/cloudinary';
 import ShareButton from '@/components/ShareButton';
 
 interface Vehicle {
+  slug?: string;
   id: string;
   make: string;
   model: string;

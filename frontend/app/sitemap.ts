@@ -27,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Make landing pages
     const makes = [...new Set(vehicles.map((v: any) => v.make).filter(Boolean))];
-    const makeUrls: MetadataRoute.Sitemap = makes.map((make: string) => ({
+    const makeUrls: MetadataRoute.Sitemap = makes.map((make) => ({
       url: `${baseUrl}/cars/make/${make.toLowerCase()}`,
       lastModified: new Date(),
       priority: 0.6,
