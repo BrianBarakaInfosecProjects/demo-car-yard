@@ -298,37 +298,39 @@ export default function SettingsPage() {
                 <p className="text-xs text-gray-400 mt-0.5">{item.desc}</p>
               </div>
             </div>
-            (item as any).isPhone ? (
-              <div className="flex items-center gap-2 shrink-0">
-                <input
-                  type="tel"
-                  value={dealerPhone}
-                  onChange={(e) => setDealerPhone(e.target.value)}
-                  className="w-32 text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                  placeholder="07XXXXXXXX"
-                />
+            <>
+              {(item as any).isPhone ? (
+                <div className="flex items-center gap-2 shrink-0">
+                  <input
+                    type="tel"
+                    value={dealerPhone}
+                    onChange={(e) => setDealerPhone(e.target.value)}
+                    className="w-32 text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                    placeholder="07XXXXXXXX"
+                  />
+                  <button
+                    onClick={saveDealerPhone}
+                    disabled={saving}
+                    className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 min-w-[50px]"
+                  >
+                    {saving ? '...' : 'Save'}
+                  </button>
+                </div>
+              ) : (
                 <button
-                  onClick={saveDealerPhone}
-                  disabled={saving}
-                  className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 min-w-[50px]"
-                >
-                  {saving ? '...' : 'Save'}
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => toggleSetting(item.key as any)}
-                className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
-                  (settings as any)[item.key] ? 'bg-blue-600' : 'bg-gray-200'
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                    (settings as any)[item.key] ? 'translate-x-5' : 'translate-x-0'
+                  onClick={() => toggleSetting(item.key as any)}
+                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
+                    (settings as any)[item.key] ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
-                />
-              </button>
-            )}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                      (settings as any)[item.key] ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              )}
+            </>
           </div>
         ))}
       </div>
