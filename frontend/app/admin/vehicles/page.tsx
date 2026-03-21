@@ -754,7 +754,6 @@ export default function VehiclesPage() {
                       quality={80}
                     />
                   </div>
-                  />
                 </div>
               )}
             </div>
