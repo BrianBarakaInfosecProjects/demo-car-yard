@@ -517,19 +517,12 @@ export const createVehicle = async (input: VehicleInput, userId: string) => {
 
   const { scheduledAt, images, imagePublicIds, ...inputWithoutScheduledAt } = input;
 
-  // Handle imagePublicIds - could be array, string, or undefined
-  const parseImagePublicIds = (value: any): string[] => {
-    if (!value) return [];
-    if (Array.isArray(value)) return value;
-    if (typeof value === 'string') {
-      try {
-        const parsed = JSON.parse(value);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
-    }
-    return [];
+  // Handle imagePublicIds - ensure it's a JSON string
+  const parseImagePublicIds = (value: any): string => {
+    if (!value) return '[]';
+    if (typeof value === 'string') return value;
+    if (Array.isArray(value)) return JSON.stringify(value);
+    return '[]';
   };
 
   const parsedImagePublicIds = parseImagePublicIds(imagePublicIds);
@@ -574,26 +567,19 @@ export const updateVehicle = async (id: string, input: Partial<VehicleInput>, us
     scheduledAt: scheduledAt || null,
   };
 
-  // Handle imagePublicIds - could be array, string, or undefined
-  const parseImagePublicIds = (value: any): string[] => {
-    if (!value) return [];
-    if (Array.isArray(value)) return value;
-    if (typeof value === 'string') {
-      try {
-        const parsed = JSON.parse(value);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
-    }
-    return [];
+  // Handle imagePublicIds - ensure it's a JSON string
+  const parseImagePublicIdsForUpdate = (value: any): string => {
+    if (!value) return '[]';
+    if (typeof value === 'string') return value;
+    if (Array.isArray(value)) return JSON.stringify(value);
+    return '[]';
   };
 
   if (images !== undefined) {
     updateData.images = images ? JSON.stringify(images) : '[]';
   }
   if (imagePublicIds !== undefined) {
-    updateData.imagePublicIds = parseImagePublicIds(imagePublicIds);
+    updateData.imagePublicIds = parseImagePublicIdsForUpdate(imagePublicIds);
   }
 
   const vehicle = await prisma.vehicle.update({

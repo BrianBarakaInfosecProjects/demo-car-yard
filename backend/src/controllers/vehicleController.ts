@@ -84,7 +84,7 @@ export const createVehicle = async (req: Request, res: Response) => {
         const uploadedImages = await uploadMultipleToCloudinary(files);
         vehicleData.images = JSON.stringify(uploadedImages.map(img => img.url));
         vehicleData.imageUrl = uploadedImages[0].url;
-        vehicleData.imagePublicIds = uploadedImages.map(img => img.publicId);
+        vehicleData.imagePublicIds = JSON.stringify(uploadedImages.map(img => img.publicId));
         console.debug('Successfully uploaded images to Cloudinary:', uploadedImages.length);
       } catch (uploadError: any) {
         console.error('Cloudinary upload failed:', uploadError);
@@ -117,7 +117,7 @@ export const createVehicle = async (req: Request, res: Response) => {
       const defaultImageUrl = 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
       vehicleData.imageUrl = defaultImageUrl;
       vehicleData.images = JSON.stringify([defaultImageUrl]);
-      vehicleData.imagePublicIds = [];
+      vehicleData.imagePublicIds = JSON.stringify([]);
       console.debug('No images uploaded, using default image:', defaultImageUrl);
     }
 
@@ -210,12 +210,12 @@ export const updateVehicle = async (req: Request, res: Response) => {
       const uploadedImages = await uploadMultipleToCloudinary(files);
       vehicleData.images = JSON.stringify(uploadedImages.map(img => img.url));
       vehicleData.imageUrl = uploadedImages[0].url;
-      vehicleData.imagePublicIds = uploadedImages.map(img => img.publicId);
+      vehicleData.imagePublicIds = JSON.stringify(uploadedImages.map(img => img.publicId));
     } else if (!vehicleData.imageUrl && !vehicleData.images) {
       const existingVehicle = await vehicleService.getVehicleById(req.params.id);
       vehicleData.imageUrl = existingVehicle.imageUrl;
       vehicleData.images = JSON.stringify(existingVehicle.images?.length ? existingVehicle.images : [existingVehicle.imageUrl]);
-      vehicleData.imagePublicIds = existingVehicle.imagePublicIds || [];
+      vehicleData.imagePublicIds = JSON.stringify(existingVehicle.imagePublicIds || []);
     } else if (vehicleData.images && vehicleData.images.length > 0) {
       vehicleData.imageUrl = vehicleData.images[0];
     }
