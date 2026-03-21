@@ -11,6 +11,7 @@ export interface Vehicle {
   transmission: string;
   drivetrain: string;
   exteriorColor: string;
+  colour?: string;
   interiorColor: string;
   engine: string;
   vin: string;
