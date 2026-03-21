@@ -18,7 +18,7 @@ interface VehicleHeaderProps {
     vin: string;
     location?: string;
   };
-  status: 'NEW' | 'USED' | 'CERTIFIED_PRE_OWNED' | 'ON_SALE';
+  status?: string;
 }
 
 export default function VehicleHeader({ vehicle, status }: VehicleHeaderProps) {
