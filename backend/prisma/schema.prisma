@@ -75,7 +75,7 @@ model Vehicle {
   description     String
   imageUrl        String
   images          String
-  imagePublicIds  String
+  imagePublicIds  String[]
   viewCount       Int             @default(0)
   isDraft         Boolean         @default(false)
   scheduledAt     DateTime?

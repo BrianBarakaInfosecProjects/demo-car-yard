@@ -9,7 +9,7 @@ function parseVehicleImages(vehicle: any) {
   return {
     ...vehicle,
     images: vehicle.images ? JSON.parse(vehicle.images) : [],
-    imagePublicIds: vehicle.imagePublicIds ? JSON.parse(vehicle.imagePublicIds) : [],
+    imagePublicIds: vehicle.imagePublicIds || [],
   };
 }
 
@@ -152,7 +152,7 @@ export const lifecycle = {
     const vehicle = await prisma.vehicle.findUnique({ where: { id } });
     if (!vehicle) throw new Error('Vehicle not found');
 
-    const publicIds = vehicle.imagePublicIds ? JSON.parse(vehicle.imagePublicIds) : [];
+    const publicIds = vehicle.imagePublicIds || [];
     if (publicIds.length > 0) {
       try {
         await deleteMultipleFromCloudinary(publicIds);
@@ -522,7 +522,7 @@ export const createVehicle = async (input: VehicleInput, userId: string) => {
       ...inputWithoutScheduledAt,
       slug,
       images: images ? JSON.stringify(images) : '[]',
-      imagePublicIds: imagePublicIds ? JSON.stringify(imagePublicIds) : '[]',
+      imagePublicIds: imagePublicIds || [],
       isDraft: input.isDraft ?? true,
       featured: false,
       scheduledAt: scheduledAt || null,
@@ -561,7 +561,7 @@ export const updateVehicle = async (id: string, input: Partial<VehicleInput>, us
     updateData.images = images ? JSON.stringify(images) : '[]';
   }
   if (imagePublicIds !== undefined) {
-    updateData.imagePublicIds = imagePublicIds ? JSON.stringify(imagePublicIds) : '[]';
+    updateData.imagePublicIds = imagePublicIds || [];
   }
 
   const vehicle = await prisma.vehicle.update({
