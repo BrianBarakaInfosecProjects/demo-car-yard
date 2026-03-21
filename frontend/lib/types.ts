@@ -28,7 +28,6 @@ export interface Vehicle {
   publishedAt?: string;
   soldAt?: string;
   createdAt: string;
-  slug?: string;
   updatedAt: string;
 }
 

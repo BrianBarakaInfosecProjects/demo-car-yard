@@ -16,7 +16,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let vehicleUrls: MetadataRoute.Sitemap = [];
 
   try {
-    const data = await api.get('/vehicles', { limit: 500 });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
+    const data = await api.get('/vehicles', { limit: 100 }).catch(() => null);
+    clearTimeout(timeoutId);
+    
+    if (!data) {
+      return staticPages;
+    }
+    
     const vehicles = Array.isArray(data) ? data : data.vehicles || [];
 
     vehicleUrls = vehicles.map((vehicle: any) => ({
