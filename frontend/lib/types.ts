@@ -15,7 +15,7 @@ export interface Vehicle {
   engine: string;
   vin: string;
   location?: string;
-  status: 'NEW' | 'USED' | 'CERTIFIED_PRE_OWNED' | 'ON_SALE';
+  status: 'NEW' | 'USED' | 'CERTIFIED_PRE_OWNED' | 'ON_SALE' | 'SOLD' | 'RESERVED';
   featured: boolean;
   description: string;
   imageUrl: string;
@@ -25,6 +25,7 @@ export interface Vehicle {
   isDraft?: boolean;
   scheduledAt?: string;
   publishedAt?: string;
+  soldAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,7 +34,7 @@ export interface User {
   id: string;
   email: string;
   name?: string;
-  role: 'ADMIN' | 'STAFF';
+  role: 'ADMIN' | 'STAFF' | 'CUSTOMER';
   createdAt: string;
   updatedAt: string;
 }
@@ -45,32 +46,20 @@ export interface Inquiry {
   phone: string;
   message: string;
   vehicleId?: string;
-  vehicle?: {
-    make: string;
-    model: string;
-    year: number;
-    priceKES: number;
-  };
-  userId?: string;
-  user?: {
-    name: string;
-    email: string;
-  };
-  status: string;
+  status: 'NEW' | 'PENDING' | 'RESOLVED' | 'CLOSED';
   createdAt: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
 }
 
 export interface VehicleFilter {
   make?: string;
-  bodyType?: Vehicle['bodyType'];
-  fuelType?: Vehicle['fuelType'];
-  priceMin?: number;
-  priceMax?: number;
-  sortBy?: 'default' | 'price-low' | 'price-high' | 'year-new' | 'year-old' | 'brand';
+  model?: string;
+  yearFrom?: number;
+  yearTo?: number;
+  priceFrom?: number;
+  priceTo?: number;
+  bodyType?: string;
+  fuelType?: string;
+  transmission?: string;
   featured?: boolean;
+  status?: string;
 }
